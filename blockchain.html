@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockcha-in | Ghostwriting Ejecutivo por Digital Atelier</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                        'raleway': ['Raleway', 'sans-serif'],
+                        'barlow': ['Barlow', 'sans-serif'],
+                    },
+                    colors: {
+                        'das-dark': '#0f1115',
+                        'das-light': '#f8f9fa',
+                        'das-accent': '#C5A059', /* Oro apagado para detalles premium */
+                        'das-border': 'rgba(0,0,0,0.06)'
+                    },
+                    backgroundImage: {
+                        'noise': "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E\")",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .btn {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .technical {
+            font-family: 'Barlow', sans-serif;
+        }
+
+        /* Efecto sutil de brillo en botones premium */
+        .premium-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .premium-btn:hover::after {
+            left: 100%;
+        }
+
+        /* Clases para animaciones de scroll (Igual que index.html) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-100 {
+            transition-delay: 100ms;
+        }
+
+        .delay-200 {
+            transition-delay: 200ms;
+        }
+
+        .delay-300 {
+            transition-delay: 300ms;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-das-light text-das-dark antialiased relative selection:bg-das-dark selection:text-white overflow-x-hidden">
+
+    <!-- Textura -->
+    <div class="fixed inset-0 w-full h-full pointer-events-none z-50 bg-noise mix-blend-multiply opacity-60"></div>
+
+    <!-- BARRA DE ESCASEZ (SCARCITY TRIGGER) -->
+    <div
+        class="bg-das-dark text-white text-[10px] md:text-xs font-bold tracking-widest uppercase py-2 text-center border-b border-white/10 relative z-50">
+        <span class="inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-das-accent animate-pulse"></span>
+            Estado Actual: Solo 2 plazas disponibles para Q2 2025
+        </span>
+    </div>
+
+    <!-- NAVBAR SIMPLE -->
+    <nav class="fixed w-full z-40 top-8 bg-das-light/90 backdrop-blur-md border-b border-das-border transition-all">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex justify-between items-center">
+            <a href="index.html"
+                class="flex items-center gap-2 group text-gray-500 hover:text-das-dark transition-colors">
+                <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+                <span class="font-barlow text-xs tracking-[0.2em] uppercase">Digital Atelier</span>
+            </a>
+            <div class="flex items-center gap-3">
+                <span class="font-poppins font-bold text-lg tracking-tight">Blockcha-in</span>
+                <span
+                    class="text-[10px] border border-das-dark px-2 py-0.5 rounded-sm uppercase tracking-wide font-bold">Private
+                    Service</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION (AUTHORITY & URGENCY) -->
+    <header class="pt-40 pb-20 px-6">
+        <div class="max-w-3xl mx-auto text-center reveal">
+
+            <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-8">
+                Tu reputación no escala. <br>
+                <span class="text-gray-400">Tu presencia digital, sí.</span>
+            </h1>
+
+            <p class="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
+                El único servicio de Ghostwriting Ejecutivo diseñado para quienes entienden que en Web3, <strong>el
+                    silencio es el activo más caro</strong>.
+                <br><br>
+                <span class="text-sm font-medium text-das-dark/80 bg-gray-200/50 px-2 py-1 rounded">No delego. No tengo
+                    juniors. Por eso hay lista de espera.</span>
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#" onclick="openModal(event)"
+                    class="premium-btn inline-block bg-das-dark text-white px-8 py-4 font-poppins font-semibold text-sm tracking-wide uppercase rounded-sm shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
+                    Aplicar para Acceso
+                </a>
+                <span
+                    class="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 sm:hidden">
+                    <i data-lucide="lock" class="w-3 h-3"></i> Plazas limitadas
+                </span>
+            </div>
+
+            <p class="mt-6 text-xs text-gray-400 font-medium">
+                *Proceso de selección activo. Solo perfiles cualificados.
+            </p>
+        </div>
+    </header>
+
+    <!-- THE PAIN (AGITATION) -->
+    <section class="py-20 px-6 bg-white border-y border-das-border">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6 reveal">
+                    <h2 class="text-2xl font-bold font-poppins">Tu competencia está ocupando el vacío que dejas.</h2>
+                    <p class="text-gray-600">Mientras tú cierras acuerdos en privado, otros con la mitad de tu
+                        experiencia están construyendo la autoridad pública que te corresponde.</p>
+
+                    <div class="space-y-4 pt-4">
+                        <div class="flex gap-4 items-start">
+                            <div class="bg-red-50 p-2 rounded text-red-900"><i data-lucide="x-circle"
+                                    class="w-5 h-5"></i></div>
+                            <div>
+                                <h4 class="font-bold text-sm">El coste de oportunidad</h4>
+                                <p class="text-xs text-gray-500">Inversores y reguladores buscan voces autorizadas en
+                                    LinkedIn. Si no estás, asumen que no tienes opinión.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start">
+                            <div class="bg-red-50 p-2 rounded text-red-900"><i data-lucide="alert-octagon"
+                                    class="w-5 h-5"></i></div>
+                            <div>
+                                <h4 class="font-bold text-sm">El riesgo de delegar mal</h4>
+                                <p class="text-xs text-gray-500">Dejar tu marca personal a una agencia generalista es un
+                                    riesgo de reputación que no puedes permitirte.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-8 border border-gray-100 rounded-sm relative reveal delay-200">
+                    <div
+                        class="absolute -top-3 -right-3 bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest transform rotate-2 shadow-lg">
+                        La Realidad</div>
+                    <blockquote class="font-raleway text-lg italic leading-relaxed text-gray-700">
+                        "Víctor, sé que debo publicar. Pero entre el board, Compliance y la operativa diaria, LinkedIn
+                        siempre queda para mañana. Y ese 'mañana' nunca llega."
+                    </blockquote>
+                    <div class="mt-6 flex items-center gap-3 opacity-60">
+                        <div class="w-8 h-8 rounded-full bg-gray-300"></div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">CEO Fintech (Cliente
+                            actual)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- THE BOUTIQUE DIFFERENCE (AUTHORITY) -->
+    <section class="py-24 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="md:w-1/2 reveal">
+                    <span class="text-das-accent font-bold tracking-widest uppercase text-xs mb-2 block">El enfoque
+                        Boutique</span>
+                    <h2 class="text-3xl font-bold mb-6">No es una agencia.<br>Es una alianza estratégica.</h2>
+                    <div class="prose text-gray-600 font-raleway space-y-4">
+                        <p>Las agencias escalan contratando juniors. Yo escalo seleccionando mejores clientes. Esa
+                            diferencia lo cambia todo.</p>
+                        <p><strong>Soy Víctor Ribes.</strong> No hay account managers, no hay teléfono roto. Tú hablas
+                            conmigo, yo escribo para ti.</p>
+                        <p>Entiendo la diferencia entre PoS y PoW. Sé por qué MiCA cambia las reglas del juego. No
+                            necesito que me expliques tu industria.</p>
+                    </div>
+                </div>
+
+                <!-- Comparison Table -->
+                <div
+                    class="md:w-1/2 w-full bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden reveal delay-200">
+                    <div
+                        class="grid grid-cols-2 text-center text-xs font-bold uppercase tracking-widest border-b border-gray-100 bg-gray-50">
+                        <div class="py-3 text-gray-400">Agencia Tradicional</div>
+                        <div class="py-3 bg-das-dark text-white">Digital Atelier</div>
+                    </div>
+                    <div class="divide-y divide-gray-100 text-sm">
+                        <div class="grid grid-cols-2 p-4">
+                            <div class="text-gray-500">Escribe un Junior/IA</div>
+                            <div class="font-bold text-das-dark">Escribe Víctor Ribes</div>
+                        </div>
+                        <div class="grid grid-cols-2 p-4">
+                            <div class="text-gray-500">Objetivo: Volumen</div>
+                            <div class="font-bold text-das-dark">Objetivo: Autoridad</div>
+                        </div>
+                        <div class="grid grid-cols-2 p-4">
+                            <div class="text-gray-500">Riesgo reputacional</div>
+                            <div class="font-bold text-das-dark">Compliance-First</div>
+                        </div>
+                        <div class="grid grid-cols-2 p-4">
+                            <div class="text-gray-500">Tono genérico</div>
+                            <div class="font-bold text-das-dark">Tu voz exacta</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- THE METHOD (PROCESS) -->
+    <section class="py-24 px-6 bg-das-dark text-white relative overflow-hidden">
+        <div
+            class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]">
+        </div>
+
+        <div class="max-w-5xl mx-auto relative z-10">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl font-bold">Máximo impacto. Mínima fricción.</h2>
+                <p class="text-gray-400 mt-4 max-w-xl mx-auto">
+                    Tu tiempo vale más que el dinero. He diseñado un proceso que solo requiere 60 minutos de tu mes para
+                    generar 30 días de presencia ejecutiva.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 text-center md:text-left">
+                <!-- Step 1 -->
+                <div
+                    class="p-6 border border-white/10 bg-white/5 rounded-sm hover:border-das-accent/50 transition-colors group reveal delay-100">
+                    <div class="text-4xl font-bold text-white/10 group-hover:text-das-accent transition-colors mb-4">01
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Voiceboard™</h3>
+                    <p class="text-sm text-gray-400">Capturo tu tono y pensamiento estratégico en una sesión de
+                        onboarding. Sin cuestionarios infinitos.</p>
+                </div>
+                <!-- Step 2 -->
+                <div
+                    class="p-6 border border-white/10 bg-white/5 rounded-sm hover:border-das-accent/50 transition-colors group reveal delay-200">
+                    <div class="text-4xl font-bold text-white/10 group-hover:text-das-accent transition-colors mb-4">02
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Ghostwriting</h3>
+                    <p class="text-sm text-gray-400">Transformo tus ideas en narrativas de negocio. Uso frameworks
+                        persuasivos adaptados a B2B institucional.</p>
+                </div>
+                <!-- Step 3 -->
+                <div
+                    class="p-6 border border-white/10 bg-white/5 rounded-sm hover:border-das-accent/50 transition-colors group reveal delay-300">
+                    <div class="text-4xl font-bold text-white/10 group-hover:text-das-accent transition-colors mb-4">03
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Aprobación</h3>
+                    <p class="text-sm text-gray-400">Revisas en Notion. Un clic para aprobar. Yo me encargo de publicar,
+                        comentar y medir.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING TIERS (ANCHORING & SCARCITY) -->
+    <section id="pricing" class="py-24 px-6 bg-gray-50">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 reveal">
+                <div>
+                    <h2 class="text-3xl font-bold">Membresías Trimestrales</h2>
+                    <p class="text-gray-600 mt-2">Trabajo artesanal. Calidad sobre volumen. Plazas estrictamente
+                        limitadas.</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <span
+                        class="inline-flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-bold uppercase tracking-widest text-das-dark">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span> Abierto para Q2
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- SEED -->
+                <div
+                    class="bg-white p-8 border border-gray-200 rounded-sm opacity-75 hover:opacity-100 transition-opacity reveal delay-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-bold text-xl font-poppins text-gray-500">SEED</h3>
+                    </div>
+                    <div class="mb-6">
+                        <span class="text-3xl font-bold">$500</span><span class="text-sm text-gray-400">/mes</span>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-600 mb-8">
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-das-dark"></i> Presencia
+                            mínima viable</li>
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-das-dark"></i> 2-3 posts
+                            semanales</li>
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-das-dark"></i> Auditoría
+                            básica</li>
+                    </ul>
+                    <a href="#" onclick="openModal(event)"
+                        class="block text-center border border-gray-300 text-gray-600 py-3 text-xs font-bold uppercase tracking-widest hover:border-das-dark hover:text-das-dark transition-colors">Solicitar</a>
+                </div>
+
+                <!-- GROWTH (MAIN) -->
+                <div
+                    class="bg-white p-8 border-2 border-das-dark rounded-sm shadow-xl relative transform scale-105 z-10 reveal delay-200">
+                    <div
+                        class="absolute top-0 inset-x-0 bg-das-dark text-white text-[10px] font-bold uppercase tracking-widest text-center py-1">
+                        Opción Recomendada</div>
+                    <div class="flex justify-between items-start mb-4 mt-2">
+                        <h3 class="font-bold text-xl font-poppins">GROWTH</h3>
+                        <i data-lucide="trending-up" class="w-5 h-5 text-das-dark"></i>
+                    </div>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">$900</span><span class="text-sm text-gray-400">/mes</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-6 pb-6 border-b border-gray-100">
+                        Para ejecutivos que quieren liderar la conversación en su nicho.
+                    </p>
+                    <ul class="space-y-3 text-sm text-das-dark mb-8 font-medium">
+                        <li class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4"></i> <strong>3-4 posts
+                                semanales</strong></li>
+                        <li class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4"></i> Gestión de comentarios
+                            (Growth Hacking)</li>
+                        <li class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4"></i> Optimización mensual
+                        </li>
+                        <li class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4"></i> Soporte prioritario
+                        </li>
+                    </ul>
+                    <a href="#" onclick="openModal(event)"
+                        class="block text-center bg-das-dark text-white py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">Aplicar
+                        ahora</a>
+                </div>
+
+                <!-- AUTHORITY (WAITLIST) -->
+                <div class="bg-gray-50 p-8 border border-gray-200 rounded-sm relative overflow-hidden reveal delay-300">
+                    <div
+                        class="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center text-center p-6">
+                        <span
+                            class="bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest mb-2">Lista
+                            de Espera</span>
+                        <p class="text-xs text-gray-600 font-medium">Actualmente al máximo de capacidad para este nivel.
+                        </p>
+                        <a href="#" onclick="openModal(event)"
+                            class="mt-4 underline text-xs font-bold text-das-dark">Unirme a la lista</a>
+                    </div>
+
+                    <div class="flex justify-between items-start mb-4 opacity-50">
+                        <h3 class="font-bold text-xl font-poppins">AUTHORITY</h3>
+                        <i data-lucide="crown" class="w-5 h-5 text-gray-400"></i>
+                    </div>
+                    <div class="mb-6 opacity-50">
+                        <span class="text-3xl font-bold">$1,500</span><span class="text-sm text-gray-400">/mes</span>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-500 mb-8 opacity-50">
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4"></i> Full C-Suite Service</li>
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4"></i> 5-6 posts semanales</li>
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4"></i> PR & Media Relations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA (APPLICATION) -->
+    <section id="auditoria" class="py-24 px-6 bg-das-dark text-white text-center relative overflow-hidden">
+        <div class="max-w-2xl mx-auto relative z-10 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">No contrates un servicio.<br>Aplica a una vacante.</h2>
+            <p class="text-gray-400 mb-10 text-lg">
+                Para garantizar la calidad de mi trabajo, mantengo un límite estricto de clientes activos. El primer
+                paso es una auditoría ejecutiva de 30 min para ver si encajamos.
+            </p>
+
+            <div class="bg-white/5 border border-white/10 p-8 rounded-sm max-w-lg mx-auto mb-8 text-left">
+                <h4 class="font-bold text-sm uppercase tracking-widest mb-4 border-b border-white/10 pb-2">Tu aplicación
+                    incluye:</h4>
+                <ul class="space-y-3 text-sm text-gray-300">
+                    <li class="flex gap-3"><i data-lucide="search" class="w-4 h-4 text-das-accent"></i> Auditoría de tu
+                        perfil actual (Riesgos/Oportunidades)</li>
+                    <li class="flex gap-3"><i data-lucide="target" class="w-4 h-4 text-das-accent"></i> Estrategia de
+                        posicionamiento preliminar</li>
+                    <li class="flex gap-3"><i data-lucide="message-square" class="w-4 h-4 text-das-accent"></i>
+                        Validación de tono y química de trabajo</li>
+                </ul>
+            </div>
+
+            <a href="#" onclick="openModal(event)"
+                class="premium-btn inline-flex items-center gap-3 bg-white text-das-dark px-10 py-5 font-bold rounded-sm hover:bg-gray-100 transition-colors shadow-2xl">
+                <span>Solicitar Entrevista de Acceso</span>
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </a>
+
+            <p class="mt-6 text-[10px] text-gray-500 uppercase tracking-widest">
+                Sin compromiso. Si no encajamos, te lo diré honestamente.
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer
+        class="py-12 px-6 bg-[#0a0c0f] border-t border-white/5 text-gray-600 text-xs flex flex-col md:flex-row justify-between items-center max-w-6xl mx-auto">
+        <p>© 2025 Digital Atelier Solutions. Todos los derechos reservados.</p>
+        <div class="flex gap-6 mt-4 md:mt-0">
+            <a href="#" class="hover:text-gray-400">Privacidad</a>
+            <a href="#" class="hover:text-gray-400">Términos</a>
+            <a href="https://linkedin.com" class="hover:text-white transition-colors"><i data-lucide="linkedin"
+                    class="w-4 h-4"></i></a>
+        </div>
+    </footer>
+
+    <!-- AUDIT MODAL (Reused) -->
+    <div id="audit-modal" class="fixed inset-0 z-[60] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-das-dark/80 backdrop-blur-sm transition-opacity opacity-0" id="modal-backdrop">
+        </div>
+
+        <!-- Modal Content -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto">
+            <div class="bg-white w-full max-w-lg rounded-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300 relative"
+                id="modal-content">
+                <!-- Close Button -->
+                <button id="close-modal"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-das-dark transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+
+                <div class="p-8 md:p-10">
+                    <div class="text-center mb-8">
+                        <h3 class="font-poppins font-bold text-2xl mb-2">Solicitar Acceso</h3>
+                        <p class="text-sm text-gray-500">Aplica para una de las plazas disponibles en Blockcha-in.</p>
+                    </div>
+
+                    <form action="mailto:info@digitalateliersolutions.agency" method="post" enctype="text/plain"
+                        class="space-y-5">
+                        <input type="hidden" name="subject" value="Aplicación Blockcha-in - DAS">
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Nombre
+                                Completo</label>
+                            <input type="text" name="nombre" required
+                                class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white"
+                                placeholder="Tu nombre">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Email
+                                Corporativo</label>
+                            <input type="email" name="email" required
+                                class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white"
+                                placeholder="nombre@empresa.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Perfil de
+                                LinkedIn</label>
+                            <input type="text" name="linkedin" required
+                                class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white"
+                                placeholder="linkedin.com/in/tu-perfil">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Objetivo
+                                Principal</label>
+                            <div class="relative">
+                                <select name="objetivo"
+                                    class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white appearance-none cursor-pointer">
+                                    <option value="Autoridad">Construir Autoridad</option>
+                                    <option value="Deal Flow">Generar Deal Flow</option>
+                                    <option value="Talento">Atraer Talento</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <i data-lucide="chevron-down"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-das-dark text-white font-poppins font-bold py-4 text-sm uppercase tracking-wider hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            Enviar Aplicación
+                        </button>
+
+                        <p class="text-[10px] text-center text-gray-400 mt-4">
+                            Al enviar, se abrirá tu cliente de correo predeterminado.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Scroll Reveal Animation
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('audit-modal');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalContent = document.getElementById('modal-content');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        function openModal(e) {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalBackdrop.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modalBackdrop.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+
+</html>

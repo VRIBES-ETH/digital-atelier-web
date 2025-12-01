@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Atelier Solutions | Comunicación Web3 Institucional</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Poppins, Raleway, Barlow -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Poppins:wght@400;500;600;700&family=Raleway:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Configuración Tailwind Personalizada -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                        'raleway': ['Raleway', 'sans-serif'],
+                        'barlow': ['Barlow', 'sans-serif'],
+                    },
+                    colors: {
+                        'das-dark': '#0f1115',      /* Negro casi puro del deck */
+                        'das-light': '#f8f9fa',     /* Gris aún más claro y limpio */
+                        'das-accent': '#e67e22',    /* Toque naranja sutil */
+                        'das-border': 'rgba(0,0,0,0.06)'
+                    },
+                    backgroundImage: {
+                        'noise': "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E\")",
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .btn {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .technical {
+            font-family: 'Barlow', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        /* Clases para animaciones de scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Retrasos escalonados */
+        .delay-100 {
+            transition-delay: 100ms;
+        }
+
+        .delay-200 {
+            transition-delay: 200ms;
+        }
+
+        .delay-300 {
+            transition-delay: 300ms;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-das-light text-das-dark antialiased relative selection:bg-das-dark selection:text-white overflow-x-hidden">
+
+    <!-- Textura de fondo global -->
+    <div class="fixed inset-0 w-full h-full pointer-events-none z-50 bg-noise mix-blend-multiply opacity-60"></div>
+
+    <!-- NAVBAR -->
+    <nav id="navbar"
+        class="fixed w-full z-40 top-0 transition-all duration-300 bg-das-light/80 backdrop-blur-md border-b border-das-border">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="flex flex-col leading-none group z-50 relative">
+                <span
+                    class="font-poppins font-bold text-xl tracking-tighter group-hover:opacity-70 transition-opacity">DIGITAL
+                    ATELIER</span>
+                <span class="font-barlow text-[10px] tracking-[0.2em] text-gray-500 uppercase">Solutions</span>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div
+                class="hidden md:flex items-center gap-8 font-barlow font-medium text-xs tracking-[0.15em] uppercase text-gray-600">
+                <a href="#expertise" class="hover:text-das-dark transition-colors relative group">
+                    Expertise
+                    <span
+                        class="absolute -bottom-1 left-0 w-0 h-px bg-das-dark transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#servicios" class="hover:text-das-dark transition-colors relative group">
+                    Servicios
+                    <span
+                        class="absolute -bottom-1 left-0 w-0 h-px bg-das-dark transition-all group-hover:w-full"></span>
+                </a>
+                <a href="blockchain.html" class="hover:text-das-dark transition-colors relative group">
+                    Blockcha-in
+                    <span
+                        class="absolute -bottom-1 left-0 w-0 h-px bg-das-dark transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#proceso" class="hover:text-das-dark transition-colors relative group">
+                    Proceso
+                    <span
+                        class="absolute -bottom-1 left-0 w-0 h-px bg-das-dark transition-all group-hover:w-full"></span>
+                </a>
+                <a href="mailto:info@digitalateliersolutions.agency"
+                    class="bg-das-dark text-white px-6 py-2.5 rounded-sm hover:bg-gray-800 transition-all hover:shadow-lg transform hover:-translate-y-0.5 duration-300">
+                    Contacto
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 text-das-dark z-50 relative">
+                <i data-lucide="menu" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu"
+            class="fixed inset-0 bg-das-light z-40 flex flex-col justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="flex flex-col gap-8 text-center font-poppins text-2xl font-bold">
+                <a href="#expertise" class="mobile-link hover:text-gray-500 transition-colors">Expertise</a>
+                <a href="#servicios" class="mobile-link hover:text-gray-500 transition-colors">Servicios</a>
+                <a href="#blockcha-in" class="mobile-link hover:text-gray-500 transition-colors">Blockcha-in</a>
+                <a href="#proceso" class="mobile-link hover:text-gray-500 transition-colors">Proceso</a>
+                <a href="mailto:info@digitalateliersolutions.agency"
+                    class="mt-4 bg-das-dark text-white px-8 py-3 rounded-sm">Contacto</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+            <div class="reveal">
+                <div
+                    class="technical text-xs font-bold tracking-[0.2em] uppercase text-gray-500 mb-6 border-l-2 border-das-dark pl-3">
+                    Agencia Boutique Copywriting & Ghostwriting
+                </div>
+                <h1 class="text-5xl lg:text-7xl font-bold leading-[1.1] mb-8 tracking-tight">
+                    Textos claros para <br>
+                    <span class="text-gray-400">proyectos serios.</span>
+                </h1>
+                <p class="text-lg lg:text-xl text-gray-600 max-w-lg mb-10 leading-relaxed font-raleway">
+                    No hacemos marketing crypto genérico. Escribimos para proyectos que buscan capital institucional,
+                    aprobaciones regulatorias y partnerships estratégicos.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#" onclick="openModal(event)"
+                        class="btn px-8 py-4 bg-das-dark text-white text-sm font-semibold tracking-wide uppercase hover:bg-gray-800 transition-all shadow-xl shadow-gray-200 hover:shadow-2xl hover:-translate-y-1">
+                        Auditoría de Comunicación
+                    </a>
+                    <a href="#servicios"
+                        class="btn px-8 py-4 bg-white border border-gray-200 text-das-dark text-sm font-semibold tracking-wide uppercase hover:bg-gray-50 transition-all hover:border-gray-400">
+                        Ver Servicios
+                    </a>
+                </div>
+            </div>
+
+            <!-- Abstract Visual -->
+            <div class="relative hidden lg:block h-full min-h-[500px] reveal delay-200">
+                <!-- Animated Background Blob -->
+                <div
+                    class="absolute right-0 top-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-gradient-to-tr from-gray-200 via-gray-100 to-transparent rounded-full opacity-60 blur-3xl animate-pulse-slow">
+                </div>
+
+                <!-- Floating Glass Card -->
+                <div class="relative z-10 glass-panel p-10 rounded-sm max-w-md ml-auto animate-float">
+                    <div class="space-y-8">
+                        <div class="flex gap-5 items-start border-b border-gray-100/50 pb-6">
+                            <div
+                                class="w-10 h-10 bg-das-dark flex items-center justify-center text-white rounded-full shrink-0 shadow-lg">
+                                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-poppins font-bold text-base">Compliance First</h3>
+                                <p class="text-sm text-gray-500 mt-1 leading-relaxed">Cero riesgo regulatorio.
+                                    Terminología validada para mercados regulados (MiCA, SEC).</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-5 items-start border-b border-gray-100/50 pb-6">
+                            <div
+                                class="w-10 h-10 bg-white border border-gray-200 flex items-center justify-center text-das-dark rounded-full shrink-0 shadow-sm">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-poppins font-bold text-base">Claridad, no tecnicismos</h3>
+                                <p class="text-sm text-gray-500 mt-1 leading-relaxed">Si un CFO tradicional no lo
+                                    entiende, lo reescribimos hasta que lo haga.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-5 items-start">
+                            <div
+                                class="w-10 h-10 bg-white border border-gray-200 flex items-center justify-center text-das-dark rounded-full shrink-0 shadow-sm">
+                                <i data-lucide="award" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-poppins font-bold text-base">Expertise Real</h3>
+                                <p class="text-sm text-gray-500 mt-1 leading-relaxed">+8 años en el sector. Sin juniors.
+                                    Sin IA generativa sin supervisión.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SERVICIOS -->
+    <section id="servicios" class="py-32 px-6 bg-gray-50/50">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 reveal">
+                <span class="technical text-xs font-bold tracking-widest uppercase text-gray-500">Nuestros
+                    Servicios</span>
+                <h2 class="font-poppins font-bold text-4xl md:text-5xl mt-4 max-w-2xl leading-tight">Qué hacemos en el
+                    Atelier</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div
+                    class="group bg-white p-10 border border-gray-100 hover:border-gray-200 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-2 reveal delay-100">
+                    <div
+                        class="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mb-8 group-hover:bg-das-dark group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="feather" class="w-6 h-6 stroke-1"></i>
+                    </div>
+                    <h3 class="font-poppins font-bold text-2xl mb-4">Copywriting &<br>Storytelling</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-8">
+                        Webs, whitepapers y landings con estándar institucional. ¿Lo entiende un inversor tradicional?
+                        ¿Pasa revisión legal? Si la respuesta es no, nosotros lo arreglamos.
+                    </p>
+                    <ul class="text-xs space-y-3 text-gray-500 font-medium">
+                        <li class="flex items-center gap-3">
+                            <div class="w-1.5 h-1.5 bg-das-dark rounded-full"></div>Whitepapers Técnicos
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-1.5 h-1.5 bg-das-dark rounded-full"></div>Web Copy Institucional
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Card 2 -->
+                <div
+                    class="group bg-white p-10 border border-gray-100 hover:border-gray-200 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-2 reveal delay-200">
+                    <div
+                        class="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mb-8 group-hover:bg-das-dark group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="presentation" class="w-6 h-6 stroke-1"></i>
+                    </div>
+                    <h3 class="font-poppins font-bold text-2xl mb-4">Pitch Decks &<br>Research</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-8">
+                        Transformamos análisis técnico en narrativa de inversión. Traducimos métricas on-chain a
+                        lenguaje financiero que convence a los fondos.
+                    </p>
+                    <ul class="text-xs space-y-3 text-gray-500 font-medium">
+                        <li class="flex items-center gap-3">
+                            <div class="w-1.5 h-1.5 bg-das-dark rounded-full"></div>Narrativa de Inversión
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-1.5 h-1.5 bg-das-dark rounded-full"></div>Investor Decks
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Card 3 -->
+                <div
+                    class="group bg-white p-10 border border-gray-100 hover:border-gray-200 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-2 reveal delay-300">
+                    <div
+                        class="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mb-8 group-hover:bg-das-dark group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="message-square" class="w-6 h-6 stroke-1"></i>
+                    </div>
+                    <h3 class="font-poppins font-bold text-2xl mb-4">Consultoría &<br>Messaging</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-8">
+                        Definimos qué dices, cómo lo dices y dónde lo amplificas. Unificación de mensaje para que CEO,
+                        equipo y marca hablen el mismo idioma.
+                    </p>
+                    <ul class="text-xs space-y-3 text-gray-500 font-medium">
+                        <li class="flex items-center gap-3">
+                            <div class="w-1.5 h-1.5 bg-das-dark rounded-full"></div>Identidad Verbal
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-1.5 h-1.5 bg-das-dark rounded-full"></div>Estrategia PR
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOCKCHA-IN DARK SECTION -->
+    <section id="blockcha-in" class="py-32 px-6 bg-das-dark text-white relative overflow-hidden">
+        <!-- Grid Pattern Overlay -->
+        <div
+            class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]">
+        </div>
+
+        <!-- Glow Effect -->
+        <div
+            class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[100px] pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8 reveal">
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="font-poppins font-bold text-2xl tracking-tighter">Blockcha-in</span>
+                        <span
+                            class="text-[10px] bg-white text-black px-2 py-0.5 rounded font-bold uppercase tracking-wide">Producto
+                            DAS</span>
+                    </div>
+                    <h2 class="font-poppins font-bold text-4xl lg:text-5xl leading-tight">
+                        Ghostwriting Ejecutivo<br>para Líderes Web3.
+                    </h2>
+                </div>
+                <p class="text-gray-400 max-w-md text-base leading-relaxed">
+                    Tu agenda está llena. LinkedIn no es prioridad. Pero el mercado espera verte activo. Construimos tu
+                    autoridad sin que escribas una sola palabra.
+                </p>
+            </div>
+
+            <!-- Pricing / Plans Grid -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Plan Seed -->
+                <div
+                    class="border border-white/10 p-8 bg-white/5 hover:bg-white/10 transition-colors rounded-sm reveal delay-100">
+                    <span class="technical text-xs font-bold text-gray-400 tracking-widest uppercase">Seed Plan</span>
+                    <div class="mt-6 mb-2 flex items-baseline gap-1">
+                        <span class="text-4xl font-bold font-poppins">$500</span>
+                        <span class="text-sm text-gray-500">/mes</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-8 border-b border-white/10 pb-6">Inicio sólido para perfiles que
+                        arrancan.</p>
+                    <ul class="space-y-4 text-sm text-gray-300">
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-white"></i> 8-10 posts/mes
+                        </li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-white"></i> Enfoque personal
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Plan Growth -->
+                <div
+                    class="border border-white/20 p-8 bg-white/10 relative rounded-sm transform md:-translate-y-4 shadow-2xl shadow-black/50 reveal delay-200">
+                    <div
+                        class="absolute top-0 right-0 bg-white text-black text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
+                        Popular</div>
+                    <span class="technical text-xs font-bold text-white tracking-widest uppercase">Growth Plan</span>
+                    <div class="mt-6 mb-2 flex items-baseline gap-1">
+                        <span class="text-4xl font-bold font-poppins">$900</span>
+                        <span class="text-sm text-gray-400">/mes</span>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-8 border-b border-white/10 pb-6">Autoridad visible y constante.
+                    </p>
+                    <ul class="space-y-4 text-sm text-gray-200">
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-white"></i> 12-14 posts/mes
+                        </li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-white"></i> Análisis de sector
+                        </li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-white"></i> Optimización
+                            perfil</li>
+                    </ul>
+                </div>
+
+                <!-- Plan Authority -->
+                <div
+                    class="border border-white/10 p-8 bg-white/5 hover:bg-white/10 transition-colors rounded-sm reveal delay-300">
+                    <span class="technical text-xs font-bold text-gray-400 tracking-widest uppercase">Authority
+                        Plan</span>
+                    <div class="mt-6 mb-2 flex items-baseline gap-1">
+                        <span class="text-4xl font-bold font-poppins">$1,500</span>
+                        <span class="text-sm text-gray-500">/mes</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-8 border-b border-white/10 pb-6">Posicionamiento C-Suite total.
+                    </p>
+                    <ul class="space-y-4 text-sm text-gray-300">
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-white"></i> 20-22 posts/mes
+                        </li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-white"></i> Engagement
+                            estratégico</li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-white"></i> Lead generation
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-16 text-center reveal">
+                <a href="mailto:victor@digitalateliersolutions.agency"
+                    class="inline-flex items-center gap-2 text-sm font-medium hover:text-gray-300 transition-colors border-b border-white pb-1 group">
+                    Solicitar disponibilidad Blockcha-in <i data-lucide="arrow-right"
+                        class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROCESO -->
+    <section id="proceso" class="py-32 px-6 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 text-center reveal">
+                <h2 class="font-poppins font-bold text-3xl md:text-4xl">Proceso de Trabajo</h2>
+                <p class="text-gray-500 mt-3">Sin rondas infinitas. Sin intermediarios.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 relative">
+                <!-- Line connector for desktop -->
+                <div class="hidden md:block absolute top-8 left-0 w-full h-[1px] bg-gray-100 -z-10"></div>
+
+                <!-- Step 1 -->
+                <div class="relative bg-white pt-4 md:pt-0 reveal delay-100">
+                    <div
+                        class="w-16 h-16 bg-das-dark text-white flex items-center justify-center text-xl font-bold font-barlow mb-6 rounded-sm shadow-xl shadow-gray-200">
+                        01</div>
+                    <h3 class="font-bold font-poppins text-lg mb-3">Análisis</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Entendemos tu tecnología y dónde falla tu
+                        comunicación actual.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="relative bg-white pt-4 md:pt-0 reveal delay-200">
+                    <div
+                        class="w-16 h-16 bg-white border border-gray-200 text-das-dark flex items-center justify-center text-xl font-bold font-barlow mb-6 rounded-sm">
+                        02</div>
+                    <h3 class="font-bold font-poppins text-lg mb-3">Estrategia</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Definimos mensajes clave y términos a evitar por
+                        riesgo regulatorio.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="relative bg-white pt-4 md:pt-0 reveal delay-300">
+                    <div
+                        class="w-16 h-16 bg-white border border-gray-200 text-das-dark flex items-center justify-center text-xl font-bold font-barlow mb-6 rounded-sm">
+                        03</div>
+                    <h3 class="font-bold font-poppins text-lg mb-3">Producción</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Escritura compliance-first. Eliminamos jerga.
+                        Validamos contigo.</p>
+                </div>
+                <!-- Step 4 -->
+                <div class="relative bg-white pt-4 md:pt-0 reveal delay-100">
+                    <!-- delay reset for mobile feel or just visual -->
+                    <div
+                        class="w-16 h-16 bg-white border border-gray-200 text-das-dark flex items-center justify-center text-xl font-bold font-barlow mb-6 rounded-sm">
+                        04</div>
+                    <h3 class="font-bold font-poppins text-lg mb-3">Entrega</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Textos listos para publicar. Directo al grano.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT FOUNDER -->
+    <section class="py-32 px-6 bg-gray-50/30">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-16 reveal">
+            <div
+                class="w-40 h-40 md:w-56 md:h-56 bg-gray-200 rounded-full overflow-hidden shrink-0 grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl">
+                <!-- Placeholder for Founder Image -->
+                <img src="https://ui-avatars.com/api/?name=Victor+Ribes&background=0f1115&color=fff&size=300"
+                    alt="Victor Ribes" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 text-center md:text-left">
+                <blockquote class="text-xl md:text-2xl font-poppins font-medium text-das-dark mb-8 leading-relaxed">
+                    "Trabajo solo. Sin equipo junior. Sin intermediarios. Sin plantillas. Tú hablas conmigo, yo escribo
+                    para ti."
+                </blockquote>
+                <div>
+                    <h4 class="font-bold font-poppins text-lg">Víctor Ribes</h4>
+                    <p class="text-xs text-gray-500 font-barlow tracking-[0.2em] uppercase mt-1">Fundador Digital
+                        Atelier Solutions</p>
+                    <p class="text-sm text-gray-600 mt-6 leading-relaxed max-w-lg">
+                        Activo en el ecosistema desde 2016. Liderando una newsletter leída por +600 C-Levels. Elevando
+                        la comunicación blockchain al nivel institucional.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER / CONTACT -->
+    <footer id="contacto" class="bg-das-dark text-white py-24 px-6 border-t border-white/10">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16">
+            <div class="reveal">
+                <h2 class="font-poppins font-bold text-3xl mb-6">¿Empezamos?</h2>
+                <p class="text-gray-400 mb-8 max-w-sm leading-relaxed">
+                    Buscamos proyectos serios que quieran comunicar con rigor. Si ese eres tú, hablemos.
+                </p>
+                <a href="mailto:info@digitalateliersolutions.agency"
+                    class="text-xl md:text-2xl font-bold underline decoration-1 underline-offset-8 hover:text-gray-300 transition-colors">
+                    info@digitalateliersolutions.agency
+                </a>
+            </div>
+            <div class="flex flex-col md:items-end justify-between reveal delay-100">
+                <div class="flex flex-col md:items-end gap-4">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Siguenos</span>
+                    <div class="flex gap-6 text-sm font-medium tracking-widest uppercase text-gray-400">
+                        <a href="#" class="hover:text-white transition-colors">LinkedIn</a>
+                        <a href="#" class="hover:text-white transition-colors">Newsletter</a>
+                        <a href="#" class="hover:text-white transition-colors">Twitter</a>
+                    </div>
+                </div>
+
+                <div class="mt-12 md:mt-0 flex flex-col md:items-end gap-2 text-gray-600 text-xs">
+                    <div class="flex gap-4">
+                        <a href="#" class="hover:text-gray-400">Aviso Legal</a>
+                        <a href="#" class="hover:text-gray-400">Privacidad</a>
+                    </div>
+                    <p>© 2025 Digital Atelier Solutions. Castellón, España.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AUDIT MODAL -->
+    <div id="audit-modal" class="fixed inset-0 z-[60] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-das-dark/80 backdrop-blur-sm transition-opacity opacity-0" id="modal-backdrop">
+        </div>
+
+        <!-- Modal Content -->
+        <div class="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto">
+            <div class="bg-white w-full max-w-lg rounded-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300 relative"
+                id="modal-content">
+                <!-- Close Button -->
+                <button id="close-modal"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-das-dark transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+
+                <div class="p-8 md:p-10">
+                    <div class="text-center mb-8">
+                        <h3 class="font-poppins font-bold text-2xl mb-2">Solicitar Auditoría</h3>
+                        <p class="text-sm text-gray-500">Analizaremos tu comunicación actual y te diremos dónde estás
+                            perdiendo credibilidad institucional.</p>
+                    </div>
+
+                    <form action="mailto:info@digitalateliersolutions.agency" method="post" enctype="text/plain"
+                        class="space-y-5">
+                        <input type="hidden" name="subject" value="Solicitud de Auditoría de Comunicación - DAS">
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Nombre
+                                Completo</label>
+                            <input type="text" name="nombre" required
+                                class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white"
+                                placeholder="Tu nombre">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Email
+                                Corporativo</label>
+                            <input type="email" name="email" required
+                                class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white"
+                                placeholder="nombre@empresa.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">URL del
+                                Proyecto / Deck</label>
+                            <input type="text" name="referencia" required
+                                class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white"
+                                placeholder="www.tuproyecto.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Objetivo
+                                Principal</label>
+                            <div class="relative">
+                                <select name="objetivo"
+                                    class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white appearance-none cursor-pointer">
+                                    <option value="Levantar Capital">Levantar Capital (Inversores)</option>
+                                    <option value="Aprobación Regulatoria">Aprobación Regulatoria (Legal)</option>
+                                    <option value="Partnerships B2B">Partnerships B2B</option>
+                                    <option value="Captación Usuarios">Captación de Usuarios</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <i data-lucide="chevron-down"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Detalles
+                                Adicionales</label>
+                            <textarea name="detalles" rows="3"
+                                class="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white resize-none"
+                                placeholder="¿Algo específico que te preocupe?"></textarea>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-das-dark text-white font-poppins font-bold py-4 text-sm uppercase tracking-wider hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            Solicitar Auditoría
+                        </button>
+
+                        <p class="text-[10px] text-center text-gray-400 mt-4">
+                            Al enviar, se abrirá tu cliente de correo predeterminado.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        let isMenuOpen = false;
+
+        mobileBtn.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+                mobileMenu.classList.add('opacity-100', 'pointer-events-auto');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            } else {
+                mobileMenu.classList.remove('opacity-100', 'pointer-events-auto');
+                mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close menu when clicking a link
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                isMenuOpen = false;
+                mobileMenu.classList.remove('opacity-100', 'pointer-events-auto');
+                mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Scroll Reveal Animation
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('audit-modal');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalContent = document.getElementById('modal-content');
+        const closeModalBtn = document.getElementById('close-modal');
+        const openModalBtns = document.querySelectorAll('a[href="#contacto"]'); // Target specific buttons if needed, or add class
+
+        function openModal(e) {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+            // Small delay to allow display:block to apply before opacity transition
+            setTimeout(() => {
+                modalBackdrop.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modalBackdrop.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300); // Match transition duration
+        }
+
+        // Attach to the specific "Auditoría" button in Hero
+        // We need to find it specifically or change its ID/Class. 
+        // Let's find the specific link by its text content or href for robustness, 
+        // but better to add a specific ID or class in the HTML update.
+        // For now, I'll update the button in the HTML to have an ID or onclick.
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+
+</html>
