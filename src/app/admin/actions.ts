@@ -195,7 +195,7 @@ export async function createPost(formData: FormData) {
         const { error } = await supabaseAdmin
             .from("posts")
             .insert({
-                client_id: clientId,
+                user_id: clientId,
                 content,
                 scheduled_for: scheduledFor || null,
                 status,
@@ -280,8 +280,9 @@ export async function getPosts() {
             .from("posts")
             .select(`
                 *,
-                profiles:client_id (full_name, company_name, id, linkedin_picture_url)
+                profiles:user_id (full_name, company_name, id, linkedin_picture_url)
             `)
+            .neq("status", "idea") // Hide ideas from admin view
             .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -332,29 +333,30 @@ export async function publishToLinkedIn(postId: string) {
         }
 
         // 2. Fetch Client Profile for LinkedIn Token
-        // console.log("Fetching profile for client_id:", post.client_id);
+        // console.log("Fetching profile for user_id:", post.user_id);
 
-        if (!post.client_id) {
-            throw new Error("El post no tiene un cliente asignado (client_id es null)");
+        if (!post.user_id) {
+            throw new Error("El post no tiene un cliente asignado (user_id es null)");
         }
 
-        const { data: profile, error: profileError } = await supabaseAdmin
+        // 2. Fetch the client's profile to get the LinkedIn token
+        const { data: clientProfile, error: profileError } = await supabaseAdmin
             .from("profiles")
             .select("linkedin_access_token, linkedin_sub")
-            .eq("id", post.client_id)
+            .eq("id", post.user_id)
             .single();
 
-        if (profileError || !profile) {
+        if (profileError || !clientProfile) {
             console.error("Error fetching client profile:", profileError);
-            throw new Error(`No se encontró el perfil del cliente asociado (ID: ${post.client_id})`);
+            throw new Error(`No se encontró el perfil del cliente asociado (ID: ${post.user_id})`);
         }
 
-        if (!profile.linkedin_access_token || !profile.linkedin_sub) {
+        if (!clientProfile.linkedin_access_token || !clientProfile.linkedin_sub) {
             throw new Error("El cliente no tiene LinkedIn conectado (Falta token o ID)");
         }
 
-        const accessToken = profile.linkedin_access_token;
-        const authorUrn = `urn:li:person:${profile.linkedin_sub}`;
+        const accessToken = clientProfile.linkedin_access_token;
+        const authorUrn = `urn:li:person:${clientProfile.linkedin_sub}`;
         let assetUrn = null;
 
         // 3. Handle Image Upload (if exists)
@@ -552,14 +554,27 @@ export async function adminRequestChanges(postId: string, feedback: string) {
 export async function adminSendComment(postId: string, feedback: string) {
     try {
         // Just update feedback, do NOT change status
-        const { error } = await supabaseAdmin
+        const { data, error } = await supabaseAdmin
             .from("posts")
             .update({
                 feedback_notes: `[CONSEJO] ${feedback}` // Prefix to distinguish if needed, or just rely on status
             })
-            .eq("id", postId);
+            .eq("id", postId)
+            .select("user_id") // Fetch user_id to send notification
+            .single();
 
         if (error) throw error;
+
+        // Create Notification
+        if (data?.user_id) {
+            await supabaseAdmin.from("notifications").insert({
+                user_id: data.user_id,
+                type: 'info',
+                title: 'Nuevo Comentario',
+                message: 'El administrador ha dejado un comentario en tu post.',
+                link: `/dashboard/posts?edit=${postId}`
+            });
+        }
 
         revalidatePath("/admin/content");
         revalidatePath("/dashboard");
@@ -641,8 +656,9 @@ export async function getRecentActivity() {
                 status,
                 created_at,
                 updated_at,
-                profiles:client_id (full_name, company_name)
+                profiles:user_id (full_name, company_name)
             `)
+            .neq("status", "idea") // Hide ideas from activity feed
             .order("updated_at", { ascending: false })
             .limit(10);
 
@@ -709,8 +725,8 @@ export async function syncPostMetrics() {
             .select(`
                 id,
                 linkedin_post_id,
-                client_id,
-                profiles:client_id (linkedin_access_token)
+                user_id,
+                profiles:user_id (linkedin_access_token)
             `)
             .eq("status", "published")
             .not("linkedin_post_id", "is", null);
@@ -809,7 +825,7 @@ export async function getReviewQueue() {
                 status,
                 created_at,
                 scheduled_for,
-                profiles:client_id (
+                profiles:user_id (
                     id,
                     full_name,
                     company_name,
@@ -835,7 +851,7 @@ export async function getPostById(postId: string) {
             .from("posts")
             .select(`
                 *,
-                profiles:client_id (
+                profiles:user_id (
                     id,
                     full_name,
                     company_name,
@@ -869,5 +885,164 @@ export async function approvePost(postId: string) {
     } catch (error: any) {
         console.error("Error approving post:", error);
         return { success: false, message: error.message };
+    }
+}
+
+export async function getAppSettings() {
+    try {
+        const { data, error } = await supabaseAdmin
+            .from("app_settings")
+            .select("*")
+            .eq("id", 1)
+            .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116 is "The result contains 0 rows"
+            throw error;
+        }
+
+        // Return default if not found (though migration should insert it)
+        return {
+            success: true,
+            data: data || {
+                usdc_erc20_wallet: '',
+                usdc_polygon_wallet: '',
+                usdc_solana_wallet: '',
+                stripe_product_copilot: '',
+                stripe_product_seed: '',
+                stripe_product_growth: '',
+                stripe_product_authority: ''
+            }
+        };
+    } catch (error: any) {
+        console.error("Error fetching app settings:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function updateAppSettings(formData: FormData) {
+    const usdcErc20 = formData.get("usdcErc20") as string;
+    const usdcPolygon = formData.get("usdcPolygon") as string;
+    const usdcSolana = formData.get("usdcSolana") as string;
+
+    const stripeCopilot = formData.get("stripeCopilot") as string;
+    const stripeSeed = formData.get("stripeSeed") as string;
+    const stripeGrowth = formData.get("stripeGrowth") as string;
+    const stripeAuthority = formData.get("stripeAuthority") as string;
+
+    try {
+        // Upsert to ensure it exists
+        const { error } = await supabaseAdmin
+            .from("app_settings")
+            .upsert({
+                id: 1,
+                usdc_erc20_wallet: usdcErc20,
+                usdc_polygon_wallet: usdcPolygon,
+                usdc_solana_wallet: usdcSolana,
+                stripe_product_copilot: stripeCopilot,
+                stripe_product_seed: stripeSeed,
+                stripe_product_growth: stripeGrowth,
+                stripe_product_authority: stripeAuthority,
+                updated_at: new Date().toISOString()
+            });
+
+        if (error) throw error;
+
+        revalidatePath("/admin/settings");
+        return { success: true, message: "Configuración actualizada correctamente" };
+    } catch (error: any) {
+        console.error("Error updating app settings:", error);
+        return { success: false, message: error.message };
+    }
+}
+
+export async function sendBroadcast(formData: FormData) {
+    const target = formData.get("target") as string;
+    const title = formData.get("title") as string;
+    const message = formData.get("message") as string;
+    const type = formData.get("type") as string;
+
+    const includeActive = formData.get("includeActive") === 'true';
+    const includeInactive = formData.get("includeInactive") === 'true';
+
+    try {
+        // 1. Get Recipients
+        let query = supabaseAdmin
+            .from("profiles")
+            .select("id");
+
+        // Apply Status Filter
+        if (includeActive && !includeInactive) {
+            query = query.eq("subscription_status", "active");
+        } else if (!includeActive && includeInactive) {
+            query = query.neq("subscription_status", "active"); // Assuming anything not active is inactive/cancelled
+        } else if (!includeActive && !includeInactive) {
+            return { success: false, message: "Debes seleccionar al menos un estado (Activo o Inactivo)" };
+        }
+        // If both are true, we don't filter by status (fetch all)
+
+        if (target !== 'all') {
+            query = query.eq("plan_tier", target);
+        }
+
+        const { data: users, error: userError } = await query;
+
+        if (userError) throw userError;
+        if (!users || users.length === 0) return { success: false, message: "No se encontraron usuarios para este segmento." };
+
+        // 2. Create Notifications
+        const notifications = users.map(user => ({
+            user_id: user.id,
+            title: title,
+            message: message,
+            type: type, // 'info', 'success', 'warning', 'action_required'
+            is_read: false,
+            created_at: new Date().toISOString()
+        }));
+
+        const { error: insertError } = await supabaseAdmin
+            .from("notifications")
+            .insert(notifications);
+
+        if (insertError) throw insertError;
+
+        // 3. Log Broadcast to History
+        const { error: broadcastError } = await supabaseAdmin
+            .from("broadcasts")
+            .insert({
+                title,
+                message,
+                type,
+                target_segment: target,
+                recipients_count: users.length,
+                created_at: new Date().toISOString()
+            });
+
+        if (broadcastError) {
+            console.error("Error logging broadcast:", broadcastError);
+            // We don't fail the request if logging fails, but it's good to know
+        }
+
+        revalidatePath("/admin/broadcast");
+        return { success: true, message: `Notificación enviada a ${users.length} usuarios.` };
+    } catch (error: any) {
+        console.error("Error sending broadcast:", error);
+        return { success: false, message: error.message };
+    }
+}
+
+export async function getBroadcasts() {
+    try {
+        const { data, error } = await supabaseAdmin
+            .from("broadcasts")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(10);
+
+        if (error) throw error;
+
+        return { success: true, data };
+    } catch (error: any) {
+        console.error("Error fetching broadcasts:", error);
+        return { success: false, error: error.message };
     }
 }

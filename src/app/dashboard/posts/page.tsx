@@ -54,7 +54,7 @@ export default async function MyPostsPage({
     const { data: posts, error } = await db
         .from("posts")
         .select("*")
-        .eq("client_id", targetUserId)
+        .eq("user_id", targetUserId)
         .order("created_at", { ascending: false });
 
     if (error) {

@@ -16,7 +16,7 @@ export default function AdminCalendarClient({ posts, clients }: { posts: any[], 
 
     // Filter Logic
     const filteredPosts = posts.filter(post => {
-        const matchesClient = selectedClient ? post.client_id === selectedClient : true;
+        const matchesClient = selectedClient ? post.user_id === selectedClient : true;
         const matchesSearch = post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
             post.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesClient && matchesSearch;

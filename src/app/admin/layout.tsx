@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, Users, PenTool, Settings, LogOut, Calendar, Search, Bell, Shield } from "lucide-react";
+import { LayoutGrid, Users, PenTool, Settings, LogOut, Calendar, Search, Bell, Shield, Megaphone } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -19,6 +19,7 @@ export default function AdminLayout({
         { href: "/admin/clients", icon: Users, label: "Clientes" },
         { href: "/admin/content", icon: PenTool, label: "Contenido" },
         { href: "/admin/calendar", icon: Calendar, label: "Calendario" },
+        { href: "/admin/broadcast", icon: Megaphone, label: "Comunicados" },
         { href: "/admin/settings", icon: Settings, label: "Configuración" },
     ];
 
@@ -35,8 +36,8 @@ export default function AdminLayout({
                             href={item.href}
                             title={item.label}
                             className={`w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${isActive(item.href)
-                                    ? 'bg-white text-black shadow-lg scale-105'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                ? 'bg-white text-black shadow-lg scale-105'
+                                : 'text-gray-400 hover:text-white hover:bg-white/10'
                                 }`}
                         >
                             <item.icon size={20} />
@@ -72,6 +73,7 @@ export default function AdminLayout({
                         {pathname === '/admin/clients' && 'Gestión de Clientes'}
                         {pathname === '/admin/content' && 'Producción de Contenido'}
                         {pathname === '/admin/calendar' && 'Calendario Editorial'}
+                        {pathname === '/admin/broadcast' && 'Centro de Comunicados'}
                         {pathname === '/admin/settings' && 'Configuración'}
                     </h1>
                     <div className="flex items-center gap-6">

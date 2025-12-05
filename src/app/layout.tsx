@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="scroll-smooth">
+    <html lang="es" className="scroll-smooth" suppressHydrationWarning>
       <body
         className={`${poppins.variable} ${raleway.variable} ${barlow.variable} antialiased bg-das-light text-das-dark font-raleway`}
       >

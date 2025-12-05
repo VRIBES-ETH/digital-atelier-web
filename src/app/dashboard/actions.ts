@@ -20,7 +20,7 @@ export async function getLinkedInAuthUrl() {
 
     const params = new URLSearchParams({
         response_type: "code",
-        client_id: clientId!,
+        user_id: clientId!,
         redirect_uri: redirectUri,
         state: state,
         scope: scope,
@@ -79,12 +79,12 @@ export async function approvePost(postId: string) {
         // 1. Verify ownership
         const { data: post, error: fetchError } = await supabaseAdmin
             .from("posts")
-            .select("client_id")
+            .select("user_id")
             .eq("id", postId)
             .single();
 
         if (fetchError || !post) throw new Error("Post no encontrado");
-        if (post.client_id !== user.id) throw new Error("No tienes permiso para aprobar este post");
+        if (post.user_id !== user.id) throw new Error("No tienes permiso para aprobar este post");
 
         // 2. Perform update as admin
         const { error } = await supabaseAdmin
@@ -131,12 +131,12 @@ export async function requestChanges(postId: string, feedback: string) {
         // 1. Verify ownership
         const { data: post, error: fetchError } = await supabaseAdmin
             .from("posts")
-            .select("client_id")
+            .select("user_id")
             .eq("id", postId)
             .single();
 
         if (fetchError || !post) throw new Error("Post no encontrado");
-        if (post.client_id !== user.id) throw new Error("No tienes permiso para editar este post");
+        if (post.user_id !== user.id) throw new Error("No tienes permiso para editar este post");
 
         // 2. Perform update as admin
         const { error } = await supabaseAdmin
@@ -259,7 +259,7 @@ export async function createClientPost(formData: FormData) {
         const { error } = await supabaseAdmin
             .from("posts")
             .insert({
-                client_id: user.id,
+                user_id: user.id,
                 content,
                 reference_link: referenceLink || null,
                 status: status,
@@ -309,12 +309,12 @@ export async function rescheduleClientPost(postId: string, newDate: string) {
         // Verify ownership
         const { data: post, error: fetchError } = await supabaseAdmin
             .from("posts")
-            .select("client_id, status")
+            .select("user_id, status")
             .eq("id", postId)
             .single();
 
         if (fetchError || !post) throw new Error("Post no encontrado");
-        if (post.client_id !== user.id) throw new Error("No tienes permiso para editar este post");
+        if (post.user_id !== user.id) throw new Error("No tienes permiso para editar este post");
         if (post.status === 'published') throw new Error("No se puede reprogramar un post ya publicado");
 
         // Determine new status: if it was draft, keep draft. If it was scheduled, keep scheduled.
@@ -369,12 +369,12 @@ export async function deletePost(postId: string) {
         // Verify ownership
         const { data: post, error: fetchError } = await supabaseAdmin
             .from("posts")
-            .select("client_id")
+            .select("user_id")
             .eq("id", postId)
             .single();
 
         if (fetchError || !post) throw new Error("Post no encontrado");
-        if (post.client_id !== user.id) throw new Error("No tienes permiso para eliminar este post");
+        if (post.user_id !== user.id) throw new Error("No tienes permiso para eliminar este post");
 
         const { error } = await supabaseAdmin
             .from("posts")
@@ -436,12 +436,12 @@ export async function updateClientPost(formData: FormData) {
         // Verify ownership
         const { data: post, error: fetchError } = await supabaseAdmin
             .from("posts")
-            .select("client_id, image_url")
+            .select("user_id, image_url")
             .eq("id", postId)
             .single();
 
         if (fetchError || !post) throw new Error("Post no encontrado");
-        if (post.client_id !== user.id) throw new Error("No tienes permiso para editar este post");
+        if (post.user_id !== user.id) throw new Error("No tienes permiso para editar este post");
 
         let imageUrl = post.image_url;
 
@@ -577,7 +577,7 @@ export async function getAnalyticsData(overrideUserId?: string) {
         const { data: posts, error } = await db
             .from("posts")
             .select("id, content, status, created_at, likes_count, comments_count, shares_count, image_url")
-            .eq("client_id", targetUserId)
+            .eq("user_id", targetUserId)
             .eq("status", "published") // Only published posts count for analytics
             .order("created_at", { ascending: false });
 
@@ -619,7 +619,10 @@ export async function getAnalyticsData(overrideUserId?: string) {
 
 // --- Notification Actions ---
 
+import { unstable_noStore as noStore } from "next/cache";
+
 export async function getNotifications() {
+    noStore();
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -679,4 +682,97 @@ export async function checkLinkedInTokenStatus() {
     }
 
     return { isValid: true };
+}
+
+// --- Ideation Bucket ---
+
+export async function createIdea(formData: FormData) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { success: false, message: "No autenticado" };
+    }
+
+    const title = formData.get("title") as string;
+    const internalNotes = formData.get("internalNotes") as string;
+    const referenceLink = formData.get("referenceLink") as string;
+
+    try {
+        const { error } = await supabase
+            .from("posts")
+            .insert({
+                user_id: user.id,
+                content: title, // We use content for the title/main idea
+                internal_notes: internalNotes || null,
+                reference_link: referenceLink || null,
+                status: "idea",
+                author_role: "client",
+                created_at: new Date().toISOString(),
+            });
+
+        if (error) throw error;
+
+        revalidatePath("/dashboard");
+        return { success: true, message: "Idea guardada correctamente" };
+    } catch (error: any) {
+        console.error("Error creating idea:", error);
+        return { success: false, message: error.message };
+    }
+}
+
+export async function updateIdea(formData: FormData) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { success: false, message: "No autenticado" };
+    }
+
+    const ideaId = formData.get("ideaId") as string;
+    const title = formData.get("title") as string;
+    const internalNotes = formData.get("internalNotes") as string;
+    const referenceLink = formData.get("referenceLink") as string;
+
+    try {
+        const { error } = await supabase
+            .from("posts")
+            .update({
+                content: title,
+                internal_notes: internalNotes || null,
+                reference_link: referenceLink || null,
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", ideaId)
+            .eq("user_id", user.id); // Security check
+
+        if (error) throw error;
+
+        revalidatePath("/dashboard");
+        return { success: true, message: "Idea actualizada correctamente" };
+    } catch (error: any) {
+        console.error("Error updating idea:", error);
+        return { success: false, message: error.message };
+    }
+}
+
+export async function getIdeas() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    const { data, error } = await supabase
+        .from("posts")
+        .select("id, content, internal_notes, reference_link, created_at")
+        .eq("user_id", user.id)
+        .eq("status", "idea")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("Error fetching ideas:", error);
+        return [];
+    }
+
+    return data;
 }

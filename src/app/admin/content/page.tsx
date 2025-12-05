@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Search, Filter, Calendar, Clock, CheckCircle, FileText, MoreVertical, X, Loader2, User, Eye, Edit, Trash2, ChevronRight, MessageSquare } from "lucide-react";
-import { getClients, createPost, updatePost, getPosts, publishToLinkedIn, clearPostFeedback, adminRequestChanges } from "../actions";
+import { getClients, createPost, updatePost, getPosts, publishToLinkedIn, clearPostFeedback, adminRequestChanges, adminSendComment } from "../actions";
 import LinkedInPostPreview from "@/components/LinkedInPostPreview";
 
 export default function ContentPage() {
@@ -80,7 +80,7 @@ export default function ContentPage() {
     };
 
     const filteredPosts = posts.filter(post => {
-        const matchesClient = filterClient === "all" || post.client_id === filterClient;
+        const matchesClient = filterClient === "all" || post.user_id === filterClient;
         const matchesStatus = filterStatus === "all" || post.status === filterStatus;
         const matchesSearch = post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
             post.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -170,7 +170,7 @@ export default function ContentPage() {
                                 </div>
                                 <div className="col-span-2">
                                     <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide border ${getStatusColor(post.status)} flex items-center gap-1 w-fit`}>
-                                        {post.feedback && (
+                                        {post.feedback_notes && (
                                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" title="Revisado / Con Feedback"></span>
                                         )}
                                         {getStatusLabel(post.status)}
@@ -325,14 +325,16 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
     const [imageUrl, setImageUrl] = useState(post.image_url || "");
     const [referenceLink, setReferenceLink] = useState(post.reference_link || "");
     const [feedback, setFeedback] = useState("");
+    const [feedbackMessage, setFeedbackMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [confirmAction, setConfirmAction] = useState<'comment' | 'changes' | null>(null);
 
     async function handleRequestChanges() {
         if (!feedback.trim()) return;
-        if (!confirm("¿Enviar solicitud de cambios al cliente?")) return;
-
+        // Confirmation is now handled in the UI
         setIsLoading(true);
         const result = await adminRequestChanges(post.id, feedback);
         setIsLoading(false);
+        setConfirmAction(null);
 
         if (result.success) {
             setMessage({ type: 'success', text: result.message });
@@ -398,12 +400,12 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
             </div>
 
             {/* Feedback Display */}
-            {post.feedback && (
+            {post.feedback_notes && (
                 <div className="bg-amber-50 p-4 rounded-md border border-amber-100 animate-in fade-in slide-in-from-top-2">
                     <div className="flex justify-between items-start mb-2">
                         <label className="block text-xs font-bold text-amber-800 uppercase flex items-center gap-2">
                             <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                            Feedback del Cliente
+                            Feedback / Notas
                         </label>
                         <button
                             type="button"
@@ -413,7 +415,28 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
                             <Trash2 className="w-3 h-3" /> Resolver
                         </button>
                     </div>
-                    <p className="text-sm text-amber-900 italic">"{post.feedback}"</p>
+                    <p className="text-sm text-amber-900 italic">"{post.feedback_notes}"</p>
+                </div>
+            )}
+
+            {/* Read Only Message for Waiting States */}
+            {post.status === 'review_client' && (
+                <div className="bg-blue-50 p-4 rounded-md border border-blue-100 flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-blue-600" />
+                    <div>
+                        <h4 className="text-sm font-bold text-blue-800">Esperando al Cliente</h4>
+                        <p className="text-xs text-blue-600">El post ha sido enviado al cliente para su revisión.</p>
+                    </div>
+                </div>
+            )}
+
+            {post.status === 'changes_requested' && (
+                <div className="bg-red-50 p-4 rounded-md border border-red-100 flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-red-600" />
+                    <div>
+                        <h4 className="text-sm font-bold text-red-800">Esperando Correcciones</h4>
+                        <p className="text-xs text-red-600">Se han solicitado cambios al cliente. Esperando su actualización.</p>
+                    </div>
                 </div>
             )}
 
@@ -427,6 +450,8 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
                     onChange={(e) => setContent(e.target.value)}
                     className="w-full border border-gray-200 p-4 text-sm rounded-sm focus:border-das-dark outline-none resize-none font-mono text-gray-700 leading-relaxed"
                     placeholder="Escribe aquí el contenido del post..."
+                    // Read only if waiting for client
+                    readOnly={post.status === 'review_client'}
                 ></textarea>
                 <p className="text-right text-xs text-gray-400 mt-1">Carácteres: {content.length}/3000</p>
             </div>
@@ -444,45 +469,20 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
                 </div>
                 <div>
                     <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Estado</label>
-                    {post.status === 'draft' ? (
-                        <div className="flex flex-col gap-2 p-2 bg-gray-50 rounded-sm border border-gray-100">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="status"
-                                    value="draft"
-                                    checked={status === 'draft'}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    className="text-das-dark focus:ring-das-dark"
-                                />
-                                <span className="text-sm text-gray-700 font-medium">Guardar Borrador</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="status"
-                                    value="pending_approval"
-                                    checked={status === 'pending_approval'}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    className="text-das-dark focus:ring-das-dark"
-                                />
-                                <span className="text-sm text-gray-700 font-medium">Enviar a Aprobación</span>
-                            </label>
-                        </div>
-                    ) : (
-                        <select
-                            name="status"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                            className="w-full border border-gray-200 p-2 text-sm rounded-sm focus:border-das-dark outline-none bg-white"
-                        >
-                            <option value="draft">Borrador</option>
-                            <option value="pending_approval">Pendiente de Revisión</option>
-                            <option value="changes_requested">Cambios Solicitados</option>
-                            <option value="scheduled">Programado</option>
-                            <option value="published">Publicado</option>
-                        </select>
-                    )}
+                    <select
+                        name="status"
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        className="w-full border border-gray-200 p-2 text-sm rounded-sm focus:border-das-dark outline-none bg-white"
+                        disabled={post.status === 'review_client'} // Lock status if waiting
+                    >
+                        <option value="draft">Borrador</option>
+                        <option value="review_client">En Revisión (Cliente)</option>
+                        <option value="pending_approval">Pendiente de Aprobación</option>
+                        <option value="changes_requested">Cambios Solicitados</option>
+                        <option value="scheduled">Programado</option>
+                        <option value="published">Publicado</option>
+                    </select>
                 </div>
             </div>
 
@@ -518,107 +518,124 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
                 </div>
             </div>
 
-            {/* Feedback Action for Client Posts */}
-            {post.author_role === 'client' && (
-                <div className="bg-red-50 p-4 rounded-sm border border-red-100">
-                    <h4 className="text-sm font-bold text-red-800 mb-2 flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4" />
-                        Solicitar Cambios / Feedback
-                    </h4>
-                    <textarea
-                        value={feedback}
-                        onChange={(e) => setFeedback(e.target.value)}
-                        placeholder="Escribe aquí tu feedback para el cliente..."
-                        className="w-full border border-red-200 focus:border-red-500 rounded-sm p-3 text-sm outline-none bg-white min-h-[80px] mb-3"
-                    />
-                    <div className="flex justify-end">
+            {/* ACTION AREA BASED ON STATUS */}
+            <div className="pt-6 border-t border-gray-100">
+                {/* DRAFT: Save, Send to Client, Publish Direct */}
+                {post.status === 'draft' && (
+                    <div className="flex justify-end gap-3">
                         <button
-                            type="button"
-                            onClick={async () => {
-                                if (!feedback.trim()) return;
-                                if (!confirm("¿Enviar comentario al cliente? (No cambiará el estado del post)")) return;
-                                setIsLoading(true);
-                                const { adminSendComment } = await import("../actions");
-                                const result = await adminSendComment(post.id, feedback);
-                                setIsLoading(false);
-                                if (result.success) {
-                                    setMessage({ type: 'success', text: result.message });
-                                    setTimeout(onSuccess, 1000);
-                                } else {
-                                    setMessage({ type: 'error', text: result.message });
-                                }
-                            }}
-                            disabled={!feedback.trim() || isLoading}
-                            className="bg-blue-50 text-blue-600 border border-blue-200 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-blue-100 transition-colors flex items-center gap-2 disabled:opacity-70"
+                            type="submit"
+                            onClick={() => setStatus('draft')}
+                            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-sm hover:bg-gray-100 text-xs font-bold uppercase tracking-wider"
                         >
-                            <MessageSquare className="w-3 h-3" />
-                            Enviar Comentario
+                            Guardar Borrador
                         </button>
                         <button
-                            type="button"
-                            onClick={handleRequestChanges}
-                            disabled={!feedback.trim() || isLoading}
-                            className="bg-red-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-70"
+                            type="submit"
+                            onClick={() => setStatus('review_client')}
+                            className="bg-blue-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-blue-700 transition-colors"
                         >
-                            <MessageSquare className="w-3 h-3" />
-                            Solicitar Cambios
+                            Enviar a Aprobación
+                        </button>
+                        <button
+                            type="submit"
+                            onClick={() => setStatus('scheduled')}
+                            className="bg-gray-900 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-black transition-colors"
+                        >
+                            Publicación Directa
                         </button>
                     </div>
-                </div>
-            )}
+                )}
 
-            <div className="pt-6 flex justify-end gap-3 border-t border-gray-100">
-                <button
-                    type="button"
-                    onClick={onSuccess}
-                    className="px-4 py-2 text-xs font-bold uppercase text-gray-500 hover:bg-gray-100 rounded-sm transition-colors"
-                >
-                    Cancelar
-                </button>
-                <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="bg-das-dark text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-gray-800 transition-colors flex items-center gap-2 disabled:opacity-70"
-                >
-                    {isLoading && <Loader2 className="w-3 h-3 animate-spin" />}
-                    Guardar Cambios
-                </button>
-            </div>
-
-            {/* Publish Action for Approved/Scheduled Posts */}
-            {(status === 'scheduled' || status === 'approved') && (
-                <div className="mt-6 pt-6 border-t border-gray-100">
-                    <div className="bg-blue-50 p-4 rounded-sm border border-blue-100 flex justify-between items-center">
-                        <div>
-                            <h4 className="text-sm font-bold text-blue-800">Publicación en LinkedIn</h4>
-                            <p className="text-xs text-blue-600 mt-1">
-                                {status === 'scheduled'
-                                    ? "Este post está programado. Puedes forzar la publicación ahora."
-                                    : "El post está aprobado. Publicar directamente."}
-                            </p>
+                {/* REVIEW REQUESTED (From Client): Request Changes, Approve */}
+                {(post.status === 'pending_approval' || post.status === 'review_requested') && (
+                    <div className="space-y-4">
+                        <div className="bg-amber-50 p-4 rounded-sm border border-amber-100">
+                            <h4 className="text-sm font-bold text-amber-800 mb-2 flex items-center gap-2">
+                                <MessageSquare className="w-4 h-4" />
+                                Solicitar Cambios al Cliente
+                            </h4>
+                            <textarea
+                                value={feedback}
+                                onChange={(e) => setFeedback(e.target.value)}
+                                placeholder="Describe los cambios necesarios..."
+                                className="w-full border border-amber-200 focus:border-amber-500 rounded-sm p-3 text-sm outline-none bg-white min-h-[80px] mb-3"
+                            />
+                            <div className="flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={handleRequestChanges}
+                                    disabled={!feedback.trim() || isLoading}
+                                    className="bg-amber-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-amber-700 transition-colors disabled:opacity-70"
+                                >
+                                    Pedir Cambios
+                                </button>
+                            </div>
                         </div>
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                onClick={() => setStatus('scheduled')}
+                                className="bg-green-600 text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-green-700 transition-colors flex items-center gap-2"
+                            >
+                                <CheckCircle className="w-4 h-4" />
+                                Aprobar y Programar
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* WAITING STATES: Read Only / Force Edit */}
+                {(post.status === 'review_client' || post.status === 'changes_requested') && (
+                    <div className="flex justify-end gap-3">
+                        <span className="text-xs text-gray-500 self-center italic mr-2">
+                            El post está en manos del cliente.
+                        </span>
                         <button
-                            type="button"
-                            onClick={async () => {
-                                if (!confirm("¿Estás seguro de que quieres publicar esto en LinkedIn AHORA?")) return;
-                                setIsLoading(true);
-                                const res = await publishToLinkedIn(post.id);
-                                setIsLoading(false);
-                                if (res.success) {
-                                    setMessage({ type: 'success', text: res.message });
-                                    setTimeout(onSuccess, 2000);
-                                } else {
-                                    setMessage({ type: 'error', text: res.message });
-                                }
-                            }}
-                            className="bg-blue-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
+                            type="submit"
+                            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-sm hover:bg-gray-100 text-xs font-bold uppercase tracking-wider"
                         >
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
-                            Publicar Ahora
+                            Forzar Guardado (Editar)
                         </button>
                     </div>
-                </div>
-            )}
+                )}
+
+                {/* SCHEDULED: Edit, Force Publish */}
+                {post.status === 'scheduled' && (
+                    <div className="flex justify-between items-center">
+                        <div className="text-xs text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-sm">
+                            Programado para {new Date(post.scheduled_for).toLocaleString()}
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                type="submit"
+                                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-sm hover:bg-gray-100 text-xs font-bold uppercase tracking-wider"
+                            >
+                                Guardar Cambios
+                            </button>
+                            <button
+                                type="button"
+                                onClick={async () => {
+                                    if (!confirm("¿Publicar AHORA en LinkedIn?")) return;
+                                    setIsLoading(true);
+                                    const res = await publishToLinkedIn(post.id);
+                                    setIsLoading(false);
+                                    if (res.success) {
+                                        setMessage({ type: 'success', text: res.message });
+                                        setTimeout(onSuccess, 2000);
+                                    } else {
+                                        setMessage({ type: 'error', text: res.message });
+                                    }
+                                }}
+                                className="bg-blue-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
+                            >
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
+                                Publicar Ahora
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
         </form>
     );
 }

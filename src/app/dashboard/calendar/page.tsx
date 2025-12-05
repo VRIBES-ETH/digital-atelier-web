@@ -23,7 +23,7 @@ export default async function CalendarPage() {
     const { data: posts, error } = await supabase
         .from("posts")
         .select("*")
-        .eq("client_id", user.id);
+        .eq("user_id", user.id);
 
     if (error) {
         console.error("Error fetching posts for calendar:", error);

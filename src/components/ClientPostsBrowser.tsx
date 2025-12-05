@@ -345,9 +345,9 @@ export default function ClientPostsBrowser({ posts, linkedinProfile, userRole = 
                                         <p className="text-xs opacity-80">El administrador ha solicitado cambios en este post.</p>
                                     </div>
                                 </div>
-                                {selectedPost.feedback && (
+                                {selectedPost.feedback_notes && (
                                     <div className="mb-4 p-3 bg-white/50 rounded border border-amber-100 text-sm italic text-amber-900">
-                                        "{selectedPost.feedback}"
+                                        "{selectedPost.feedback_notes}"
                                     </div>
                                 )}
                                 <div className="flex justify-between items-center">
@@ -382,7 +382,7 @@ export default function ClientPostsBrowser({ posts, linkedinProfile, userRole = 
                         )}
 
                         {/* Advice/Comment Display for non-blocking states */}
-                        {selectedPost.feedback && selectedPost.status !== 'changes_requested' && (
+                        {selectedPost.feedback_notes && selectedPost.status !== 'changes_requested' && (
                             <div className="p-4 border-t border-gray-200 bg-blue-50 shrink-0">
                                 <div className="flex items-center gap-3 text-blue-800 mb-3">
                                     <MessageSquare className="w-5 h-5" />
@@ -392,7 +392,7 @@ export default function ClientPostsBrowser({ posts, linkedinProfile, userRole = 
                                     </div>
                                 </div>
                                 <div className="p-3 bg-white/50 rounded border border-blue-100 text-sm italic text-blue-900">
-                                    "{selectedPost.feedback}"
+                                    "{selectedPost.feedback_notes}"
                                 </div>
                             </div>
                         )}

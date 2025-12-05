@@ -1,9 +1,11 @@
-import { ArrowUpRight, Clock, CheckCircle, AlertCircle, Linkedin, Zap, Calendar, FileText, BarChart3 } from "lucide-react";
+import { ArrowUpRight, Clock, CheckCircle, AlertCircle, Linkedin, Zap, Calendar, FileText, BarChart3, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getLinkedInAuthUrl, fetchLinkedInProfile } from "./actions";
+import { getLinkedInAuthUrl, fetchLinkedInProfile, getIdeas } from "./actions";
 import Link from "next/link";
 import ScheduledPostsWidget from "./components/ScheduledPostsWidget";
 import ActionCard from "./components/ActionCard";
+import IdeasWidget from "./components/IdeasWidget";
+import IdeaModalWrapper from "./components/IdeaModalWrapper"; // Keep for the empty state action
 
 export default async function DashboardHome({
     searchParams,
@@ -22,6 +24,7 @@ export default async function DashboardHome({
         total: 0
     };
     let pendingPosts = [];
+    let ideas: any[] = [];
 
     // Initialize admin client for impersonation if needed
     const { createClient: createAdminClient } = await import("@supabase/supabase-js");
@@ -70,13 +73,13 @@ export default async function DashboardHome({
         const { count: pendingCount } = await db
             .from("posts")
             .select("*", { count: 'exact', head: true })
-            .eq("client_id", targetUserId)
+            .eq("user_id", targetUserId)
             .eq("status", "pending_approval");
 
         const { count: publishedCount } = await db
             .from("posts")
             .select("*", { count: 'exact', head: true })
-            .eq("client_id", targetUserId)
+            .eq("user_id", targetUserId)
             .eq("status", "published");
 
         postsStats.pending = pendingCount || 0;
@@ -86,12 +89,25 @@ export default async function DashboardHome({
         const { data: posts } = await db
             .from("posts")
             .select("*")
-            .eq("client_id", targetUserId)
+            .eq("user_id", targetUserId)
             .in("status", ["pending_approval", "changes_requested"])
             .order("updated_at", { ascending: false })
             .limit(5);
 
         pendingPosts = posts || [];
+
+        // Fetch Ideas
+        // We can't reuse the getIdeas action directly here because we might be impersonating
+        // So we fetch directly using the db client we set up
+        const { data: ideasData } = await db
+            .from("posts")
+            .select("id, content, internal_notes, reference_link, created_at")
+            .eq("user_id", targetUserId)
+            .eq("status", "idea")
+            .order("created_at", { ascending: false })
+            .limit(5);
+
+        ideas = ideasData || [];
     }
 
     const isLinked = !!profile?.linkedin_access_token;
@@ -166,6 +182,7 @@ export default async function DashboardHome({
                                     title={post.content}
                                     date={new Date(post.updated_at).toLocaleDateString()}
                                     status={post.status}
+                                    hasFeedback={!!post.feedback_notes}
                                 />
                             ))
                         ) : (
@@ -176,9 +193,7 @@ export default async function DashboardHome({
                                     </div>
                                     <p className="text-gray-900 font-medium">Todo limpio por aquí</p>
                                     <p className="text-sm text-gray-500 mb-4">Tus próximos borradores aparecerán aquí cuando estén listos.</p>
-                                    <button className="text-sm px-4 py-2 border border-gray-300 rounded-lg hover:bg-white text-gray-600 font-medium transition-colors">
-                                        Añadir idea al Bucket
-                                    </button>
+                                    <IdeaModalWrapper />
                                 </div>
                             </div>
                         )}
@@ -205,6 +220,8 @@ export default async function DashboardHome({
                     {/* Scheduled Posts Widget */}
                     <ScheduledPostsWidget userId={targetUserId} />
 
+                    {/* Ideation Bucket / Upcoming Topics */}
+                    <IdeasWidget ideas={ideas} />
 
                 </div>
             </div>

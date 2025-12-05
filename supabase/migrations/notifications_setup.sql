@@ -25,72 +25,107 @@ create policy "Users can update their own notifications"
     on public.notifications for update
     using (auth.uid() = user_id);
 
--- 4. Function: Notify Admin on Review Request
-create or replace function public.notify_admin_on_review()
+-- 4. Unified Notification Function
+create or replace function public.notify_post_owner()
 returns trigger as $$
 declare
     admin_id uuid;
+    client_name text;
+    admin_name text := 'Víctor'; -- Placeholder or fetch from profile if needed
 begin
-    -- Find an admin user. For simplicity, we might pick one or broadcast. 
-    -- Ideally, you have a 'roles' table or metadata. 
-    -- For this MVP, let's assume a specific admin ID or just insert for all admins if we had a way to identify them.
-    -- OPTION: We'll fetch the first user with role 'admin' from public.profiles if it exists, or just hardcode for now if we can't find one.
-    -- Better approach: The trigger runs with admin privileges.
-    
-    -- Let's try to find an admin from profiles table
+    -- Fetch Admin ID (Assuming single admin or first found)
     select id into admin_id from public.profiles where role = 'admin' limit 1;
     
-    if admin_id is not null then
-        insert into public.notifications (user_id, type, title, message, link)
-        values (
-            admin_id,
-            'action_required',
-            'Nueva Solicitud de Revisión',
-            'El cliente ha solicitado revisión para un post.',
-            '/admin/posts' -- Or specific post link if we had a page for it
-        );
-    end if;
-    return new;
-end;
-$$ language plpgsql security definer;
+    -- Fetch Client Name
+    select full_name into client_name from public.profiles where id = new.user_id;
 
--- 5. Trigger: On Post Status Change to 'review_requested' (or 'pending_approval')
--- Checking current codebase, status is likely 'pending_approval'
-create trigger on_post_review_request
-    after update on public.posts
-    for each row
-    when (old.status <> 'pending_approval' and new.status = 'pending_approval')
-    execute function public.notify_admin_on_review();
+    -- SCENARIO 1: Client -> Admin (Request Review)
+    if old.status = 'draft' and new.status = 'review_requested' then
+        if admin_id is not null then
+            insert into public.notifications (user_id, type, title, message, link)
+            values (
+                admin_id,
+                'action_required',
+                '⚡ Nueva Revisión',
+                'El cliente ' || coalesce(client_name, 'Desconocido') || ' solicita tu feedback.',
+                '/admin/content'
+            );
+        end if;
 
--- 6. Function: Notify Client on Admin Action
-create or replace function public.notify_client_on_status_change()
-returns trigger as $$
-begin
-    if new.status = 'scheduled' and old.status <> 'scheduled' then
+    -- SCENARIO 2: Admin -> Client (Assign Post)
+    elsif old.status = 'draft' and new.status = 'review_client' then
         insert into public.notifications (user_id, type, title, message, link)
         values (
             new.user_id,
-            'success',
-            'Post Aprobado',
-            'Tu post ha sido aprobado y programado.',
+            'info',
+            '📝 Nuevo Post Asignado',
+            admin_name || ' ha redactado un post para ti. Revísalo.',
             '/dashboard/posts'
         );
-    elsif new.status = 'changes_requested' and old.status <> 'changes_requested' then
+
+    -- SCENARIO 3: Admin -> Client (Request Changes / Feedback)
+    elsif old.status = 'review_requested' and new.status = 'changes_requested' then
         insert into public.notifications (user_id, type, title, message, link)
         values (
             new.user_id,
             'warning',
-            'Cambios Solicitados',
-            'El administrador ha solicitado cambios en tu post.',
+            '⚠️ Feedback Recibido',
+            admin_name || ' sugiere cambios en tu post.',
+            '/dashboard/posts'
+        );
+
+    -- SCENARIO 4: Client -> Admin (Request Changes on Admin Post)
+    elsif old.status = 'review_client' and new.status = 'changes_requested' then
+        if admin_id is not null then
+            insert into public.notifications (user_id, type, title, message, link)
+            values (
+                admin_id,
+                'warning',
+                '💬 Cliente pide cambios',
+                coalesce(client_name, 'El cliente') || ' ha dejado notas en el post propuesto.',
+                '/admin/content'
+            );
+        end if;
+
+    -- SCENARIO 5: Client -> Admin (Approve Admin Post)
+    elsif old.status = 'review_client' and new.status = 'scheduled' then
+        if admin_id is not null then
+            insert into public.notifications (user_id, type, title, message, link)
+            values (
+                admin_id,
+                'success',
+                '✅ Post Aprobado',
+                coalesce(client_name, 'El cliente') || ' ha aprobado el post. Listo para salir.',
+                '/admin/content'
+            );
+        end if;
+
+    -- SCENARIO 6: Admin -> Client (Approve/Schedule Client Post)
+    elsif old.status = 'review_requested' and new.status = 'scheduled' then
+        insert into public.notifications (user_id, type, title, message, link)
+        values (
+            new.user_id,
+            'success',
+            '🚀 Post Programado',
+            'Tu post ha sido validado y programado.',
             '/dashboard/posts'
         );
     end if;
+
     return new;
 end;
 $$ language plpgsql security definer;
 
--- 7. Trigger: On Post Status Change (Admin Actions)
-create trigger on_post_status_change_notify_client
+-- 5. Trigger: Unified Post Notification Trigger
+drop trigger if exists on_post_status_change_notify on public.posts;
+create trigger on_post_status_change_notify
     after update on public.posts
     for each row
-    execute function public.notify_client_on_status_change();
+    when (old.status is distinct from new.status)
+    execute function public.notify_post_owner();
+
+-- Cleanup old triggers if they exist
+drop trigger if exists on_post_review_request on public.posts;
+drop trigger if exists on_post_status_change_notify_client on public.posts;
+drop function if exists public.notify_admin_on_review();
+drop function if exists public.notify_client_on_status_change();

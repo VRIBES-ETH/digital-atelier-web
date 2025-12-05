@@ -9,7 +9,7 @@ export default async function ScheduledPostsWidget({ userId }: { userId: string 
     const { data: scheduledPosts } = await supabase
         .from("posts")
         .select("*")
-        .eq("client_id", userId)
+        .eq("user_id", userId)
         .in("status", ["scheduled", "approved"])
         .gte("scheduled_for", new Date().toISOString())
         .order("scheduled_for", { ascending: true })

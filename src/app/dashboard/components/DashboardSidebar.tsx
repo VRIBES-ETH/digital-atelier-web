@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, FileText, Calendar, Settings, LogOut, User, BarChart3 } from "lucide-react";
+import { LayoutDashboard, FileText, Calendar, Settings, LogOut, User, BarChart3, Box, Lock } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -79,6 +79,7 @@ export default function DashboardSidebar() {
         { href: "/dashboard/posts", label: "Mis Posts", icon: FileText },
         { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
         { href: "/dashboard/calendar", label: "Calendario", icon: Calendar },
+        { href: "/dashboard/assets", label: "Bóveda", icon: Box },
     ];
 
     const accountItems = [
@@ -105,16 +106,25 @@ export default function DashboardSidebar() {
             </div>
 
             <nav className="flex-1 px-4 space-y-1">
-                {navItems.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={`${item.href}${queryParams}`}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive(item.href) ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                    >
-                        <item.icon className="w-5 h-5" />
-                        {item.label}
-                    </Link>
-                ))}
+                {navItems.map((item) => {
+                    const isVault = item.label === "Bóveda";
+                    const isLocked = isVault && profile?.plan_tier === 'copilot';
+
+                    return (
+                        <Link
+                            key={item.href}
+                            href={`${item.href}${queryParams}`}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors 
+                                ${isActive(item.href) ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}
+                                ${isLocked ? 'opacity-60' : ''}
+                            `}
+                        >
+                            <item.icon className="w-5 h-5" />
+                            {item.label}
+                            {isLocked && <Lock className="w-3 h-3 ml-auto text-gray-500" />}
+                        </Link>
+                    );
+                })}
 
                 <div className="pt-6 mt-6 border-t border-gray-800">
                     <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Cuenta</p>

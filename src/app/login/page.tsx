@@ -1,54 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Lock, AlertCircle } from "lucide-react";
+import { ArrowRight, Lock, AlertCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { login } from "./actions";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
-    const supabase = createClient();
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (formData: FormData) => {
         setIsLoading(true);
         setError(null);
 
-        try {
-            const { data: { user }, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+        const result = await login(formData);
 
-            if (error) throw error;
-
-            if (user) {
-                // Fetch profile to know where to redirect
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('role')
-                    .eq('id', user.id)
-                    .single();
-
-                const role = profile?.role || 'client';
-
-                if (role === 'admin') {
-                    router.push("/admin");
-                } else {
-                    router.push("/dashboard");
-                }
-                router.refresh();
-            }
-        } catch (err: any) {
-            setError(err.message || "Error al iniciar sesión");
-        } finally {
+        if (result?.error) {
+            setError(result.error);
             setIsLoading(false);
         }
+        // If success, the server action will redirect, so we don't need to do anything here.
+        // We keep isLoading true to show the spinner while redirecting.
     };
 
     return (
@@ -76,13 +48,12 @@ export default function LoginPage() {
                         </div>
                     )}
 
-                    <form onSubmit={handleLogin} className="space-y-6">
+                    <form action={handleSubmit} className="space-y-6">
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Email Corporativo</label>
                             <input
+                                name="email"
                                 type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white"
                                 placeholder="nombre@empresa.com"
@@ -92,9 +63,8 @@ export default function LoginPage() {
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Contraseña</label>
                             <input
+                                name="password"
                                 type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
                                 required
                                 className="w-full border border-gray-200 p-3 text-sm focus:outline-none focus:border-das-dark transition-colors bg-gray-50 focus:bg-white"
                                 placeholder="••••••••"
@@ -107,7 +77,10 @@ export default function LoginPage() {
                             className="w-full bg-das-dark text-white font-poppins font-bold py-4 text-sm uppercase tracking-wider hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {isLoading ? (
-                                <span className="animate-pulse">Verificando...</span>
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Verificando...</span>
+                                </>
                             ) : (
                                 <>
                                     <span>Entrar a la Suite</span>
