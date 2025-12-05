@@ -59,7 +59,7 @@ export default function ContentPage() {
             case 'published': return 'bg-green-100 text-green-700 border-green-200';
             case 'scheduled': return 'bg-blue-100 text-blue-700 border-blue-200';
             case 'pending_approval': return 'bg-amber-100 text-amber-700 border-amber-200';
-            case 'changes_requested': return 'bg-red-100 text-red-700 border-red-200';
+            case 'changes_requested': return 'bg-orange-100 text-orange-700 border-orange-200';
             default: return 'bg-gray-100 text-gray-600 border-gray-200';
         }
     }
@@ -69,7 +69,7 @@ export default function ContentPage() {
             case 'published': return 'Publicado';
             case 'scheduled': return 'Programado';
             case 'pending_approval': return 'Pendiente de Revisión';
-            case 'changes_requested': return 'Cambios Solicitados';
+            case 'changes_requested': return 'FEEDBACK ENVIADO';
             case 'draft': return 'Borrador';
             default: return status;
         }
@@ -431,11 +431,11 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
             )}
 
             {post.status === 'changes_requested' && (
-                <div className="bg-red-50 p-4 rounded-md border border-red-100 flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-red-600" />
+                <div className="bg-orange-50 p-4 rounded-md border border-orange-100 flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-orange-600" />
                     <div>
-                        <h4 className="text-sm font-bold text-red-800">Esperando Correcciones</h4>
-                        <p className="text-xs text-red-600">Se han solicitado cambios al cliente. Esperando su actualización.</p>
+                        <h4 className="text-sm font-bold text-orange-800">Feedback Enviado</h4>
+                        <p className="text-xs text-orange-600">Se ha enviado feedback al cliente. Esperando su actualización.</p>
                     </div>
                 </div>
             )}
@@ -479,7 +479,7 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
                         <option value="draft">Borrador</option>
                         <option value="review_client">En Revisión (Cliente)</option>
                         <option value="pending_approval">Pendiente de Aprobación</option>
-                        <option value="changes_requested">Cambios Solicitados</option>
+                        <option value="changes_requested">Feedback Enviado</option>
                         <option value="scheduled">Programado</option>
                         <option value="published">Publicado</option>
                     </select>
@@ -553,12 +553,12 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
                         <div className="bg-amber-50 p-4 rounded-sm border border-amber-100">
                             <h4 className="text-sm font-bold text-amber-800 mb-2 flex items-center gap-2">
                                 <MessageSquare className="w-4 h-4" />
-                                Solicitar Cambios al Cliente
+                                Sugerencias o Feedback
                             </h4>
                             <textarea
                                 value={feedback}
                                 onChange={(e) => setFeedback(e.target.value)}
-                                placeholder="Describe los cambios necesarios..."
+                                placeholder="Escribe aquí tu feedback o sugerencias..."
                                 className="w-full border border-amber-200 focus:border-amber-500 rounded-sm p-3 text-sm outline-none bg-white min-h-[80px] mb-3"
                             />
                             <div className="flex justify-end">
@@ -568,7 +568,7 @@ function PostEditForm({ post, onSuccess }: { post: any, onSuccess: () => void })
                                     disabled={!feedback.trim() || isLoading}
                                     className="bg-amber-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-amber-700 transition-colors disabled:opacity-70"
                                 >
-                                    Pedir Cambios
+                                    Enviar Feedback
                                 </button>
                             </div>
                         </div>

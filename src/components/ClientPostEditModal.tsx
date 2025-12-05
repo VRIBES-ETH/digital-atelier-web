@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, Loader2, Image as ImageIcon, Calendar, Trash2, FileCheck, Save } from "lucide-react";
-import { updateClientPost, deletePost } from "@/app/dashboard/actions";
+import { X, Loader2, Image as ImageIcon, Calendar, Trash2, FileCheck, Save, Linkedin, Clock } from "lucide-react";
+import { updateClientPost, deletePost, publishClientPost } from "@/app/dashboard/actions";
 
 interface ClientPostEditModalProps {
     post: any;
@@ -20,6 +20,9 @@ export default function ClientPostEditModal({ post, isOpen, onClose, userRole = 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
 
+    // State for schedule mode in modal
+    const [isScheduling, setIsScheduling] = useState(false);
+
     const isAdmin = userRole === 'admin';
     const charCount = content.length;
     const isOverLimit = charCount > 210;
@@ -30,6 +33,7 @@ export default function ClientPostEditModal({ post, isOpen, onClose, userRole = 
             setInternalNotes(post.internal_notes || "");
             setPreviewUrl(post.image_url || null);
             setScheduledFor(post.scheduled_for ? new Date(post.scheduled_for).toISOString().slice(0, 16) : "");
+            setIsScheduling(false);
         }
     }, [isOpen, post]);
 
@@ -63,6 +67,39 @@ export default function ClientPostEditModal({ post, isOpen, onClose, userRole = 
         if (!confirm("¿Estás seguro de que quieres eliminar este post? Esta acción no se puede deshacer.")) return;
         setIsLoading(true);
         const result = await deletePost(post.id);
+        setIsLoading(false);
+
+        if (result.success) {
+            onClose();
+            window.location.reload();
+        } else {
+            alert(result.message);
+        }
+    };
+
+    const handlePublishNow = async () => {
+        if (!confirm("¿Estás seguro de que quieres publicar este post AHORA en LinkedIn?")) return;
+        setIsLoading(true);
+
+        // 1. First save changes
+        if (formRef.current) {
+            const formData = new FormData(formRef.current);
+            formData.append("postId", post.id);
+            // Action type as draft just to save content without changing status logic in updateClientPost
+            // actually 'draft' typically implies status=draft.
+            // But we want to preserve status? No, we are publishing next anyway.
+            formData.append("actionType", 'draft');
+
+            const updateResult = await updateClientPost(formData);
+            if (!updateResult.success) {
+                setIsLoading(false);
+                alert("Error guardando cambios: " + updateResult.message);
+                return;
+            }
+        }
+
+        // 2. Then publish
+        const result = await publishClientPost(post.id);
         setIsLoading(false);
 
         if (result.success) {
@@ -107,7 +144,7 @@ export default function ClientPostEditModal({ post, isOpen, onClose, userRole = 
                 <div className="p-6 overflow-y-auto">
                     {post.feedback_notes && (
                         <div className="mb-6 bg-amber-50 p-4 rounded-sm border border-amber-100">
-                            <h4 className="text-xs font-bold text-amber-800 uppercase mb-1">Feedback del Editor</h4>
+                            <h4 className="text-xs font-bold text-amber-800 uppercase mb-1">Feedback del Ghostwriter</h4>
                             <p className="text-sm text-amber-900 italic">"{post.feedback_notes}"</p>
                         </div>
                     )}
@@ -128,27 +165,31 @@ export default function ClientPostEditModal({ post, isOpen, onClose, userRole = 
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Notas o Instrucciones (Opcional)</label>
-                            <input
-                                name="internalNotes"
-                                value={internalNotes}
-                                onChange={(e) => setInternalNotes(e.target.value)}
-                                placeholder="Ej: Revisar el tono del segundo párrafo..."
-                                className="w-full border border-gray-200 p-2 text-sm rounded-sm focus:border-das-dark outline-none bg-gray-50"
-                            />
-                        </div>
+                        {!((!isAdmin && (post.status === 'changes_requested' || post.feedback_notes))) && (
+                            <>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Notas o Instrucciones (Opcional)</label>
+                                    <input
+                                        name="internalNotes"
+                                        value={internalNotes}
+                                        onChange={(e) => setInternalNotes(e.target.value)}
+                                        placeholder="Ej: Revisar el tono del segundo párrafo..."
+                                        className="w-full border border-gray-200 p-2 text-sm rounded-sm focus:border-das-dark outline-none bg-gray-50"
+                                    />
+                                </div>
 
-                        <div>
-                            <label className="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Link de Referencia (Opcional)</label>
-                            <input
-                                name="referenceLink"
-                                type="url"
-                                defaultValue={post.reference_link || ""}
-                                placeholder="https://..."
-                                className="w-full border border-gray-200 p-2 text-sm rounded-sm focus:border-das-dark outline-none"
-                            />
-                        </div>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Link de Referencia (Opcional)</label>
+                                    <input
+                                        name="referenceLink"
+                                        type="url"
+                                        defaultValue={post.reference_link || ""}
+                                        placeholder="https://..."
+                                        className="w-full border border-gray-200 p-2 text-sm rounded-sm focus:border-das-dark outline-none"
+                                    />
+                                </div>
+                            </>
+                        )}
 
                         <div>
                             <label className="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Imagen (Opcional)</label>
@@ -183,24 +224,26 @@ export default function ClientPostEditModal({ post, isOpen, onClose, userRole = 
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider flex items-center gap-2">
-                                <Calendar className="w-4 h-4" /> Programar (Opcional)
-                            </label>
-                            <input
-                                name="scheduledFor"
-                                type="datetime-local"
-                                value={scheduledFor}
-                                onChange={(e) => setScheduledFor(e.target.value)}
-                                className="w-full border border-gray-200 p-2 text-sm rounded-sm focus:border-das-dark outline-none"
-                            />
-                        </div>
+                        {(isScheduling || scheduledFor) && (
+                            <div className="animate-in fade-in slide-in-from-top-2">
+                                <label className="block text-xs font-bold uppercase text-das-dark mb-2 tracking-wider flex items-center gap-2">
+                                    <Calendar className="w-4 h-4" /> Programar para
+                                </label>
+                                <input
+                                    name="scheduledFor"
+                                    type="datetime-local"
+                                    value={scheduledFor}
+                                    onChange={(e) => setScheduledFor(e.target.value)}
+                                    className="w-full border border-gray-200 p-2 text-sm rounded-sm focus:border-das-dark outline-none"
+                                />
+                            </div>
+                        )}
                     </form>
                 </div>
 
                 {/* Footer Actions */}
                 <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50 shrink-0">
-                    {/* ZONA IZQUIERDA: Eliminar (Solo si es borrador o cambios solicitados) */}
+                    {/* ZONA IZQUIERDA: Eliminar */}
                     <div>
                         {(post.status === 'draft' || post.status === 'changes_requested') && (
                             <button
@@ -215,116 +258,98 @@ export default function ClientPostEditModal({ post, isOpen, onClose, userRole = 
                     </div>
 
                     {/* ZONA DERECHA: Acciones Principales */}
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={onClose}
-                            disabled={isLoading}
-                            className="px-4 py-2 text-gray-500 hover:text-gray-900 text-xs font-bold uppercase tracking-wider"
-                        >
-                            Cancelar
-                        </button>
-
-                        {/* CASO A: CLIENTE */}
-                        {!isAdmin && (
+                    <div className="flex items-center gap-2">
+                        {!isScheduling ? (
                             <>
-                                {/* Draft: Guardar Borrador & Solicitar Revisión */}
-                                {post.status === 'draft' && (
-                                    <>
-                                        <button
-                                            onClick={() => submitForm('draft')}
-                                            disabled={isLoading}
-                                            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-sm hover:bg-gray-100 text-xs font-bold uppercase tracking-wider flex items-center gap-2"
-                                        >
-                                            <Save size={16} />
-                                            <span className="hidden sm:inline">Guardar Borrador</span>
-                                        </button>
-                                        <button
-                                            onClick={() => submitForm('review_requested')}
-                                            disabled={isLoading}
-                                            className="px-4 py-2 bg-orange-600 text-white rounded-sm hover:bg-orange-700 shadow-sm text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
-                                        >
-                                            <FileCheck size={16} />
-                                            <span>Solicitar Revisión</span>
-                                        </button>
-                                    </>
-                                )}
+                                <button
+                                    onClick={onClose}
+                                    disabled={isLoading}
+                                    className="px-3 py-2 text-gray-500 hover:text-gray-900 text-xs font-bold uppercase tracking-wider"
+                                >
+                                    Cancelar
+                                </button>
 
-                                {/* Review Requested: Solo Lectura */}
-                                {post.status === 'review_requested' && (
-                                    <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-sm border border-orange-100">
-                                        Esperando revisión de Víctor
-                                    </span>
-                                )}
-
-                                {/* Changes Requested: Guardar Cambios & Enviar Correcciones */}
-                                {post.status === 'changes_requested' && (
+                                {/* CASO A: CLIENTE */}
+                                {!isAdmin && (
                                     <>
-                                        <button
-                                            onClick={() => submitForm('draft')} // Save as draft/changes but don't change status yet
-                                            disabled={isLoading}
-                                            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-sm hover:bg-gray-100 text-xs font-bold uppercase tracking-wider flex items-center gap-2"
-                                        >
-                                            <Save size={16} />
-                                            <span className="hidden sm:inline">Guardar Cambios</span>
-                                        </button>
-                                        <button
-                                            onClick={() => submitForm('review_requested')}
-                                            disabled={isLoading}
-                                            className="px-4 py-2 bg-orange-600 text-white rounded-sm hover:bg-orange-700 shadow-sm text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
-                                        >
-                                            <FileCheck size={16} />
-                                            <span>Enviar Correcciones</span>
-                                        </button>
-                                    </>
-                                )}
+                                        {/* Status: changes_requested OR has feedback */}
+                                        {(post.status === 'changes_requested' || post.feedback_notes) && (
+                                            <>
+                                                <button
+                                                    onClick={() => {
+                                                        setIsScheduling(true);
+                                                        if (!scheduledFor) {
+                                                            const date = new Date();
+                                                            date.setDate(date.getDate() + 1);
+                                                            date.setMinutes(0);
+                                                            const formatted = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                                                            setScheduledFor(formatted);
+                                                        }
+                                                    }}
+                                                    disabled={isLoading}
+                                                    className="px-3 py-2 border border-blue-200 text-blue-700 hover:bg-blue-50 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                                                >
+                                                    <Calendar size={14} />
+                                                    <span>Programar</span>
+                                                </button>
 
-                                {/* Review Client: Solicitar Cambios & Aprobar */}
-                                {post.status === 'review_client' && (
-                                    <>
-                                        <button
-                                            onClick={() => submitForm('changes_requested')} // Logic to request changes needs feedback input, assuming modal handles it or this button opens feedback
-                                            // For simplicity in this modal, we might need a way to input feedback if requesting changes.
-                                            // But the prompt says "Solicitar Cambios (Pasa a changes_requested)".
-                                            // Let's assume for now it just changes status, or we might need a feedback field.
-                                            // Given the UI, let's use 'review_requested' as "Request Changes" equivalent if we don't have a feedback field ready here?
-                                            // Wait, 'review_client' means Admin wrote it. Client can 'Request Changes'.
-                                            // We'll map 'changes_requested' action to a status update.
-                                            disabled={isLoading}
-                                            className="px-4 py-2 border border-red-200 text-red-700 hover:bg-red-50 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-2"
-                                        >
-                                            <FileCheck size={16} />
-                                            <span>Solicitar Cambios</span>
-                                        </button>
-                                        <button
-                                            onClick={() => submitForm(scheduledFor ? 'schedule' : 'publish_now')}
-                                            disabled={isLoading}
-                                            className="px-4 py-2 bg-green-600 text-white rounded-sm hover:bg-green-700 shadow-sm text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
-                                        >
-                                            <Calendar size={16} />
-                                            <span>{scheduledFor ? 'Aprobar y Programar' : 'Aprobar y Publicar'}</span>
-                                        </button>
-                                    </>
-                                )}
+                                                <button
+                                                    onClick={handlePublishNow}
+                                                    disabled={isLoading}
+                                                    className="px-4 py-2 bg-das-dark text-white rounded-sm hover:bg-black shadow-sm text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
+                                                >
+                                                    {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : <Linkedin size={14} />}
+                                                    <span>Publicar Ahora</span>
+                                                </button>
+                                            </>
+                                        )}
 
-                                {/* Scheduled: Solo Lectura + Desprogramar */}
-                                {post.status === 'scheduled' && (
-                                    <>
-                                        <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-sm border border-blue-100 mr-2">
-                                            Programado para {new Date(post.scheduled_for).toLocaleString()}
-                                        </span>
-                                        <button
-                                            onClick={() => submitForm('draft')}
-                                            disabled={isLoading}
-                                            className="px-4 py-2 border border-gray-300 text-gray-600 hover:bg-gray-100 rounded-sm text-xs font-bold uppercase tracking-wider"
-                                        >
-                                            Desprogramar
-                                        </button>
+                                        {/* Draft/Idea: Guardar Borrador & Solicitar Revisión */}
+                                        {(post.status === 'draft' || post.status === 'idea') && !post.feedback_notes && (
+                                            <>
+                                                <button
+                                                    onClick={() => submitForm('draft')}
+                                                    disabled={isLoading}
+                                                    className="px-3 py-2 border border-gray-300 text-gray-700 rounded-sm hover:bg-gray-100 text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                                                >
+                                                    <Save size={14} />
+                                                    <span className="hidden sm:inline">{post.status === 'idea' ? 'Convertir en Borrador' : 'Guardar'}</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => submitForm('review_requested')}
+                                                    disabled={isLoading}
+                                                    className="px-4 py-2 bg-orange-600 text-white rounded-sm hover:bg-orange-700 shadow-sm text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
+                                                >
+                                                    <FileCheck size={14} />
+                                                    <span>Solicitar Revisión</span>
+                                                </button>
+                                            </>
+                                        )}
                                     </>
                                 )}
                             </>
+                        ) : (
+                            // Scheduling Mode Actions
+                            <>
+                                <button
+                                    onClick={() => setIsScheduling(false)}
+                                    disabled={isLoading}
+                                    className="px-3 py-2 text-gray-500 hover:text-gray-900 text-xs font-bold uppercase tracking-wider"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={() => submitForm('schedule')}
+                                    disabled={isLoading || !scheduledFor}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 shadow-sm text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
+                                >
+                                    <Calendar size={14} />
+                                    <span>Confirmar Programación</span>
+                                </button>
+                            </>
                         )}
 
-                        {/* CASO B: ADMIN (Fallback simple logic as this modal is primarily for clients, but admin can view it) */}
+                        {/* CASO B: ADMIN */}
                         {isAdmin && (
                             <button
                                 onClick={() => submitForm(scheduledFor ? 'schedule' : 'publish_now')}

@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, FileText, Calendar, Settings, LogOut, User, BarChart3, Box, Lock } from "lucide-react";
+import { LayoutDashboard, FileText, Calendar, Settings, LogOut, User, BarChart3, Box, Lock, Book } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -83,6 +83,7 @@ export default function DashboardSidebar() {
     ];
 
     const accountItems = [
+        { href: "/dashboard/guide", label: "Guía de Uso", icon: Book },
         { href: "/dashboard/profile", label: "Perfil Ejecutivo", icon: User },
         { href: "/dashboard/subscription", label: "Suscripción", icon: Settings },
     ];

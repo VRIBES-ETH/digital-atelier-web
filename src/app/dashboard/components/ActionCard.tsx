@@ -29,8 +29,8 @@ export default function ActionCard({ title, date, status, id, hasFeedback }: Act
                                 {title || "Borrador sin título"}
                             </h4>
                             <div className="flex items-center gap-3 mt-1.5">
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide border ${status === 'changes_requested' ? 'bg-red-100 text-red-800 border-red-200' : hasFeedback ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'}`}>
-                                    {status === 'changes_requested' ? 'Cambios Solicitados' : hasFeedback ? 'Tienes Feedback' : 'Revisión Pendiente'}
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide border ${status === 'changes_requested' ? 'bg-amber-100 text-amber-800 border-amber-200' : hasFeedback ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'}`}>
+                                    {(status === 'changes_requested' || hasFeedback) ? 'Tienes Feedback' : 'Revisión Pendiente'}
                                 </span>
                                 <span className="text-xs text-gray-400 flex items-center gap-1">
                                     <Calendar size={12} /> {date}

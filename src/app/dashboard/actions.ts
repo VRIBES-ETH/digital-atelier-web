@@ -343,6 +343,48 @@ export async function rescheduleClientPost(postId: string, newDate: string) {
     }
 }
 
+export async function publishClientPost(postId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { success: false, message: "No autenticado" };
+    }
+
+    // Initialize admin client to bypass potential RLS issues
+    const { createClient: createAdminClient } = await import("@supabase/supabase-js");
+    const supabaseAdmin = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false,
+            },
+        }
+    );
+
+    try {
+        // Verify ownership
+        const { data: post, error: fetchError } = await supabaseAdmin
+            .from("posts")
+            .select("user_id")
+            .eq("id", postId)
+            .single();
+
+        if (fetchError || !post) throw new Error("Post no encontrado");
+        if (post.user_id !== user.id) throw new Error("No tienes permiso para publicar este post");
+
+        // Use the admin action to publish (reusing logic)
+        const { publishToLinkedIn } = await import("@/app/admin/actions");
+        return await publishToLinkedIn(postId);
+
+    } catch (error: any) {
+        console.error("Error publishing client post:", error);
+        return { success: false, message: error.message };
+    }
+}
+
 
 export async function deletePost(postId: string) {
     const supabase = await createClient();

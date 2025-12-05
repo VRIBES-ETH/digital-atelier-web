@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, FileText, ChevronRight, X, Check, MessageSquare, Clock, Calendar, Globe, Linkedin, Trash2 } from "lucide-react";
-import { approvePost, requestChanges, rescheduleClientPost, deletePost } from "@/app/dashboard/actions";
+import { Search, Filter, FileText, ChevronRight, X, Check, MessageSquare, Clock, Calendar, Globe, Linkedin, Trash2, Edit } from "lucide-react";
+import { approvePost, requestChanges, rescheduleClientPost, deletePost, publishClientPost } from "@/app/dashboard/actions";
 import { publishToLinkedIn } from "@/app/admin/actions";
 import ClientPostEditModal from "./ClientPostEditModal";
 
@@ -25,23 +25,29 @@ export default function ClientPostsBrowser({ posts, linkedinProfile, userRole = 
     });
 
     // Helper Functions
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (status: string, feedbackNotes?: string) => {
         switch (status) {
             case 'published': return 'bg-green-100 text-green-700 border-green-200';
             case 'scheduled': return 'bg-blue-100 text-blue-700 border-blue-200';
-            case 'pending_approval': return 'bg-das-accent/10 text-das-accent border-das-accent/20';
+            case 'pending_approval':
+                if (feedbackNotes) return 'bg-amber-100 text-amber-700 border-amber-200';
+                return 'bg-das-accent/10 text-das-accent border-das-accent/20';
             case 'changes_requested': return 'bg-amber-100 text-amber-700 border-amber-200';
+            case 'idea': return 'bg-gray-100 text-gray-500 border-gray-200 border-dashed';
             default: return 'bg-gray-100 text-gray-600 border-gray-200';
         }
     };
 
-    const getStatusLabel = (status: string) => {
+    const getStatusLabel = (status: string, feedbackNotes?: string) => {
         switch (status) {
             case 'published': return 'Publicado';
             case 'scheduled': return 'Programado';
-            case 'pending_approval': return 'Pendiente de Revisión';
-            case 'changes_requested': return 'Cambios Solicitados';
+            case 'pending_approval':
+                if (feedbackNotes) return 'Tienes Feedback';
+                return 'Pendiente de Revisión';
+            case 'changes_requested': return 'Tienes Feedback';
             case 'draft': return 'Borrador';
+            case 'idea': return 'Idea';
             default: return status;
         }
     };
@@ -111,6 +117,8 @@ export default function ClientPostsBrowser({ posts, linkedinProfile, userRole = 
                         className="flex-1 sm:flex-none px-3 py-2 border border-gray-200 rounded-sm text-sm text-gray-600 focus:outline-none focus:border-das-dark bg-white"
                     >
                         <option value="all">Todos los Estados</option>
+                        <option value="idea">Ideas</option>
+                        <option value="draft">Borradores</option>
                         <option value="pending_approval">Pendiente de Revisión</option>
                         <option value="changes_requested">Cambios Solicitados</option>
                         <option value="scheduled">Programado</option>
@@ -147,8 +155,8 @@ export default function ClientPostsBrowser({ posts, linkedinProfile, userRole = 
                                     </div>
                                 </div>
                                 <div className="col-span-1 sm:col-span-3 flex items-center">
-                                    <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide border ${getStatusColor(post.status)}`}>
-                                        {getStatusLabel(post.status)}
+                                    <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide border ${getStatusColor(post.status, post.feedback_notes)}`}>
+                                        {getStatusLabel(post.status, post.feedback_notes)}
                                     </span>
                                 </div>
                                 <div className="col-span-1 sm:col-span-3 text-gray-500 text-xs flex justify-between items-center">
@@ -185,8 +193,8 @@ export default function ClientPostsBrowser({ posts, linkedinProfile, userRole = 
                         <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-white shrink-0 z-10">
                             <div className="flex items-center gap-3">
                                 <h3 className="font-poppins font-bold text-lg text-das-dark">Detalle del Post</h3>
-                                <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide border ${getStatusColor(selectedPost.status)}`}>
-                                    {getStatusLabel(selectedPost.status)}
+                                <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide border ${getStatusColor(selectedPost.status, selectedPost.feedback_notes)}`}>
+                                    {getStatusLabel(selectedPost.status, selectedPost.feedback_notes)}
                                 </span>
                             </div>
                             <button
@@ -264,135 +272,208 @@ export default function ClientPostsBrowser({ posts, linkedinProfile, userRole = 
                         </div>
 
                         {/* Modal Footer (Actions) */}
-                        {selectedPost.status === 'pending_approval' && (
-                            <div className="p-4 border-t border-gray-200 bg-white shrink-0">
-                                {!isRejecting ? (
-                                    <div className="flex justify-between items-center gap-3">
-                                        <button
-                                            onClick={async () => {
-                                                if (!confirm("¿Estás seguro de que quieres eliminar este post? Esta acción no se puede deshacer.")) return;
-                                                setIsLoading(true);
-                                                const res = await deletePost(selectedPost.id);
-                                                setIsLoading(false);
-                                                if (res.success) {
-                                                    setSelectedPost(null);
-                                                    window.location.reload();
-                                                } else {
-                                                    alert(res.message);
-                                                }
-                                            }}
-                                            disabled={isLoading}
-                                            className="text-red-500 hover:bg-red-50 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors flex items-center gap-2"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                            Eliminar
-                                        </button>
-                                        <div className="flex gap-3">
-                                            <button
-                                                onClick={() => setIsRejecting(true)}
-                                                className="px-4 py-2 text-xs font-bold uppercase text-gray-500 hover:bg-gray-100 rounded-sm transition-colors flex items-center gap-2"
-                                            >
-                                                <MessageSquare className="w-4 h-4" />
-                                                Solicitar Cambios
-                                            </button>
-                                            <button
-                                                onClick={handleApprove}
-                                                disabled={isLoading}
-                                                className="bg-das-dark text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-gray-800 transition-colors flex items-center gap-2 shadow-lg"
-                                            >
-                                                {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                                                Aprobar Post
-                                            </button>
+                        {/* Actions for Pending/Changes Requested - CLIENT VIEW vs ADMIN VIEW */}
+                        {(selectedPost.status === 'pending_approval' || selectedPost.status === 'changes_requested') && (
+                            <div className={`p-4 border-t border-gray-200 shrink-0 ${selectedPost.status === 'changes_requested' || selectedPost.feedback_notes ? 'bg-amber-50' : 'bg-white'}`}>
+
+                                {/* Feedback Display */}
+                                {(selectedPost.feedback_notes) && (
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-3 text-amber-800 mb-2">
+                                            <MessageSquare className="w-5 h-5" />
+                                            <div>
+                                                <p className="text-sm font-bold">Feedback del Ghostwriter</p>
+                                            </div>
+                                        </div>
+                                        <div className="p-3 bg-white/80 rounded border border-amber-200 text-sm text-amber-900 shadow-sm">
+                                            "{selectedPost.feedback_notes}"
                                         </div>
                                     </div>
-                                ) : (
-                                    <div className="space-y-3 animate-in slide-in-from-bottom-2">
-                                        <label className="block text-xs font-bold uppercase text-red-500">Motivo de la revisión</label>
-                                        <textarea
-                                            value={feedback}
-                                            onChange={(e) => setFeedback(e.target.value)}
-                                            placeholder="Explica qué cambios necesitas..."
-                                            className="w-full border border-red-200 focus:border-red-500 rounded-sm p-3 text-sm outline-none bg-red-50/50 min-h-[80px]"
-                                            autoFocus
-                                        />
-                                        <div className="flex justify-end gap-3">
-                                            <button
-                                                onClick={() => setIsRejecting(false)}
-                                                className="px-4 py-2 text-xs font-bold uppercase text-gray-500 hover:bg-gray-100 rounded-sm transition-colors"
-                                            >
-                                                Cancelar
-                                            </button>
-                                            <button
-                                                onClick={handleRequestChanges}
-                                                disabled={!feedback.trim() || isLoading}
-                                                className="bg-red-500 text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-red-600 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
-                                                Enviar Cambios
-                                            </button>
-                                        </div>
+                                )}
+
+                                {/* ADMIN ACTIONS */}
+                                {userRole === 'admin' && (
+                                    <>
+                                        {!isRejecting ? (
+                                            <div className="flex justify-between items-center gap-3">
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!confirm("¿Estás seguro de que quieres eliminar este post? Esta acción no se puede deshacer.")) return;
+                                                        setIsLoading(true);
+                                                        const res = await deletePost(selectedPost.id);
+                                                        setIsLoading(false);
+                                                        if (res.success) {
+                                                            setSelectedPost(null);
+                                                            window.location.reload();
+                                                        } else {
+                                                            alert(res.message);
+                                                        }
+                                                    }}
+                                                    disabled={isLoading}
+                                                    className="text-red-500 hover:bg-red-50 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors flex items-center gap-2"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    Eliminar
+                                                </button>
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={() => setIsRejecting(true)}
+                                                        className="px-4 py-2 text-xs font-bold uppercase text-gray-500 hover:bg-gray-100 rounded-sm transition-colors flex items-center gap-2"
+                                                    >
+                                                        <MessageSquare className="w-4 h-4" />
+                                                        Solicitar Cambios
+                                                    </button>
+                                                    <button
+                                                        onClick={handleApprove}
+                                                        disabled={isLoading}
+                                                        className="bg-das-dark text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-gray-800 transition-colors flex items-center gap-2 shadow-lg"
+                                                    >
+                                                        {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                                        Aprobar Post
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-3 animate-in slide-in-from-bottom-2">
+                                                <label className="block text-xs font-bold uppercase text-red-500">Motivo de la revisión</label>
+                                                <textarea
+                                                    value={feedback}
+                                                    onChange={(e) => setFeedback(e.target.value)}
+                                                    placeholder="Explica qué cambios necesitas..."
+                                                    className="w-full border border-red-200 focus:border-red-500 rounded-sm p-3 text-sm outline-none bg-red-50/50 min-h-[80px]"
+                                                    autoFocus
+                                                />
+                                                <div className="flex justify-end gap-3">
+                                                    <button
+                                                        onClick={() => setIsRejecting(false)}
+                                                        className="px-4 py-2 text-xs font-bold uppercase text-gray-500 hover:bg-gray-100 rounded-sm transition-colors"
+                                                    >
+                                                        Cancelar
+                                                    </button>
+                                                    <button
+                                                        onClick={handleRequestChanges}
+                                                        disabled={!feedback.trim() || isLoading}
+                                                        className="bg-red-500 text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-red-600 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
+                                                        Enviar Cambios
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* CLIENT ACTIONS (Only when they have feedback or changes requested) */}
+                                {userRole === 'client' && (selectedPost.status === 'changes_requested' || selectedPost.feedback_notes) && (
+                                    <div className="flex flex-col gap-3">
+
+                                        {!isRescheduling ? (
+                                            <div className="flex justify-end items-center gap-3">
+                                                <button
+                                                    onClick={() => setIsEditModalOpen(true)}
+                                                    className="px-4 py-2 text-xs font-bold uppercase text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-sm transition-colors flex items-center gap-2"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                    Editar Contenido
+                                                </button>
+
+                                                <button
+                                                    onClick={() => {
+                                                        setIsRescheduling(true);
+                                                        // Set default to tomorrow same time if not set
+                                                        const date = new Date();
+                                                        date.setDate(date.getDate() + 1);
+                                                        date.setMinutes(0);
+                                                        const formatted = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                                                        setNewDate(formatted);
+                                                    }}
+                                                    className="px-4 py-2 text-xs font-bold uppercase text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-sm transition-colors flex items-center gap-2"
+                                                >
+                                                    <Calendar className="w-4 h-4" />
+                                                    Programar Post
+                                                </button>
+
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!confirm("¿Estás seguro de que quieres publicar este post AHORA en LinkedIn?")) return;
+                                                        setIsLoading(true);
+                                                        const res = await publishClientPost(selectedPost.id);
+                                                        setIsLoading(false);
+                                                        if (res.success) {
+                                                            alert("¡Post publicado con éxito!");
+                                                            setSelectedPost(null);
+                                                            window.location.reload();
+                                                        } else {
+                                                            alert(res.message);
+                                                        }
+                                                    }}
+                                                    disabled={isLoading}
+                                                    className="bg-das-dark text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-gray-900 transition-colors flex items-center gap-2 shadow-lg"
+                                                >
+                                                    {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : <Linkedin className="w-4 h-4" />}
+                                                    PUBLICAR AHORA
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-white p-4 rounded border border-gray-200 animate-in slide-in-from-bottom-2">
+                                                <label className="block text-xs font-bold uppercase text-das-dark mb-2">Selecciona fecha y hora</label>
+                                                <div className="flex gap-3">
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={newDate}
+                                                        onChange={(e) => setNewDate(e.target.value)}
+                                                        className="flex-1 border border-gray-200 focus:border-das-dark rounded-sm p-2 text-sm outline-none"
+                                                    />
+                                                    <button
+                                                        onClick={() => setIsRescheduling(false)}
+                                                        className="px-4 py-2 text-xs font-bold uppercase text-gray-500 hover:bg-gray-100 rounded-sm transition-colors"
+                                                    >
+                                                        Cancelar
+                                                    </button>
+                                                    <button
+                                                        onClick={handleReschedule}
+                                                        disabled={!newDate || isLoading}
+                                                        className="bg-blue-600 text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : <Calendar className="w-4 h-4" />}
+                                                        Guardar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
                         )}
 
-                        {selectedPost.status === 'changes_requested' && (
-                            <div className="p-4 border-t border-gray-200 bg-amber-50 shrink-0">
-                                <div className="flex items-center gap-3 text-amber-800 mb-3">
-                                    <MessageSquare className="w-5 h-5" />
-                                    <div>
-                                        <p className="text-sm font-bold">Se requieren cambios</p>
-                                        <p className="text-xs opacity-80">El administrador ha solicitado cambios en este post.</p>
-                                    </div>
-                                </div>
-                                {selectedPost.feedback_notes && (
-                                    <div className="mb-4 p-3 bg-white/50 rounded border border-amber-100 text-sm italic text-amber-900">
-                                        "{selectedPost.feedback_notes}"
-                                    </div>
-                                )}
+                        {/* Actions for 'idea' Status - Client View Only */}
+                        {selectedPost.status === 'idea' && userRole === 'client' && (
+                            <div className="p-4 border-t border-gray-200 shrink-0 bg-white">
                                 <div className="flex justify-between items-center">
                                     <button
                                         onClick={async () => {
-                                            if (!confirm("¿Estás seguro de que quieres eliminar este post? Esta acción no se puede deshacer.")) return;
+                                            if (!confirm("¿Eliminar esta idea?")) return;
                                             setIsLoading(true);
                                             const res = await deletePost(selectedPost.id);
                                             setIsLoading(false);
                                             if (res.success) {
                                                 setSelectedPost(null);
                                                 window.location.reload();
-                                            } else {
-                                                alert(res.message);
                                             }
                                         }}
-                                        disabled={isLoading}
-                                        className="text-red-500 hover:bg-red-50 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors flex items-center gap-2"
+                                        className="text-red-400 hover:text-red-600 text-xs font-bold uppercase tracking-wider flex items-center gap-2"
                                     >
                                         <Trash2 className="w-4 h-4" />
-                                        Eliminar
+                                        Eliminar Idea
                                     </button>
                                     <button
                                         onClick={() => setIsEditModalOpen(true)}
-                                        className="bg-gray-900 text-white px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-black transition-colors flex items-center gap-2 shadow-sm"
+                                        className="px-6 py-2 bg-das-dark text-white rounded-sm hover:bg-black shadow-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105"
                                     >
-                                        <FileText className="w-4 h-4" />
-                                        Editar y Resolver
+                                        <Edit className="w-4 h-4" />
+                                        Convertir en Post
                                     </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Advice/Comment Display for non-blocking states */}
-                        {selectedPost.feedback_notes && selectedPost.status !== 'changes_requested' && (
-                            <div className="p-4 border-t border-gray-200 bg-blue-50 shrink-0">
-                                <div className="flex items-center gap-3 text-blue-800 mb-3">
-                                    <MessageSquare className="w-5 h-5" />
-                                    <div>
-                                        <p className="text-sm font-bold">Consejo del Administrador</p>
-                                        <p className="text-xs opacity-80">El administrador ha dejado un comentario sobre este post.</p>
-                                    </div>
-                                </div>
-                                <div className="p-3 bg-white/50 rounded border border-blue-100 text-sm italic text-blue-900">
-                                    "{selectedPost.feedback_notes}"
                                 </div>
                             </div>
                         )}
