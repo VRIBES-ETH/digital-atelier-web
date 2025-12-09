@@ -1,4 +1,4 @@
-```typescript
+
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { publishToLinkedIn } from "@/lib/linkedin";
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         // 3. Check Token Validity
         if (!author.linkedin_access_token) {
             return NextResponse.json({
-                error: `El cliente(${ author.full_name }) no ha conectado su cuenta de LinkedIn.`
+                error: `El cliente(${author.full_name}) no ha conectado su cuenta de LinkedIn.`
             }, { status: 400 });
         }
 
