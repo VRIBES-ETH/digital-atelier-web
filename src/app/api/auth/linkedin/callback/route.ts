@@ -1,87 +1,54 @@
-import { createClient } from "@supabase/supabase-js";
-import { NextResponse } from "next/server";
-
-// Initialize Supabase Admin Client to bypass RLS when updating tokens
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false,
-        },
-    }
-);
+import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    const code = searchParams.get("code");
-    const state = searchParams.get("state"); // Contains user ID
-    const error = searchParams.get("error");
+    const code = searchParams.get('code');
 
-    if (error || !code || !state) {
-        return NextResponse.redirect(new URL("/dashboard?error=linkedin_auth_failed", request.url));
+    if (!code) {
+        return NextResponse.json({ error: 'No code provided' });
     }
 
+    const clientId = process.env.LINKEDIN_CLIENT_ID;
+    const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
+    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/linkedin/callback`;
+
     try {
-        // 1. Exchange code for access token
-        const tokenResponse = await fetch("https://www.linkedin.com/oauth/v2/accessToken", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        const response = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
-                grant_type: "authorization_code",
+                grant_type: 'authorization_code',
                 code: code,
-                redirect_uri: `${new URL(request.url).origin}/api/auth/linkedin/callback`,
-                client_id: process.env.LINKEDIN_CLIENT_ID!,
-                client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
+                redirect_uri: redirectUri,
+                client_id: clientId!,
+                client_secret: clientSecret!,
             }),
         });
 
-        const tokenData = await tokenResponse.json();
+        const data = await response.json();
 
-        if (!tokenResponse.ok) {
-            throw new Error(tokenData.error_description || "Failed to exchange token");
+        if (data.error) {
+            return NextResponse.json(data);
         }
 
-        // 2. Calculate expiration
-        const expiresIn = tokenData.expires_in; // Seconds
-        const expiresAt = new Date(Date.now() + expiresIn * 1000);
-
-        // 3. Fetch LinkedIn Profile to get 'sub' (User ID)
-        const profileResponse = await fetch('https://api.linkedin.com/v2/userinfo', {
-            headers: {
-                Authorization: `Bearer ${tokenData.access_token}`,
-            },
+        return new NextResponse(`
+      <html>
+        <body style="font-family: sans-serif; padding: 40px; max-width: 800px; mx: auto;">
+          <h1>✅ LinkedIn Authorization Success!</h1>
+          <p>Here is your <strong>Refresh Token</strong>. Copy this value and paste it into your <code>.env.local</code> file.</p>
+          
+          <div style="background: #f4f4f4; padding: 20px; border-radius: 8px; word-break: break-all; border: 1px solid #ddd;">
+            <strong>LINKEDIN_REFRESH_TOKEN=</strong>${data.refresh_token}
+          </div>
+          
+          <p style="margin-top: 20px; color: #666;">Access Token (expires in ${data.expires_in}s): ${data.access_token.substring(0, 20)}...</p>
+        </body>
+      </html>
+    `, {
+            headers: { 'Content-Type': 'text/html' },
         });
 
-        if (!profileResponse.ok) {
-            console.error("Failed to fetch LinkedIn profile during callback");
-            // We continue but log it. Ideally we should fail or retry.
-        }
-
-        const profileData = await profileResponse.json();
-        const linkedinSub = profileData.sub;
-
-        // 4. Update User Profile in Supabase
-        const userId = state;
-
-        const { error: updateError } = await supabaseAdmin
-            .from("profiles")
-            .update({
-                linkedin_access_token: tokenData.access_token,
-                linkedin_refresh_token: tokenData.refresh_token || null,
-                linkedin_token_expires_at: expiresAt.toISOString(),
-                linkedin_sub: linkedinSub, // Save the LinkedIn User ID
-                linkedin_picture_url: profileData.picture, // Save Profile Picture
-            })
-            .eq("id", userId);
-
-        if (updateError) throw updateError;
-
-        return NextResponse.redirect(new URL("/dashboard?success=linkedin_connected", request.url));
-
     } catch (error) {
-        console.error("LinkedIn Auth Error:", error);
-        return NextResponse.redirect(new URL("/dashboard?error=linkedin_connection_error", request.url));
+        return NextResponse.json({ error: String(error) });
     }
 }

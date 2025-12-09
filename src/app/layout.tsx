@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins, Raleway, Barlow } from "next/font/google";
 import "./globals.css";
+import TopLoader from "@/components/TopLoader";
+import CookieBanner from "@/components/CookieBanner";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -21,8 +23,8 @@ const barlow = Barlow({
 });
 
 export const metadata: Metadata = {
-  title: "Digital Atelier Solutions | Comunicación Web3 Institucional",
-  description: "Agencia Boutique Copywriting & Ghostwriting para líderes Web3.",
+  title: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
+  description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas.",
 };
 
 export default function RootLayout({
@@ -31,11 +33,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="es" className={`${poppins.variable} ${raleway.variable} ${barlow.variable} scroll-smooth`} suppressHydrationWarning>
       <body
         className={`${poppins.variable} ${raleway.variable} ${barlow.variable} antialiased bg-das-light text-das-dark font-raleway`}
       >
+        <TopLoader />
         {children}
+        <CookieBanner />
       </body>
     </html>
   );

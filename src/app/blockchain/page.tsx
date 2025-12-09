@@ -229,7 +229,7 @@ export default function BlockchainPage() {
                         </div>
 
                         {/* GROWTH (MAIN) */}
-                        <div className="bg-white p-8 border-2 border-das-dark rounded-sm shadow-xl relative transform scale-105 z-10 reveal delay-200">
+                        <div className="bg-white p-8 border-2 border-das-dark rounded-sm shadow-xl relative transform scale-105 z-10 reveal delay-200 ring-2 ring-das-accent shadow-glow">
                             <div className="absolute top-0 inset-x-0 bg-das-dark text-white text-[10px] font-bold uppercase tracking-widest text-center py-1">Opción Recomendada</div>
                             <div className="flex justify-between items-start mb-4 mt-2">
                                 <h3 className="font-bold text-xl font-poppins">GROWTH</h3>
@@ -310,8 +310,8 @@ export default function BlockchainPage() {
             <footer className="py-12 px-6 bg-[#0a0c0f] border-t border-white/5 text-gray-600 text-xs flex flex-col md:flex-row justify-between items-center max-w-6xl mx-auto">
                 <p>© 2025 Digital Atelier Solutions. Todos los derechos reservados.</p>
                 <div className="flex gap-6 mt-4 md:mt-0">
-                    <a href="#" className="hover:text-gray-400">Privacidad</a>
-                    <a href="#" className="hover:text-gray-400">Términos</a>
+                    <a href="/privacidad" className="hover:text-gray-400">Privacidad</a>
+                    <a href="/aviso-legal" className="hover:text-gray-400">Aviso Legal</a>
                     <a href="https://linkedin.com" className="hover:text-white transition-colors"><MessageSquare className="w-4 h-4" /></a>
                 </div>
             </footer>
