@@ -1,8 +1,11 @@
+
 import { Suspense } from "react";
 import DashboardSidebar from "./components/DashboardSidebar";
 import DashboardHeader from "./components/DashboardHeader";
 
-export default function DashboardLayout({
+export const runtime = 'edge';
+
+export default async function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;

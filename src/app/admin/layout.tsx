@@ -2,6 +2,9 @@
 
 import { LayoutGrid, Users, PenTool, Settings, LogOut, Calendar, Search, Bell, Shield, Megaphone } from "lucide-react";
 import Link from "next/link";
+
+export const runtime = 'edge';
+
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 

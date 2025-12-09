@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas.",
 };
 
-export const runtime = "edge";
+
 
 export default function RootLayout({
   children,
