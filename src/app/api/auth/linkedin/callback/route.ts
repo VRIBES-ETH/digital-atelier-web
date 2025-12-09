@@ -1,37 +1,39 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const code = searchParams.get('code');
+export const runtime = 'edge';
 
-    if (!code) {
-        return NextResponse.json({ error: 'No code provided' });
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const code = searchParams.get('code');
+
+  if (!code) {
+    return NextResponse.json({ error: 'No code provided' });
+  }
+
+  const clientId = process.env.LINKEDIN_CLIENT_ID;
+  const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
+  const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/linkedin/callback`;
+
+  try {
+    const response = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: redirectUri,
+        client_id: clientId!,
+        client_secret: clientSecret!,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      return NextResponse.json(data);
     }
 
-    const clientId = process.env.LINKEDIN_CLIENT_ID;
-    const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
-    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/linkedin/callback`;
-
-    try {
-        const response = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                grant_type: 'authorization_code',
-                code: code,
-                redirect_uri: redirectUri,
-                client_id: clientId!,
-                client_secret: clientSecret!,
-            }),
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-            return NextResponse.json(data);
-        }
-
-        return new NextResponse(`
+    return new NextResponse(`
       <html>
         <body style="font-family: sans-serif; padding: 40px; max-width: 800px; mx: auto;">
           <h1>✅ LinkedIn Authorization Success!</h1>
@@ -45,10 +47,10 @@ export async function GET(request: Request) {
         </body>
       </html>
     `, {
-            headers: { 'Content-Type': 'text/html' },
-        });
+      headers: { 'Content-Type': 'text/html' },
+    });
 
-    } catch (error) {
-        return NextResponse.json({ error: String(error) });
-    }
+  } catch (error) {
+    return NextResponse.json({ error: String(error) });
+  }
 }

@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
+import { linkedinClient } from '@/lib/linkedin';
 
 // Cloudflare Workers run on the Edge runtime, so we enforce it here.
 export const runtime = 'edge';
 
-export async function GET() {
+export async function GET(request: Request) {
   const clientId = process.env.LINKEDIN_CLIENT_ID;
   const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
   const refreshToken = process.env.LINKEDIN_REFRESH_TOKEN;
