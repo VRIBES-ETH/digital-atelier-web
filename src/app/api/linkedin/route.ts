@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { linkedinClient } from '@/lib/linkedin';
+
 
 // Cloudflare Workers run on the Edge runtime, so we enforce it here.
 export const runtime = 'edge';
