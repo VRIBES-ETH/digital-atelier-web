@@ -60,9 +60,9 @@ export async function GET(request: Request) {
         if (!accessToken) throw new Error("Failed to refresh token: No access token in response");
 
         // 2. Fetch Posts
-        // Using the UGC Posts API or Shares API depending on the URN type (person vs organization)
-        // Here we use a generic request structure suitable for most retrieval cases
-        const response = await fetch(`https://api.linkedin.com/v2/ugcPosts?q=authors&authors=List(${authorUrn})&count=3`, {
+        // Important: URL Encode the URN for the search query
+        const encodedUrn = encodeURIComponent(authorUrn);
+        const response = await fetch(`https://api.linkedin.com/v2/ugcPosts?q=authors&authors=List(${encodedUrn})&count=3`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'X-Restli-Protocol-Version': '2.0.0'
