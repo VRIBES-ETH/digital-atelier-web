@@ -1,116 +1,62 @@
+"use client";
+
 import { ArrowUpRight, Clock, CheckCircle, AlertCircle, Linkedin, Zap, Calendar, FileText, BarChart3, Plus } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { getLinkedInAuthUrl, fetchLinkedInProfile, getIdeas } from "./actions";
+import { getDashboardSummary } from "./actions";
 import Link from "next/link";
 import ScheduledPostsWidget from "./components/ScheduledPostsWidget";
 import ActionCard from "./components/ActionCard";
 import IdeasWidget from "./components/IdeasWidget";
-import IdeaModalWrapper from "./components/IdeaModalWrapper"; // Keep for the empty state action
+import IdeaModalWrapper from "./components/IdeaModalWrapper";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default async function DashboardHome({
-    searchParams,
-}: {
-    searchParams: { [key: string]: string | string[] | undefined };
-}) {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+export default function DashboardHome() {
+    const searchParams = useSearchParams();
+    const userIdParam = searchParams.get("userId");
 
-    let profile = null;
-    let linkedinUrl = "";
-    let linkedinData = null;
-    let postsStats = {
-        pending: 0,
-        published: 0,
-        total: 0
-    };
-    let pendingPosts = [];
-    let ideas: any[] = [];
+    const [data, setData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Initialize admin client for impersonation if needed
-    const { createClient: createAdminClient } = await import("@supabase/supabase-js");
-    const supabaseAdmin = createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        {
-            auth: {
-                autoRefreshToken: false,
-                persistSession: false,
-            },
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const res = await getDashboardSummary(userIdParam || undefined);
+                if (res && !res.error) {
+                    setData(res);
+                }
+            } catch (err) {
+                console.error("Error loading dashboard:", err);
+            } finally {
+                setLoading(false);
+            }
         }
-    );
+        loadData();
+    }, [userIdParam]);
 
-    let targetUserId = user?.id || "";
-
-    if (user) {
-        // 1. Check if current user is admin
-        const { data: currentUserProfile } = await supabase
-            .from("profiles")
-            .select("role")
-            .eq("id", user.id)
-            .single();
-
-        const isAdmin = currentUserProfile?.role === 'admin';
-        if (isAdmin && searchParams.userId) {
-            targetUserId = searchParams.userId as string;
-        }
-
-        // Use supabaseAdmin if impersonating to bypass RLS, otherwise standard client
-        const db = (isAdmin && searchParams.userId) ? supabaseAdmin : supabase;
-
-        // Fetch Profile
-        const { data: profileData } = await db.from("profiles").select("*").eq("id", targetUserId).single();
-        profile = profileData;
-
-        // Fetch LinkedIn Data if connected
-        if (profile?.linkedin_access_token) {
-            linkedinData = await fetchLinkedInProfile(profile.linkedin_access_token);
-        } else if (targetUserId === user.id) {
-            // Only show auth URL if viewing own profile
-            linkedinUrl = await getLinkedInAuthUrl();
-        }
-
-        // Fetch Posts Stats
-        const { count: pendingCount } = await db
-            .from("posts")
-            .select("*", { count: 'exact', head: true })
-            .eq("user_id", targetUserId)
-            .eq("status", "pending_approval");
-
-        const { count: publishedCount } = await db
-            .from("posts")
-            .select("*", { count: 'exact', head: true })
-            .eq("user_id", targetUserId)
-            .eq("status", "published");
-
-        postsStats.pending = pendingCount || 0;
-        postsStats.published = publishedCount || 0;
-
-        // Fetch Pending Posts for "Attention Required"
-        const { data: posts } = await db
-            .from("posts")
-            .select("*")
-            .eq("user_id", targetUserId)
-            .in("status", ["pending_approval", "changes_requested"])
-            .order("updated_at", { ascending: false })
-            .limit(5);
-
-        pendingPosts = posts || [];
-
-        // Fetch Ideas
-        // We can't reuse the getIdeas action directly here because we might be impersonating
-        // So we fetch directly using the db client we set up
-        const { data: ideasData } = await db
-            .from("posts")
-            .select("id, content, internal_notes, reference_link, created_at")
-            .eq("user_id", targetUserId)
-            .eq("status", "idea")
-            .order("created_at", { ascending: false })
-            .limit(5);
-
-        ideas = ideasData || [];
+    if (loading) {
+        return (
+            <div className="space-y-8 animate-pulse">
+                <div className="h-8 w-48 bg-gray-200 rounded"></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="h-32 bg-gray-200 rounded-xl"></div>
+                    <div className="h-32 bg-gray-200 rounded-xl"></div>
+                    <div className="h-32 bg-gray-200 rounded-xl"></div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-6">
+                        <div className="h-64 bg-gray-200 rounded-xl"></div>
+                    </div>
+                    <div className="space-y-6">
+                        <div className="h-32 bg-gray-200 rounded-xl"></div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
-    const isLinked = !!profile?.linkedin_access_token;
+    if (!data) return null;
+
+    const { profile, postsStats, pendingPosts, ideas, targetUserId } = data;
     const firstName = profile?.full_name?.split(' ')[0] || 'Usuario';
 
     return (

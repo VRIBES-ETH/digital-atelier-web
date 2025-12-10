@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import DashboardSidebar from "./components/DashboardSidebar";
 import DashboardHeader from "./components/DashboardHeader";
 
-export const runtime = 'edge';
+
 
 export default async function DashboardLayout({
     children,

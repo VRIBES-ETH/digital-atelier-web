@@ -1,12 +1,40 @@
+"use client";
+
 import { Clock, Filter, Users, FileText, DollarSign, TrendingUp } from "lucide-react";
 import { getAdminStats, getReviewQueue } from "./actions";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default async function AdminDashboard() {
-    const { stats } = await getAdminStats();
-    const { data: reviewQueue } = await getReviewQueue();
+export default function AdminDashboard() {
+    const [stats, setStats] = useState<any>(null);
+    const [reviewQueue, setReviewQueue] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const [statsRes, queueRes] = await Promise.all([
+                    getAdminStats(),
+                    getReviewQueue()
+                ]);
+
+                if (statsRes.success) setStats(statsRes.stats);
+                if (queueRes.success) setReviewQueue(queueRes.data || []);
+
+            } catch (err) {
+                console.error("Error loading admin data:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        loadData();
+    }, []);
 
     const pendingCount = reviewQueue?.length || 0;
+
+    if (loading) {
+        return <div className="p-8 text-center text-gray-500 animate-pulse">Cargando panel de administración...</div>;
+    }
 
     return (
         <div className="space-y-8">
@@ -131,4 +159,3 @@ export default async function AdminDashboard() {
         </div>
     );
 }
-

@@ -818,3 +818,98 @@ export async function getIdeas() {
 
     return data;
 }
+
+export async function getDashboardSummary(searchParamsUserId?: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { error: "No autenticado" };
+    }
+
+    // Initialize admin client for impersonation if needed
+    const { createClient: createAdminClient } = await import("@supabase/supabase-js");
+    const supabaseAdmin = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false,
+            },
+        }
+    );
+
+    let targetUserId = user.id;
+
+    // 1. Check if current user is admin
+    const { data: currentUserProfile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+    const isAdmin = currentUserProfile?.role === 'admin';
+    if (isAdmin && searchParamsUserId) {
+        targetUserId = searchParamsUserId;
+    }
+
+    // Use supabaseAdmin if impersonating
+    const db = (isAdmin && searchParamsUserId) ? supabaseAdmin : supabase;
+
+    // Fetch Profile
+    const { data: profile } = await db.from("profiles").select("*").eq("id", targetUserId).single();
+
+    let linkedinUrl = "";
+
+    // Fetch LinkedIn Data if connected
+    if (!profile?.linkedin_access_token && targetUserId === user.id) {
+        linkedinUrl = await getLinkedInAuthUrl();
+    }
+
+    // Fetch Posts Stats
+    const { count: pendingCount } = await db
+        .from("posts")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", targetUserId)
+        .eq("status", "pending_approval");
+
+    const { count: publishedCount } = await db
+        .from("posts")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", targetUserId)
+        .eq("status", "published");
+
+    const postsStats = {
+        pending: pendingCount || 0,
+        published: publishedCount || 0,
+        total: 0
+    };
+
+    // Fetch Pending Posts
+    const { data: pendingPosts } = await db
+        .from("posts")
+        .select("*")
+        .eq("user_id", targetUserId)
+        .in("status", ["pending_approval", "changes_requested"])
+        .order("updated_at", { ascending: false })
+        .limit(5);
+
+    // Fetch Ideas
+    const { data: ideas } = await db
+        .from("posts")
+        .select("id, content, internal_notes, reference_link, created_at")
+        .eq("user_id", targetUserId)
+        .eq("status", "idea")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+    return {
+        profile,
+        linkedinUrl,
+        postsStats,
+        pendingPosts: pendingPosts || [],
+        ideas: ideas || [],
+        targetUserId
+    };
+}
