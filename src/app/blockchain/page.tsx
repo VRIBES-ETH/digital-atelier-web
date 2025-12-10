@@ -293,8 +293,10 @@ export default function BlockchainPage() {
                     </div>
 
                     <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="premium-btn inline-flex items-center gap-3 bg-white text-das-dark px-10 py-5 font-bold rounded-sm hover:bg-gray-100 transition-colors shadow-2xl"
+                        data-cal-namespace="blockcha-in"
+                        data-cal-link="vribes/blockcha-in"
+                        data-cal-config='{"layout":"month_view"}'
+                        className="premium-btn inline-flex items-center gap-3 bg-white text-das-dark px-10 py-5 font-bold rounded-sm hover:bg-gray-100 transition-colors shadow-2xl cursor-pointer"
                     >
                         <span>Solicitar Entrevista de Acceso</span>
                         <ArrowRight className="w-5 h-5" />
