@@ -51,7 +51,7 @@ export default function BlockchainPage() {
                         <span className="text-gray-400">escribir posts de LinkedIn.</span>
                     </h2>
                     <p className="text-gray-600 mb-12 text-lg font-raleway">
-                        Deja que el sistema trabaje por ti mientras tú diriges la empresa.
+                        Deja que **tu ghostwriter ejecutivo** trabaje por ti mientras tú diriges la empresa.
                     </p>
                     <div className="inline-block bg-gray-100 rounded-sm px-4 py-2 text-xs font-medium text-gray-600 mb-8">
                         No delego. No tengo juniors. Por eso hay lista de espera.
