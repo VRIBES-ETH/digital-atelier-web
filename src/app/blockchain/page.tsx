@@ -37,8 +37,10 @@ export default function BlockchainPage() {
             <div className="fixed inset-0 w-full h-full pointer-events-none z-50 bg-noise mix-blend-multiply opacity-60"></div>
 
             {/* Status Bar */}
-            <div className="bg-das-dark text-white text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase py-3 text-center sticky top-0 z-50">
-                <span className="text-das-accent mr-2">•</span> Estado Actual: Solo 4 plazas disponibles para Q1 2026
+            {/* Status Bar */}
+            <div className="bg-das-dark text-white text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase py-3 text-center sticky top-0 z-50 flex justify-center items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-das-accent inline-block animate-pulse"></span>
+                <span>Estado Actual: Solo 4 plazas disponibles para Q1 2026</span>
             </div>
 
             <SimpleNavbar />
@@ -51,7 +53,7 @@ export default function BlockchainPage() {
                         <span className="text-gray-400">escribir posts de LinkedIn.</span>
                     </h2>
                     <p className="text-gray-600 mb-12 text-lg font-raleway">
-                        Deja que **tu ghostwriter ejecutivo** trabaje por ti mientras tú diriges la empresa.
+                        Deja que <strong className="text-das-dark">un ghostwriter ejecutivo</strong> trabaje por ti, mientras tú diriges la empresa.
                     </p>
                     <div className="inline-block bg-gray-100 rounded-sm px-4 py-2 text-xs font-medium text-gray-600 mb-8">
                         No delego. No tengo juniors. Por eso hay lista de espera.
