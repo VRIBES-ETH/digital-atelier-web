@@ -4,11 +4,17 @@ import SimpleNavbar from "@/components/SimpleNavbar";
 import AuditModal from "@/components/AuditModal";
 import { Lock, XCircle, AlertOctagon, Check, CheckCircle, TrendingUp, Crown, Search, Target, MessageSquare, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getCalApi } from "@calcom/embed-react";
 
 export default function BlockchainPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
+        (async function () {
+            const cal = await getCalApi({ "namespace": "blockcha-in" });
+            cal("ui", { "styles": { "branding": { "brandColor": "#0f1115" } }, "hideEventTypeDetails": false, "layout": "month_view" });
+        })();
+
         const observerOptions = {
             root: null,
             rootMargin: '0px',
