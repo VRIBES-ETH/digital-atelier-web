@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Save, Plus, Trash2, Linkedin, Globe, MessageSquare, User } from "lucide-react";
-import { updateProfile } from "@/app/dashboard/actions";
+// import { updateProfile } from "@/app/dashboard/actions"; // DISABLED FOR WEB-ONLY
 
 interface ProfileData {
     headline: string;
@@ -51,7 +51,12 @@ export default function ExecutiveProfileForm({ profile, linkedinProfile }: { pro
         data.append("toneOfVoice", formData.tone_of_voice);
         data.append("contentPillars", JSON.stringify(formData.content_pillars));
 
-        const res = await updateProfile(data);
+        // const res = await updateProfile(data);
+        console.log("Profile update disabled in Web-Only mode", Object.fromEntries(data));
+
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Mock delay
+        const res = { success: true, message: "Modo Demo: Perfil guardado (simulado)" };
+
         setIsLoading(false);
 
         if (res.success) {
