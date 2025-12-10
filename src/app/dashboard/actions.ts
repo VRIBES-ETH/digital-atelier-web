@@ -904,11 +904,22 @@ export async function getDashboardSummary(searchParamsUserId?: string) {
         .order("created_at", { ascending: false })
         .limit(5);
 
+    // Fetch Scheduled Posts (for Widget)
+    const { data: scheduledPosts } = await db
+        .from("posts")
+        .select("*")
+        .eq("user_id", targetUserId)
+        .in("status", ["scheduled", "approved"])
+        .gte("scheduled_for", new Date().toISOString())
+        .order("scheduled_for", { ascending: true })
+        .limit(3);
+
     return {
         profile,
         linkedinUrl,
         postsStats,
         pendingPosts: pendingPosts || [],
+        scheduledPosts: scheduledPosts || [],
         ideas: ideas || [],
         targetUserId
     };

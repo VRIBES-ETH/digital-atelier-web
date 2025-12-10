@@ -1,26 +1,15 @@
-import { createClient } from "@/lib/supabase/server";
 import { Calendar } from "lucide-react";
 import Link from "next/link";
 
-export default async function ScheduledPostsWidget({ userId }: { userId: string }) {
-    const supabase = await createClient();
+interface ScheduledPostsWidgetProps {
+    userId: string;
+    scheduledPosts: any[]; // Or define proper type
+}
 
-    // Fetch scheduled posts
-    const { data: scheduledPosts } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("user_id", userId)
-        .in("status", ["scheduled", "approved"])
-        .gte("scheduled_for", new Date().toISOString())
-        .order("scheduled_for", { ascending: true })
-        .limit(3);
-
+export default function ScheduledPostsWidget({ userId, scheduledPosts }: ScheduledPostsWidgetProps) {
     const hasPosts = scheduledPosts && scheduledPosts.length > 0;
 
     if (!hasPosts) {
-        // Option A: Hide completely
-        // return null; 
-
         // Option B: Show empty state (preferred for "Agenda de Salida" context)
         return (
             <div className="bg-white border border-gray-200 rounded-xl p-5 mb-6 shadow-sm">

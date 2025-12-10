@@ -56,7 +56,7 @@ export default function DashboardHome() {
 
     if (!data) return null;
 
-    const { profile, postsStats, pendingPosts, ideas, targetUserId } = data;
+    const { profile, postsStats, pendingPosts, scheduledPosts, ideas, targetUserId } = data;
     const firstName = profile?.full_name?.split(' ')[0] || 'Usuario';
 
     return (
@@ -164,7 +164,7 @@ export default function DashboardHome() {
                     </div>
 
                     {/* Scheduled Posts Widget */}
-                    <ScheduledPostsWidget userId={targetUserId} />
+                    <ScheduledPostsWidget userId={targetUserId} scheduledPosts={scheduledPosts} />
 
                     {/* Ideation Bucket / Upcoming Topics */}
                     <IdeasWidget ideas={ideas} />
