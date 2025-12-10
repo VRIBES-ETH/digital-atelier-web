@@ -25,6 +25,10 @@ const barlow = Barlow({
 export const metadata: Metadata = {
   title: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
   description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas.",
+  appleWebApp: {
+    title: "DAS®",
+    statusBarStyle: "default",
+  },
 };
 
 
