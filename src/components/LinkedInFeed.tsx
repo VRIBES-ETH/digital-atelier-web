@@ -64,21 +64,21 @@ export default function LinkedInFeed() {
                         <div key={post.id} className={`bg-white border border-gray-100 p-6 rounded-sm shadow-sm hover:shadow-md transition-shadow reveal active`}>
                             {/* Header */}
                             <div className="flex gap-4 mb-4">
-                                <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden shrink-0">
-                                    <img src="/images/victor-ribes.png" alt="Victor Ribes" className="w-full h-full object-cover grayscale" />
+                                <div className="w-12 h-12 bg-das-dark rounded-sm overflow-hidden shrink-0 flex items-center justify-center">
+                                    <span className="text-white font-bold text-xl">DA</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <h4 className="font-bold text-sm font-poppins truncate">Víctor Ribes</h4>
-                                            <p className="text-xs text-gray-400 truncate">Founder @ Digital Atelier Solutions</p>
+                                            <h4 className="font-bold text-sm font-poppins truncate">Digital Atelier Solutions</h4>
+                                            <p className="text-xs text-gray-400 truncate">Ghostwriting Agency</p>
                                         </div>
                                         <Linkedin className="w-4 h-4 text-[#0077b5]" />
                                     </div>
                                     <div className="flex items-center gap-1 text-[10px] text-gray-400 mt-1">
                                         <span>{post.date}</span>
                                         <span>•</span>
-                                        <Link href={post.url || "#"} target="_blank"><ExternalLink className="w-3 h-3 hover:text-das-dark transition-colors" /></Link>
+                                        <Link href={`https://www.linkedin.com/feed/update/${post.id}`} target="_blank"><ExternalLink className="w-3 h-3 hover:text-das-dark transition-colors" /></Link>
                                     </div>
                                 </div>
                             </div>
