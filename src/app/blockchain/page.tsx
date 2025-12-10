@@ -36,43 +36,32 @@ export default function BlockchainPage() {
             {/* Texture */}
             <div className="fixed inset-0 w-full h-full pointer-events-none z-50 bg-noise mix-blend-multiply opacity-60"></div>
 
-            {/* BARRA DE ESCASEZ */}
-            <div className="bg-das-dark text-white text-[10px] md:text-xs font-bold tracking-widest uppercase py-2 text-center border-b border-white/10 relative z-50">
-                <span className="inline-flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-das-accent animate-pulse"></span>
-                    Estado Actual: Solo 2 plazas disponibles para Q2 2025
-                </span>
+            {/* Status Bar */}
+            <div className="bg-das-dark text-white text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase py-3 text-center sticky top-0 z-50">
+                <span className="text-das-accent mr-2">•</span> Estado Actual: Solo 4 plazas disponibles para Q1 2026
             </div>
 
             <SimpleNavbar />
 
             {/* HERO SECTION */}
             <header className="pt-40 pb-20 px-6">
-                <div className="max-w-3xl mx-auto text-center reveal">
-                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-8">
-                        Tu reputación no escala. <br />
-                        <span className="text-gray-400">Tu presencia digital, sí.</span>
-                    </h1>
-
-                    <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
-                        El único servicio de Ghostwriting Ejecutivo diseñado para quienes entienden que en Web3, <strong>el silencio es el activo más caro</strong>.
-                        <br /><br />
-                        <span className="text-sm font-medium text-das-dark/80 bg-gray-200/50 px-2 py-1 rounded">No delego. No tengo juniors. Por eso hay lista de espera.</span>
+                <div className="max-w-3xl mx-auto text-center reveal active">
+                    <h2 className="font-poppins font-bold text-3xl md:text-5xl mb-8 leading-tight">
+                        Tu tiempo vale más que <br />
+                        <span className="text-gray-400">escribir posts de LinkedIn.</span>
+                    </h2>
+                    <p className="text-gray-600 mb-12 text-lg font-raleway">
+                        Deja que el sistema trabaje por ti mientras tú diriges la empresa.
                     </p>
-
-                    <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="premium-btn inline-block bg-das-dark text-white px-8 py-4 font-poppins font-semibold text-sm tracking-wide uppercase rounded-sm shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
-                        >
-                            Aplicar para Acceso
-                        </button>
-                        <span className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 sm:hidden">
-                            <Lock className="w-3 h-3" /> Plazas limitadas
-                        </span>
+                    <div className="inline-block bg-gray-100 rounded-sm px-4 py-2 text-xs font-medium text-gray-600 mb-8">
+                        No delego. No tengo juniors. Por eso hay lista de espera.
                     </div>
 
-                    <p className="mt-6 text-xs text-gray-400 font-medium">
+                    <button data-cal-namespace="blockcha-in" data-cal-link="vribes/blockcha-in" data-cal-config='{"layout":"month_view"}' className="premium-btn bg-das-dark text-white px-10 py-4 rounded-sm font-bold tracking-widest uppercase text-xs hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer">
+                        Aplicar para Acceso
+                    </button>
+
+                    <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-wider">
                         *Proceso de selección activo. Solo perfiles cualificados.
                     </p>
                 </div>
