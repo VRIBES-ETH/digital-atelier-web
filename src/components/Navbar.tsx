@@ -58,11 +58,11 @@ export default function Navbar() {
             {/* Mobile Menu Overlay */}
             <div className={`fixed inset-0 bg-das-light z-40 flex flex-col justify-center items-center transition-opacity duration-300 ${isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
                 <div className="flex flex-col gap-8 text-center font-poppins text-2xl font-bold">
-                    <Link href="/#expertise" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Expertise</Link>
-                    <Link href="/#servicios" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Servicios</Link>
-                    <Link href="/blockchain" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Blockcha-in</Link>
-                    <Link href="/#proceso" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Proceso</Link>
-                    <a href="mailto:info@digitalateliersolutions.agency" className="mt-4 bg-das-dark text-white px-8 py-3 rounded-sm">Contacto</a>
+                    <Link href="/#expertise" onClick={closeMenu} className="hover:text-gray-500 active:scale-95 transition-all">Expertise</Link>
+                    <Link href="/#servicios" onClick={closeMenu} className="hover:text-gray-500 active:scale-95 transition-all">Servicios</Link>
+                    <Link href="/blockchain" onClick={closeMenu} className="hover:text-gray-500 active:scale-95 transition-all">Blockcha-in</Link>
+                    <Link href="/#proceso" onClick={closeMenu} className="hover:text-gray-500 active:scale-95 transition-all">Proceso</Link>
+                    <a href="mailto:info@digitalateliersolutions.agency" className="mt-4 bg-das-dark text-white px-8 py-3 rounded-sm active:bg-gray-800 active:scale-95 transition-all">Contacto</a>
                 </div>
             </div>
         </nav>
