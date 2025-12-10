@@ -59,6 +59,8 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     // Protected routes logic
+    // Protected routes logic - TEMPORARILY DISABLED FOR WEB-ONLY DEPLOY
+    /*
     if (user) {
         // If user is logged in, check their role
         // We can fetch this from the 'profiles' table we just created
@@ -92,6 +94,7 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/login', request.url))
         }
     }
+    */
 
     return response
 }
