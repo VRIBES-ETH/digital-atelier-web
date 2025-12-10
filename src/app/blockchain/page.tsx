@@ -206,7 +206,7 @@ export default function BlockchainPage() {
                         </div>
                         <div className="mt-4 md:mt-0">
                             <span className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-bold uppercase tracking-widest text-das-dark">
-                                <span className="w-2 h-2 bg-green-500 rounded-full"></span> Abierto para Q2
+                                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Abierto: Q1-Q2 2026
                             </span>
                         </div>
                     </div>
