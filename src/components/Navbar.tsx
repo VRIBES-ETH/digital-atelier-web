@@ -2,10 +2,18 @@
 
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { getCalApi } from "@calcom/embed-react";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    useEffect(() => {
+        (async function () {
+            const cal = await getCalApi({ "namespace": "consultoria-inicial-das" });
+            cal("ui", { "styles": { "branding": { "brandColor": "#0f1115" } }, "hideEventTypeDetails": false, "layout": "month_view" });
+        })();
+    }, []);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -44,9 +52,9 @@ export default function Navbar() {
                         Proceso
                         <span className="absolute -bottom-1 left-0 w-0 h-px bg-das-dark transition-all group-hover:w-full"></span>
                     </Link>
-                    <a href="mailto:info@digitalateliersolutions.agency" className="bg-das-dark text-white px-6 py-2.5 rounded-sm hover:bg-gray-800 transition-all hover:shadow-lg transform hover:-translate-y-0.5 duration-300">
-                        Contacto
-                    </a>
+                    <button data-cal-namespace="consultoria-inicial-das" data-cal-link="vribes/consultoria-inicial-das" data-cal-config='{"layout":"month_view"}' className="bg-das-dark text-white px-6 py-2.5 rounded-sm hover:bg-gray-800 active:bg-gray-900 transition-all hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 duration-300 cursor-pointer">
+                        Agenda tu Llamada
+                    </button>
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -62,7 +70,7 @@ export default function Navbar() {
                     <Link href="/#servicios" onClick={closeMenu} className="hover:text-gray-500 active:scale-95 transition-all">Servicios</Link>
                     <Link href="/blockchain" onClick={closeMenu} className="hover:text-gray-500 active:scale-95 transition-all">Blockcha-in</Link>
                     <Link href="/#proceso" onClick={closeMenu} className="hover:text-gray-500 active:scale-95 transition-all">Proceso</Link>
-                    <a href="mailto:info@digitalateliersolutions.agency" className="mt-4 bg-das-dark text-white px-8 py-3 rounded-sm active:bg-gray-800 active:scale-95 transition-all">Contacto</a>
+                    <button data-cal-namespace="consultoria-inicial-das" data-cal-link="vribes/consultoria-inicial-das" data-cal-config='{"layout":"month_view"}' className="mt-4 bg-das-dark text-white px-8 py-3 rounded-sm active:bg-gray-800 active:scale-95 transition-all text-base w-full max-w-xs mx-auto cursor-pointer">Agenda tu Llamada</button>
                 </div>
             </div>
         </nav>
