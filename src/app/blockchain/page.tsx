@@ -107,7 +107,10 @@ export default function BlockchainPage() {
                                 "Víctor, sé que debo publicar. Pero entre el board, Compliance y la operativa diaria, LinkedIn siempre queda para mañana. Y ese 'mañana' nunca llega."
                             </blockquote>
                             <div className="mt-6 flex items-center gap-3 opacity-60">
-                                <div className="w-8 h-8 rounded-full bg-gray-300"></div>
+                                <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src="/images/ceo_avatar.png" alt="CEO Fintech" className="w-full h-full object-cover grayscale" />
+                                </div>
                                 <span className="text-xs font-bold uppercase tracking-widest text-gray-500">CEO Fintech (Cliente actual)</span>
                             </div>
                         </div>
