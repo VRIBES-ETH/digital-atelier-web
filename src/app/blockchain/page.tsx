@@ -214,7 +214,7 @@ export default function BlockchainPage() {
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-das-dark" /> 2-3 posts semanales</li>
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-das-dark" /> Auditoría básica</li>
                             </ul>
-                            <a href="https://buy.stripe.com/test_seed" target="_blank" rel="noopener noreferrer" className="block text-center border border-gray-300 text-gray-600 py-3 text-xs font-bold uppercase tracking-widest hover:border-das-dark hover:text-das-dark transition-colors">Solicitar</a>
+                            <button data-cal-namespace="blockcha-in" data-cal-link="vribes/blockcha-in" data-cal-config='{"layout":"month_view"}' className="block w-full text-center border border-gray-300 text-gray-600 py-3 text-xs font-bold uppercase tracking-widest hover:border-das-dark hover:text-das-dark transition-colors cursor-pointer">Solicitar</button>
                         </div>
 
                         {/* GROWTH (MAIN) */}
@@ -236,66 +236,65 @@ export default function BlockchainPage() {
                                 <li className="flex gap-2"><CheckCircle className="w-4 h-4" /> Optimización mensual</li>
                                 <li className="flex gap-2"><CheckCircle className="w-4 h-4" /> Soporte prioritario</li>
                             </ul>
-                            <a href="https://buy.stripe.com/test_growth" target="_blank" rel="noopener noreferrer" className="block text-center bg-das-dark text-white py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">Aplicar ahora</a>
+                            <button data-cal-namespace="blockcha-in" data-cal-link="vribes/blockcha-in" data-cal-config='{"layout":"month_view"}' className="block w-full text-center bg-das-dark text-white py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors cursor-pointer">Aplicar ahora</button>
                         </div>
 
                         {/* AUTHORITY (WAITLIST) */}
-                        <div className="bg-gray-50 p-8 border border-gray-200 rounded-sm relative overflow-hidden reveal delay-300">
-                            <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center text-center p-6">
-                                <span className="bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest mb-2">Lista de Espera</span>
-                                <p className="text-xs text-gray-600 font-medium">Actualmente al máximo de capacidad para este nivel.</p>
-                                <button onClick={() => setIsModalOpen(true)} className="mt-4 underline text-xs font-bold text-das-dark">Unirme a la lista</button>
-                            </div>
-
-                            <div className="flex justify-between items-start mb-4 opacity-50">
-                                <h3 className="font-bold text-xl font-poppins">AUTHORITY</h3>
-                                <Crown className="w-5 h-5 text-gray-400" />
-                            </div>
-                            <div className="mb-6 opacity-50">
-                                <span className="text-3xl font-bold">$1,500</span><span className="text-sm text-gray-400">/mes</span>
-                            </div>
-                            <ul className="space-y-3 text-sm text-gray-500 mb-8 opacity-50">
-                                <li className="flex gap-2"><Check className="w-4 h-4" /> Full C-Suite Service</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4" /> 5-6 posts semanales</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4" /> PR & Media Relations</li>
-                            </ul>
+                        <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center text-center p-6">
+                            <span className="bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest mb-2">Lista de Espera</span>
+                            <p className="text-xs text-gray-600 font-medium">Actualmente al máximo de capacidad para este nivel.</p>
+                            <button data-cal-namespace="blockcha-in" data-cal-link="vribes/blockcha-in" data-cal-config='{"layout":"month_view"}' className="mt-4 underline text-xs font-bold text-das-dark cursor-pointer">Consultar disponibilidad</button>
                         </div>
-                    </div>
-                </div>
-            </section>
 
-            {/* FINAL CTA */}
-            <section id="auditoria" className="py-24 px-6 bg-das-dark text-white text-center relative overflow-hidden">
-                <div className="max-w-2xl mx-auto relative z-10 reveal">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6">No contrates un servicio.<br />Aplica a una vacante.</h2>
-                    <p className="text-gray-400 mb-10 text-lg">
-                        Para garantizar la calidad de mi trabajo, mantengo un límite estricto de clientes activos. El primer paso es una auditoría ejecutiva de 30 min para ver si encajamos.
-                    </p>
-
-                    <div className="bg-white/5 border border-white/10 p-8 rounded-sm max-w-lg mx-auto mb-8 text-left">
-                        <h4 className="font-bold text-sm uppercase tracking-widest mb-4 border-b border-white/10 pb-2">Tu aplicación incluye:</h4>
-                        <ul className="space-y-3 text-sm text-gray-300">
-                            <li className="flex gap-3"><Search className="w-4 h-4 text-das-accent" /> Auditoría de tu perfil actual (Riesgos/Oportunidades)</li>
-                            <li className="flex gap-3"><Target className="w-4 h-4 text-das-accent" /> Estrategia de posicionamiento preliminar</li>
-                            <li className="flex gap-3"><MessageSquare className="w-4 h-4 text-das-accent" /> Validación de tono y química de trabajo</li>
+                        <div className="flex justify-between items-start mb-4 opacity-50">
+                            <h3 className="font-bold text-xl font-poppins">AUTHORITY</h3>
+                            <Crown className="w-5 h-5 text-gray-400" />
+                        </div>
+                        <div className="mb-6 opacity-50">
+                            <span className="text-3xl font-bold">$1,500</span><span className="text-sm text-gray-400">/mes</span>
+                        </div>
+                        <ul className="space-y-3 text-sm text-gray-500 mb-8 opacity-50">
+                            <li className="flex gap-2"><Check className="w-4 h-4" /> Full C-Suite Service</li>
+                            <li className="flex gap-2"><Check className="w-4 h-4" /> 5-6 posts semanales</li>
+                            <li className="flex gap-2"><Check className="w-4 h-4" /> PR & Media Relations</li>
                         </ul>
                     </div>
-
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="premium-btn inline-flex items-center gap-3 bg-white text-das-dark px-10 py-5 font-bold rounded-sm hover:bg-gray-100 transition-colors shadow-2xl"
-                    >
-                        <span>Solicitar Entrevista de Acceso</span>
-                        <ArrowRight className="w-5 h-5" />
-                    </button>
-
-                    <p className="mt-6 text-[10px] text-gray-500 uppercase tracking-widest">
-                        Sin compromiso. Si no encajamos, te lo diré honestamente.
-                    </p>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            {/* FOOTER */}
+            {/* FINAL CTA */ }
+    <section id="auditoria" className="py-24 px-6 bg-das-dark text-white text-center relative overflow-hidden">
+        <div className="max-w-2xl mx-auto relative z-10 reveal">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">No contrates un servicio.<br />Aplica a una vacante.</h2>
+            <p className="text-gray-400 mb-10 text-lg">
+                Para garantizar la calidad de mi trabajo, mantengo un límite estricto de clientes activos. El primer paso es una auditoría ejecutiva de 30 min para ver si encajamos.
+            </p>
+
+            <div className="bg-white/5 border border-white/10 p-8 rounded-sm max-w-lg mx-auto mb-8 text-left">
+                <h4 className="font-bold text-sm uppercase tracking-widest mb-4 border-b border-white/10 pb-2">Tu aplicación incluye:</h4>
+                <ul className="space-y-3 text-sm text-gray-300">
+                    <li className="flex gap-3"><Search className="w-4 h-4 text-das-accent" /> Auditoría de tu perfil actual (Riesgos/Oportunidades)</li>
+                    <li className="flex gap-3"><Target className="w-4 h-4 text-das-accent" /> Estrategia de posicionamiento preliminar</li>
+                    <li className="flex gap-3"><MessageSquare className="w-4 h-4 text-das-accent" /> Validación de tono y química de trabajo</li>
+                </ul>
+            </div>
+
+            <button
+                onClick={() => setIsModalOpen(true)}
+                className="premium-btn inline-flex items-center gap-3 bg-white text-das-dark px-10 py-5 font-bold rounded-sm hover:bg-gray-100 transition-colors shadow-2xl"
+            >
+                <span>Solicitar Entrevista de Acceso</span>
+                <ArrowRight className="w-5 h-5" />
+            </button>
+
+            <p className="mt-6 text-[10px] text-gray-500 uppercase tracking-widest">
+                Sin compromiso. Si no encajamos, te lo diré honestamente.
+            </p>
+        </div>
+    </section>
+
+    {/* FOOTER */ }
             <footer className="py-12 px-6 bg-[#0a0c0f] border-t border-white/5 text-gray-600 text-xs flex flex-col md:flex-row justify-between items-center max-w-6xl mx-auto">
                 <p>© 2025 Digital Atelier Solutions. Todos los derechos reservados.</p>
                 <div className="flex gap-6 mt-4 md:mt-0">
@@ -306,6 +305,6 @@ export default function BlockchainPage() {
             </footer>
 
             <AuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultSubject="Aplicación Blockcha-in - DAS" />
-        </main>
+        </main >
     );
 }
