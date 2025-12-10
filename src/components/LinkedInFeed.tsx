@@ -61,7 +61,7 @@ export default function LinkedInFeed() {
 
                 <div className="grid md:grid-cols-3 gap-8">
                     {posts.map((post, index) => (
-                        <div key={post.id} className={`bg-white border border-gray-100 p-6 rounded-sm shadow-sm hover:shadow-md active:scale-[0.99] active:shadow-none transition-all duration-200 reveal active`}>
+                        <Link href={`https://www.linkedin.com/feed/update/${post.id}`} target="_blank" key={post.id} className={`block bg-white border border-gray-100 p-6 rounded-sm shadow-sm hover:shadow-md hover:border-gray-300 active:scale-[0.99] active:shadow-none transition-all duration-200 reveal active cursor-pointer group`}>
                             {/* Header */}
                             <div className="flex gap-4 mb-4">
                                 <div className="w-12 h-12 bg-das-dark rounded-sm overflow-hidden shrink-0 flex items-center justify-center">
@@ -70,7 +70,7 @@ export default function LinkedInFeed() {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <h4 className="font-bold text-sm font-poppins truncate">Digital Atelier Solutions</h4>
+                                            <h4 className="font-bold text-sm font-poppins truncate group-hover:text-blue-700 transition-colors">Digital Atelier Solutions</h4>
                                             <p className="text-xs text-gray-400 truncate">Ghostwriting Agency</p>
                                         </div>
                                         <Linkedin className="w-4 h-4 text-[#0077b5]" />
@@ -78,7 +78,7 @@ export default function LinkedInFeed() {
                                     <div className="flex items-center gap-1 text-[10px] text-gray-400 mt-1">
                                         <span>{post.date}</span>
                                         <span>•</span>
-                                        <Link href={`https://www.linkedin.com/feed/update/${post.id}`} target="_blank"><ExternalLink className="w-3 h-3 hover:text-das-dark active:scale-110 transition-all" /></Link>
+                                        <ExternalLink className="w-3 h-3 group-hover:text-das-dark transition-all" />
                                     </div>
                                 </div>
                             </div>
@@ -91,18 +91,18 @@ export default function LinkedInFeed() {
                             {/* Footer / Stats */}
                             <div className="pt-4 border-t border-gray-50 flex justify-between items-center text-gray-400 text-xs">
                                 <div className="flex items-center gap-4">
-                                    <span className="flex items-center gap-1 hover:text-blue-600 active:text-blue-800 cursor-pointer transition-colors">
+                                    <span className="flex items-center gap-1 group-hover:text-gray-600 transition-colors">
                                         <ThumbsUp className="w-3.5 h-3.5" /> {post.likes}
                                     </span>
-                                    <span className="flex items-center gap-1 hover:text-blue-600 active:text-blue-800 cursor-pointer transition-colors">
+                                    <span className="flex items-center gap-1 group-hover:text-gray-600 transition-colors">
                                         <MessageCircle className="w-3.5 h-3.5" /> {post.comments}
                                     </span>
-                                    <span className="flex items-center gap-1 hover:text-blue-600 active:text-blue-800 cursor-pointer transition-colors">
+                                    <span className="flex items-center gap-1 group-hover:text-gray-600 transition-colors">
                                         <Share2 className="w-3.5 h-3.5" /> Comp.
                                     </span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
 
