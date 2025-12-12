@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, CheckCircle, Clock, AlertCircle, X, Globe, MessageSquare, Linkedin, Search, Filter, LayoutGrid } from "lucide-react";
-import { publishToLinkedIn, adminRequestChanges } from "@/app/admin/actions";
+import { publishToLinkedIn, adminRequestChanges } from "@/app/_admin/actions";
 
 export default function AdminCalendarClient({ posts, clients }: { posts: any[], clients: any[] }) {
     const [viewMode, setViewMode] = useState<'month' | 'week'>('week');
