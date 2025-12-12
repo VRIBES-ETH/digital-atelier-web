@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Bell, Check, Info, AlertTriangle, AlertCircle, X } from "lucide-react";
-import { getNotifications, markNotificationAsRead } from "@/app/dashboard/actions";
+import { getNotifications, markNotificationAsRead } from "@/app/_dashboard/actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

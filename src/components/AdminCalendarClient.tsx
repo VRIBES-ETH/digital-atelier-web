@@ -428,7 +428,7 @@ export default function AdminCalendarClient({ posts, clients }: { posts: any[], 
                                                 onClick={async () => {
                                                     if (!feedback.trim()) return;
                                                     setIsLoading(true);
-                                                    const { rejectPost } = await import("@/app/admin/actions");
+                                                    const { rejectPost } = await import("@/app/_admin/actions");
                                                     await rejectPost(selectedPost.id, feedback);
                                                     setIsLoading(false);
                                                     setSelectedPost(null);

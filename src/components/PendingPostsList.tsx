@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Clock, ChevronRight, X, Check, MessageSquare } from "lucide-react";
-import { approvePost, requestChanges } from "@/app/dashboard/actions";
+import { updateClientPost, approvePost, requestChanges } from "@/app/_dashboard/actions";
 
 export default function PendingPostsList({ posts }: { posts: any[] }) {
     const [selectedPost, setSelectedPost] = useState<any>(null);

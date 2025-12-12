@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Plus, X, Loader2, Send, Image as ImageIcon, Calendar, Clock, FileCheck } from "lucide-react";
-import { createClientPost } from "@/app/dashboard/actions";
+import { createClientPost } from "@/app/_dashboard/actions";
 
 interface ClientPostCreateModalProps {
     userRole?: 'admin' | 'client';

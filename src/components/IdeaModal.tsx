@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Lightbulb, Loader2, Trash2, Link as LinkIcon } from "lucide-react";
-import { createIdea, updateIdea, deletePost } from "@/app/dashboard/actions";
+import { createIdea, updateIdea, deletePost } from "@/app/_dashboard/actions";
 
 interface Idea {
     id: string;

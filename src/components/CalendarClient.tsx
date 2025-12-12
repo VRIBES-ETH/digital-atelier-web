@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, CheckCircle, Clock, AlertCircle, X, Globe, MessageSquare, Check, Linkedin, Plus } from "lucide-react";
-import { approvePost, requestChanges, rescheduleClientPost } from "@/app/dashboard/actions";
-import { publishToLinkedIn } from "@/app/admin/actions";
+import { approvePost, requestChanges, rescheduleClientPost } from "@/app/_dashboard/actions";
+import { publishToLinkedIn } from "@/app/_admin/actions";
 import ClientPostCreateModal from "./ClientPostCreateModal";
 
 export default function CalendarClient({ posts, linkedinProfile }: { posts: any[], linkedinProfile: any }) {

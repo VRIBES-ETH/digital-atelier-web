@@ -376,7 +376,7 @@ export async function publishClientPost(postId: string) {
         if (post.user_id !== user.id) throw new Error("No tienes permiso para publicar este post");
 
         // Use the admin action to publish (reusing logic)
-        const { publishToLinkedIn } = await import("@/app/admin/actions");
+        const { publishToLinkedIn } = await import("@/app/_admin/actions");
         return await publishToLinkedIn(postId);
 
     } catch (error: any) {

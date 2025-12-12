@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Save, Plus, Trash2, Linkedin, Globe, MessageSquare, User } from "lucide-react";
-import { updateProfile } from "@/app/dashboard/actions";
+import { updateProfile } from "@/app/_dashboard/actions";
 
 interface ProfileData {
     headline: string;

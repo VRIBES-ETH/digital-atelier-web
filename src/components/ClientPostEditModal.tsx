@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { X, Loader2, Image as ImageIcon, Calendar, Trash2, FileCheck, Save, Linkedin, Clock } from "lucide-react";
-import { updateClientPost, deletePost, publishClientPost } from "@/app/dashboard/actions";
+import { updateClientPost, deletePost, publishClientPost } from "@/app/_dashboard/actions";
 
 interface ClientPostEditModalProps {
     post: any;
