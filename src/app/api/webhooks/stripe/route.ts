@@ -5,17 +5,22 @@ import { createClient } from "@supabase/supabase-js";
 
 export const runtime = 'edge';
 
-// Initialize Supabase Admin to update profiles bypassing RLS
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false,
-        },
+// function to get admin client safely
+function getSupabaseAdmin() {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        return null; // Return null if keys are missing (e.g. in Web-only prod)
     }
-);
+    return createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false,
+            },
+        }
+    );
+}
 
 export async function POST(req: Request) {
     const body = await req.text();
@@ -34,6 +39,14 @@ export async function POST(req: Request) {
     }
 
     const session = event.data.object as any;
+    const supabaseAdmin = getSupabaseAdmin();
+
+    // If we don't have admin access (no keys), we can't update DB.
+    // In "Web only" deployment, this is expected behavior.
+    if (!supabaseAdmin) {
+        console.warn("Supabase keys missing. Skipping DB update for Stripe webhook.");
+        return new NextResponse(null, { status: 200 });
+    }
 
     if (event.type === "checkout.session.completed") {
         const subscription = await stripe.subscriptions.retrieve(session.subscription);
