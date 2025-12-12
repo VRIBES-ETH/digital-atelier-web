@@ -1,11 +1,12 @@
 "use client";
 
 import SimpleNavbar from "@/components/SimpleNavbar";
-
+import AuditModal from "@/components/AuditModal";
 import { Lock, XCircle, AlertOctagon, Check, CheckCircle, TrendingUp, Crown, Search, Target, MessageSquare, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function BlockchainPage() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const observerOptions = {
@@ -60,12 +61,12 @@ export default function BlockchainPage() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <a
-                            href="mailto:info@digitalateliersolutions.agency?subject=Solicitud de Acceso - Blockcha-in"
+                        <button
+                            onClick={() => setIsModalOpen(true)}
                             className="premium-btn inline-block bg-das-dark text-white px-8 py-4 font-poppins font-semibold text-sm tracking-wide uppercase rounded-sm shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
                         >
                             Aplicar para Acceso
-                        </a>
+                        </button>
                         <span className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 sm:hidden">
                             <Lock className="w-3 h-3" /> Plazas limitadas
                         </span>
@@ -254,7 +255,7 @@ export default function BlockchainPage() {
                             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center text-center p-6">
                                 <span className="bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest mb-2">Lista de Espera</span>
                                 <p className="text-xs text-gray-600 font-medium">Actualmente al máximo de capacidad para este nivel.</p>
-                                <a href="mailto:info@digitalateliersolutions.agency" className="mt-4 underline text-xs font-bold text-das-dark">Unirme a la lista</a>
+                                <button onClick={() => setIsModalOpen(true)} className="mt-4 underline text-xs font-bold text-das-dark">Unirme a la lista</button>
                             </div>
 
                             <div className="flex justify-between items-start mb-4 opacity-50">
@@ -291,13 +292,13 @@ export default function BlockchainPage() {
                         </ul>
                     </div>
 
-                    <a
-                        href="mailto:info@digitalateliersolutions.agency?subject=Solicitud Entrevista - Blockcha-in"
+                    <button
+                        onClick={() => setIsModalOpen(true)}
                         className="premium-btn inline-flex items-center gap-3 bg-white text-das-dark px-10 py-5 font-bold rounded-sm hover:bg-gray-100 transition-colors shadow-2xl"
                     >
                         <span>Solicitar Entrevista de Acceso</span>
                         <ArrowRight className="w-5 h-5" />
-                    </a>
+                    </button>
 
                     <p className="mt-6 text-[10px] text-gray-500 uppercase tracking-widest">
                         Sin compromiso. Si no encajamos, te lo diré honestamente.
@@ -315,6 +316,7 @@ export default function BlockchainPage() {
                 </div>
             </footer>
 
+            <AuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultSubject="Aplicación Blockcha-in - DAS" />
         </main>
     );
 }
