@@ -1,7 +1,7 @@
 "use client";
 
 import SimpleNavbar from "@/components/SimpleNavbar";
-import AuditModal from "@/components/AuditModal";
+// import AuditModal from "@/components/AuditModal"; // Removed for Web-only build
 import { Lock, XCircle, AlertOctagon, Check, CheckCircle, TrendingUp, Crown, Search, Target, MessageSquare, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -316,7 +316,7 @@ export default function BlockchainPage() {
                 </div>
             </footer>
 
-            <AuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultSubject="Aplicación Blockcha-in - DAS" />
+            {/* <AuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultSubject="Aplicación Blockcha-in - DAS" /> */}
         </main>
     );
 }

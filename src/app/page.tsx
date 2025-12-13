@@ -1,8 +1,8 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import AuditModal from "@/components/AuditModal";
-import ExecutiveProfileForm from "@/components/ExecutiveProfileForm";
+// import AuditModal from "@/components/AuditModal"; // Removed for Web-only build
+// import ExecutiveProfileForm from "@/components/ExecutiveProfileForm"; // Removed for Web-only build
 import LinkedInFeed from "@/components/LinkedInFeed";
 import LoopsForm from "@/components/LoopsForm";
 import { ShieldCheck, Eye, Award, ArrowRight, Globe, Presentation, FileText, PenTool, Building2, BarChart3, Check } from "lucide-react";
@@ -430,7 +430,7 @@ export default function Home() {
         </div>
       </footer>
 
-      <AuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      {/* <AuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
     </main>
   );
 }
