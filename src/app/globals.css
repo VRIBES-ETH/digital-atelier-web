@@ -24,6 +24,16 @@
       transform: translateY(-20px);
     }
   }
+
+  --color-atelier-bg: #0f0f0f;
+  --color-atelier-card: #161616;
+  --color-atelier-accent: #EA580C;
+  --color-atelier-border: #27272a;
+  --color-atelier-text: #F3F4F6;
+  --color-atelier-muted: #9CA3AF;
+
+  --font-display: var(--font-manrope);
+  --font-inter: var(--font-inter);
 }
 
 @layer utilities {
