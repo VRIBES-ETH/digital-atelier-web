@@ -3,6 +3,17 @@ import OpenAI from 'openai';
 import { z } from 'zod';
 import { MOCK_PROFILE } from '@/lib/linkedin-mock';
 
+// Schema for the AI Response
+const AnalysisSchema = z.object({
+    score: z.number().min(0).max(100),
+    headline_critique: z.string(),
+    summary_critique: z.string(),
+    key_strengths: z.array(z.string()),
+    key_weaknesses: z.array(z.string()),
+    hook_suggestion: z.string(),
+    improved_headline: z.string(),
+});
+
 export async function POST(req: Request) {
     try {
         const { url } = await req.json();
