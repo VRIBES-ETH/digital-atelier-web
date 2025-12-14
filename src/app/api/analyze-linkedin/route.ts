@@ -3,6 +3,8 @@ import OpenAI from 'openai';
 import { z } from 'zod';
 import { MOCK_PROFILE } from '@/lib/linkedin-mock';
 
+export const runtime = 'edge';
+
 // Schema for the AI Response
 const AnalysisSchema = z.object({
     score: z.number().min(0).max(100),
