@@ -116,6 +116,36 @@ export default function Home() {
         </div>
       </header>
 
+      {/* EXECUTIVE REPORT BANNER (NEW) */}
+      <section className="bg-zinc-950 py-12 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-8 md:p-12 relative overflow-hidden group">
+            {/* Background decorative elements */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="text-center md:text-left">
+                <span className="inline-block py-1 px-3 border border-orange-500/30 rounded text-orange-400 text-[10px] font-bold tracking-widest mb-4 uppercase bg-orange-900/10">
+                  NUEVO RESEARCH
+                </span>
+                <h2 className="text-3xl md:text-5xl font-bold font-poppins mb-3 tracking-tight text-white">
+                  El Ejecutivo <span className="text-orange-600">Blockchain</span>
+                </h2>
+                <p className="text-gray-400 text-sm md:text-base font-raleway leading-relaxed max-w-xl">
+                  Análisis de tendencias profesionales en Digital Assets, RWA, Tokenización y Desarrollo de Marca Profesional bajo el nuevo algoritmo de LinkedIn 2026.
+                </p>
+              </div>
+
+              <Link href="/report-ejecutivo-2026" className="shrink-0 flex items-center gap-3 px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold uppercase tracking-wider rounded-lg transition-all shadow-lg hover:shadow-orange-900/20 group-hover:scale-105">
+                Leer Reporte
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SERVICIOS */}
       <section id="servicios" className="py-32 px-6 bg-gray-50/50">
         <div className="max-w-7xl mx-auto">
