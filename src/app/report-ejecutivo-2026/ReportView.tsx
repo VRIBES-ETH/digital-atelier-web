@@ -198,7 +198,45 @@ export default function ReportView() {
             const result = await generateGeminiContent(prompt);
 
             if (result.success) {
-                setModalContent(result.data!);
+                // 1. Extract Score (Expects "Puntuación: 75/100" or similar)
+                const scoreMatch = result.data!.match(/Puntuación:?\s*(\d+)/i);
+                const rawScore = scoreMatch ? parseInt(scoreMatch[1]) : 0;
+                const finalScore = rawScore <= 10 ? rawScore : (rawScore / 10).toFixed(1); // Normalized to 0-10
+
+                // 2. Generate Share Text based on score
+                let shareText = "";
+                if (parseFloat(finalScore.toString()) >= 8) {
+                    shareText = `He puesto a prueba mi perfil de LinkedIn con la IA de Digital Atelier y he sacado un ${finalScore}/10.\n\nLa herramienta analiza autoridad real vs ruido.\n\nPruébalo aquí: https://digitalateliersolutions.agency/report-ejecutivo-2026`;
+                } else {
+                    shareText = `He analizado mi perfil con la IA de Digital Atelier. Score: ${finalScore}/10.\n\nTengo trabajo que hacer para posicionarme como autoridad en 2026.\n\nPruébalo aquí: https://digitalateliersolutions.agency/report-ejecutivo-2026`;
+                }
+                const linkedInUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;
+
+                // 3. Construct Virality Block HTML
+                const viralityBlock = `
+                    <div class="mt-8 bg-[#18181b] border border-[#27272a] p-6 rounded-lg relative overflow-hidden group">
+                         <!-- Decorative Icon -->
+                        <div class="absolute -top-6 -right-6 text-[#0a66c2] opacity-10 group-hover:opacity-20 transition-opacity transform rotate-12">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                        </div>
+
+                        <div class="relative z-10">
+                            <h4 class="text-white font-bold font-display text-lg mb-2">
+                                Tu Score de Autoridad: <span class="text-[#EA580C] text-2xl">${finalScore}/10</span>
+                            </h4>
+                            <p class="text-gray-300 text-sm mb-6 max-w-[90%] leading-relaxed">
+                                ¿Quieres mejorar este número? Comparte tu resultado en LinkedIn etiquetando a <strong class="text-white">@VictorRibes</strong> y te daré <span class="text-[#EA580C] font-bold">3 ajustes de alto impacto</span> gratis.
+                            </p>
+                            
+                            <a href="${linkedInUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-[#0a66c2] hover:bg-[#004182] text-white px-5 py-2.5 rounded text-sm font-bold transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-900/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                                Compartir Resultado
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                setModalContent(result.data! + viralityBlock);
             } else {
                 setModalContent(`<p class="text-red-500 font-bold">Error de Sistema:</p><p class="text-red-400 text-sm mt-2">${result.error}</p>`);
             }
