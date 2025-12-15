@@ -196,10 +196,16 @@ export default function ReportView() {
       </div>`;
 
             const result = await generateGeminiContent(prompt);
-            setModalContent(result);
+
+            if (result.success) {
+                setModalContent(result.data!);
+            } else {
+                setModalContent(`<p class="text-red-500 font-bold">Error de Sistema:</p><p class="text-red-400 text-sm mt-2">${result.error}</p>`);
+            }
+
         } catch (error) {
-            console.error(error);
-            setModalContent(`<p class="text-red-500">Error al contactar con la IA: ${(error as Error).message}</p>`);
+            console.error("Client Error:", error);
+            setModalContent(`<p class="text-red-500">Error inesperado en cliente: ${(error as Error).message}</p>`);
         } finally {
             setLoading(false);
         }
@@ -257,10 +263,15 @@ export default function ReportView() {
       </div>`;
 
             const result = await generateGeminiContent(prompt);
-            setModalContent(result);
+
+            if (result.success) {
+                setModalContent(result.data!);
+            } else {
+                setModalContent(`<p class="text-red-500 font-bold">Error de Sistema:</p><p class="text-red-400 text-sm mt-2">${result.error}</p>`);
+            }
         } catch (error) {
-            console.error(error);
-            setModalContent(`<p class="text-red-500">Error al contactar con la IA: ${(error as Error).message}</p>`);
+            console.error("Client Error:", error);
+            setModalContent(`<p class="text-red-500">Error inesperado en cliente: ${(error as Error).message}</p>`);
         } finally {
             setLoading(false);
         }

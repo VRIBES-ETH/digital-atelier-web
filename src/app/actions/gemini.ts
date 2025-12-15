@@ -12,13 +12,13 @@ export async function generateGeminiContent(prompt: string) {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
     if (!GEMINI_API_KEY) {
-        console.error("Server Action: GEMINI_API_KEY is missing from environment variables.");
-        throw new Error("GEMINI_API_KEY is not configured on the server.");
+        console.error("Server Action: GEMINI_API_KEY is missing.");
+        return { success: false, error: "Configuration Error: GEMINI_API_KEY is missing on server." };
     }
 
     const validated = GenerateSchema.safeParse({ prompt });
     if (!validated.success) {
-        throw new Error("Invalid input");
+        return { success: false, error: "Validation Error: Invalid prompt input." };
     }
 
     try {
@@ -35,17 +35,21 @@ export async function generateGeminiContent(prompt: string) {
         if (!response.ok) {
             const errorText = await response.text();
             console.error("Gemini API Error:", response.status, errorText);
-            throw new Error(`API Error: ${response.status} - ${errorText}`);
+            return { success: false, error: `Google API Error (${response.status}): ${errorText}` };
         }
 
         const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
-    } catch (error) {
-        console.error("Gemini Action Error:", error);
-        // Throw the actual error message to help with debugging if it propagates to the client
-        if (error instanceof Error) {
-            throw new Error(`Gemini Error: ${error.message}`);
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!content) {
+            return { success: false, error: "API Response Error: No content generated." };
         }
-        throw new Error("Failed to generate content.");
+
+        return { success: true, data: content };
+
+    } catch (error) {
+        console.error("Gemini Action Exception:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        return { success: false, error: `Server Exception: ${errorMessage}` };
     }
 }
