@@ -5,11 +5,20 @@ import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function NewsletterForm() {
     const [email, setEmail] = useState("");
+    const [botField, setBotField] = useState("");
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [message, setMessage] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Honeypot check
+        if (botField !== "") {
+            setStatus("success");
+            setMessage("¡Suscripción confirmada!");
+            setEmail("");
+            return;
+        }
 
         // Rate limit check
         const time = new Date();
@@ -69,6 +78,17 @@ export default function NewsletterForm() {
     return (
         <form onSubmit={handleSubmit} className="w-full">
             <div className="flex flex-col sm:flex-row gap-3">
+                {/* Honeypot field - hidden from humans */}
+                <input
+                    type="text"
+                    name="b_c_312"
+                    tabIndex={-1}
+                    value={botField}
+                    onChange={(e) => setBotField(e.target.value)}
+                    style={{ position: 'absolute', opacity: 0, zIndex: -1, width: 0, height: 0 }}
+                    autoComplete="off"
+                    aria-hidden="true"
+                />
                 <input
                     type="email"
                     value={email}
