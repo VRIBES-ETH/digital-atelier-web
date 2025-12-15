@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 const GenerateSchema = z.object({
     prompt: z.string().min(1),
