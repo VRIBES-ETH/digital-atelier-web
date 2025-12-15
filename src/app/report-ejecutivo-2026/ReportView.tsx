@@ -199,7 +199,7 @@ export default function ReportView() {
             setModalContent(result);
         } catch (error) {
             console.error(error);
-            setModalContent('<p class="text-red-500">Error al contactar con la IA. Verifica la configuración.</p>');
+            setModalContent(`<p class="text-red-500">Error al contactar con la IA: ${(error as Error).message}</p>`);
         } finally {
             setLoading(false);
         }
@@ -260,7 +260,7 @@ export default function ReportView() {
             setModalContent(result);
         } catch (error) {
             console.error(error);
-            setModalContent('<p class="text-red-500">Error al contactar con la IA. Verifica la configuración.</p>');
+            setModalContent(`<p class="text-red-500">Error al contactar con la IA: ${(error as Error).message}</p>`);
         } finally {
             setLoading(false);
         }
