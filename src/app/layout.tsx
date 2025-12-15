@@ -35,6 +35,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://digitalateliersolutions.agency'),
   title: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
   description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas.",
   appleWebApp: {
