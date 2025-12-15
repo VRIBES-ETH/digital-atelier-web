@@ -2,6 +2,8 @@
 
 import { z } from 'zod';
 
+export const runtime = 'edge';
+
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 const GenerateSchema = z.object({
