@@ -4,6 +4,8 @@ import '../globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space' });
 
+export const runtime = 'edge';
+
 export const metadata = {
     title: 'DAS Admin | Client Suite',
     description: 'Internal Operations Dashboard',
