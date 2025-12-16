@@ -17,6 +17,9 @@ export default function LoginPage() {
             if (result?.error) {
                 setError(result.error);
                 setLoading(false);
+            } else if (result?.success) {
+                // Hard redirect to ensure cookie is respected by Middleware
+                window.location.href = '/vribesadmin';
             }
         } catch (e) {
             setError('Error de conexión');

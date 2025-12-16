@@ -16,7 +16,7 @@ export async function loginAdmin(formData: FormData) {
             maxAge: 60 * 60 * 24 * 7, // 1 week
             path: '/',
         });
-        redirect('/vribesadmin');
+        return { success: true };
     } else {
         return { error: 'Contraseña incorrecta' };
     }
