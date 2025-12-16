@@ -66,7 +66,6 @@ export default function LoginPage() {
                     </button>
                 </form>
             </div>
-            <div className="absolute bottom-4 right-4 text-xs text-zinc-800">v2.1 (Debug)</div>
         </div>
     );
 }
