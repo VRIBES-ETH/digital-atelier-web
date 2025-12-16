@@ -21,14 +21,15 @@ export default function LoginPage() {
                 // Hard redirect to ensure cookie is respected by Middleware
                 window.location.href = '/vribesadmin';
             }
-        } catch (e) {
-            setError('Error de conexión');
+        } catch (e: any) {
+            console.error(e);
+            setError(`Error: ${e.message || String(e)}`);
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-[80vh]">
+        <div className="flex items-center justify-center min-h-[80vh] relative">
             <div className="w-full max-w-sm p-8 bg-zinc-900/50 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-sm">
                 <div className="flex flex-col items-center mb-8">
                     <div className="w-12 h-12 bg-orange-950/30 rounded-full flex items-center justify-center border border-orange-900/50 mb-4">
@@ -51,7 +52,7 @@ export default function LoginPage() {
                     </div>
 
                     {error && (
-                        <div className="p-3 bg-red-950/30 border border-red-900/50 rounded text-red-400 text-xs text-center font-medium animate-pulse">
+                        <div className="p-3 bg-red-950/30 border border-red-900/50 rounded text-red-400 text-xs text-center font-medium animate-pulse break-all">
                             {error}
                         </div>
                     )}
@@ -65,6 +66,7 @@ export default function LoginPage() {
                     </button>
                 </form>
             </div>
+            <div className="absolute bottom-4 right-4 text-xs text-zinc-800">v2.1 (Debug)</div>
         </div>
     );
 }
