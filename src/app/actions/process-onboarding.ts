@@ -131,7 +131,6 @@ export async function processTranscript(
             generateObject({
                 model,
                 schema: VoiceProfileSchema,
-                mode: 'json',
                 prompt: `
 ${SPEAKER_GUARDRAILS}
 
@@ -153,7 +152,6 @@ INSTRUCCIONES DE IDENTIDAD (NO GENÉRICA):
             generateObject({
                 model,
                 schema: PositioningProfileSchema,
-                mode: 'json',
                 prompt: `
 ${SPEAKER_GUARDRAILS}
 
@@ -190,7 +188,6 @@ ${transcript.substring(0, 3000)}...
             generateObject({
                 model,
                 schema: OperationalRulesSchema,
-                mode: 'json',
                 prompt: `
 ${SPEAKER_GUARDRAILS}
 ${contextPrompt}
@@ -208,7 +205,6 @@ INSTRUCCIONES DE ESTILO (CRÍTICO):
             generateObject({
                 model,
                 schema: ContentOutputsSchema,
-                mode: 'json',
                 prompt: `
 ${SPEAKER_GUARDRAILS}
 ${contextPrompt}
