@@ -21,6 +21,7 @@ export default function PrivacidadPage() {
                         <li><strong>Prestación de Servicios:</strong> Gestionar la relación contractual y los servicios de agencia o suscripción a Blockcha-in.</li>
                         <li><strong>Agendamiento:</strong> Gestionar las citas solicitadas a través de nuestra integración con Cal.com.</li>
                         <li><strong>Comunicaciones:</strong> Si te has suscrito, enviarte nuestra newsletter o análisis de mercado.</li>
+                        <li><strong>Integraciones:</strong> En el marco de determinados servicios, Digital Atelier Solutions LLC puede interactuar con APIs de terceros, incluyendo LinkedIn, exclusivamente con autorización expresa del usuario y conforme a las políticas de dichas plataformas.</li>
                     </ol>
                     <p className="mb-4">
                         La base legal es tu <strong>consentimiento</strong> (al reservar/suscribirte) y la <strong>ejecución de un contrato</strong> (al contratar servicios).
@@ -44,7 +45,7 @@ export default function PrivacidadPage() {
 
                     <h2 className="font-poppins font-bold text-xl text-das-dark mt-8 mb-4">5. Tus Derechos</h2>
                     <p className="mb-4">
-                        Respetamos tus derechos de privacidad globales. Puedes solicitar el acceso, rectificación, supresión y portabilidad de tus datos escribiendo directamente a info@digitalateliersolutions.agency.
+                        Respetamos tus derechos de privacidad globales. Puedes solicitar el acceso, rectificación, supresión y portabilidad de tus datos escribiendo directamente a info@digitalateliersolutions.agency. Asimismo, podrás solicitar la eliminación completa de los datos tratados en el marco de integraciones con plataformas de terceros, incluida la revocación de accesos autorizados.
                     </p>
                 </div>
             </div>
