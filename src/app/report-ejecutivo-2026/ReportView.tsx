@@ -20,6 +20,7 @@ import {
 } from 'chart.js';
 import { Bar, Radar, Line, PolarArea, Doughnut } from 'react-chartjs-2';
 import { generateGeminiContent } from '../actions/gemini';
+import { verifyEmail } from '../actions/verify-email';
 import { Share2, Linkedin, Copy, Check, Twitter } from 'lucide-react';
 
 // Register ChartJS components
@@ -41,36 +42,6 @@ ChartJS.register(
 ChartJS.defaults.font.family = "'Inter', sans-serif";
 ChartJS.defaults.color = '#9CA3AF';
 ChartJS.defaults.scale.grid.color = '#27272a';
-
-const BLACKLISTED_DOMAINS = [
-    'spam.spam',
-    'mailinator.com',
-    'temp-mail.org',
-    'guerrillamail.com',
-    '10minutemail.com',
-    'trashmail.com',
-    'yopmail.com',
-    'fools.com',
-    'falso.com',
-    'fake.com',
-    'example.com',
-    'test.com',
-    'sharklasers.com',
-    'getnada.com',
-    'spam.com'
-];
-
-const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return { valid: false, message: "El formato del correo no es válido." };
-
-    const domain = email.split('@')[1].toLowerCase();
-    if (BLACKLISTED_DOMAINS.includes(domain) || domain.includes('spam') || domain.split('.')[0] === 'test') {
-        return { valid: false, message: "Por favor, utiliza un correo corporativo o personal válido." };
-    }
-
-    return { valid: true };
-};
 
 export default function ReportView() {
     // State for Report Logic
@@ -149,19 +120,19 @@ export default function ReportView() {
     // Handle Gate Submit
     const handleGateSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        const validation = isValidEmail(gateForm.email);
-        if (!validation.valid) {
-            setGateError(validation.message!);
-            return;
-        }
-
         setGateLoading(true);
         setGateError('');
 
-        const formBody = "userGroup=Reporte2026&mailingLists=&email=" + encodeURIComponent(gateForm.email) + "&firstName=" + encodeURIComponent(gateForm.name);
-
         try {
+            const validation = await verifyEmail(gateForm.email);
+            if (!validation.valid) {
+                setGateError(validation.message!);
+                setGateLoading(false);
+                return;
+            }
+
+            const formBody = "userGroup=Reporte2026&mailingLists=&email=" + encodeURIComponent(gateForm.email) + "&firstName=" + encodeURIComponent(gateForm.name);
+
             const res = await fetch("https://app.loops.so/api/newsletter-form/cm2rflmgu01h51390iumvl8na", {
                 method: "POST",
                 body: formBody,
