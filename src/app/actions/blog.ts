@@ -1,7 +1,7 @@
 'use server';
 
 import { supabase } from '@/lib/supabase';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
@@ -84,51 +84,64 @@ function safeRevalidate(path: string) {
 }
 
 export async function getAllPostsAdmin() {
-    await checkAdminSession();
+    try {
+        await checkAdminSession();
+        const supabaseAdmin = getSupabaseAdmin();
 
-    const { data, error } = await supabaseAdmin
-        .from('blog_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+        const { data, error } = await supabaseAdmin
+            .from('blog_posts')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    if (error) {
-        console.error('Error fetching admin posts:', error);
+        if (error) {
+            console.error('Error fetching admin posts:', error);
+            return [];
+        }
+
+        return data as BlogPost[];
+    } catch (error) {
+        console.error('Admin Fetch Error:', error);
         return [];
     }
-
-    return data as BlogPost[];
 }
 
 export async function getPostByIdAdmin(id: string) {
-    await checkAdminSession();
+    try {
+        await checkAdminSession();
+        const supabaseAdmin = getSupabaseAdmin();
 
-    const { data, error } = await supabaseAdmin
-        .from('blog_posts')
-        .select('*')
-        .eq('id', id)
-        .single();
+        const { data, error } = await supabaseAdmin
+            .from('blog_posts')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-    if (error) return null;
-    return data as BlogPost;
+        if (error) return null;
+        return data as BlogPost;
+    } catch (error) {
+        return null;
+    }
 }
 
 export async function createPost(formData: FormData) {
-    await checkAdminSession();
-
-    const title = formData.get('title') as string;
-    const slug = formData.get('slug') as string;
-    const content = formData.get('content') as string;
-    const excerpt = formData.get('excerpt') as string;
-    const status = formData.get('status') as 'draft' | 'published';
-    const featured_image = formData.get('featured_image') as string;
-    const seo_title = formData.get('seo_title') as string;
-    const seo_description = formData.get('seo_description') as string;
-
-    // 1. Env Check
-    const envError = await checkEnvVars();
-    if (envError) return { success: false, message: `Server Config Error: ${envError}` };
-
     try {
+        await checkAdminSession(); // Moved inside try
+
+        // 1. Env Check
+        const envError = await checkEnvVars();
+        if (envError) return { success: false, message: `Server Config Error: ${envError}` };
+
+        const supabaseAdmin = getSupabaseAdmin(); // Lazy init inside try
+
+        const title = formData.get('title') as string;
+        const slug = formData.get('slug') as string;
+        const content = formData.get('content') as string;
+        const excerpt = formData.get('excerpt') as string;
+        const status = formData.get('status') as 'draft' | 'published';
+        const featured_image = formData.get('featured_image') as string;
+        const seo_title = formData.get('seo_title') as string;
+        const seo_description = formData.get('seo_description') as string;
+
         const { error } = await supabaseAdmin.from('blog_posts').insert({
             title,
             slug,
@@ -152,22 +165,24 @@ export async function createPost(formData: FormData) {
 }
 
 export async function updatePost(id: string, formData: FormData) {
-    await checkAdminSession();
-
-    const title = formData.get('title') as string;
-    const slug = formData.get('slug') as string;
-    const content = formData.get('content') as string;
-    const excerpt = formData.get('excerpt') as string;
-    const status = formData.get('status') as 'draft' | 'published';
-    const featured_image = formData.get('featured_image') as string;
-    const seo_title = formData.get('seo_title') as string;
-    const seo_description = formData.get('seo_description') as string;
-
-    // 1. Env Check
-    const envError = await checkEnvVars();
-    if (envError) return { success: false, message: `Server Config Error: ${envError}` };
-
     try {
+        await checkAdminSession(); // Moved inside try
+
+        // 1. Env Check
+        const envError = await checkEnvVars();
+        if (envError) return { success: false, message: `Server Config Error: ${envError}` };
+
+        const supabaseAdmin = getSupabaseAdmin(); // Lazy init inside try
+
+        const title = formData.get('title') as string;
+        const slug = formData.get('slug') as string;
+        const content = formData.get('content') as string;
+        const excerpt = formData.get('excerpt') as string;
+        const status = formData.get('status') as 'draft' | 'published';
+        const featured_image = formData.get('featured_image') as string;
+        const seo_title = formData.get('seo_title') as string;
+        const seo_description = formData.get('seo_description') as string;
+
         const { error } = await supabaseAdmin.from('blog_posts').update({
             title,
             slug,
@@ -193,11 +208,16 @@ export async function updatePost(id: string, formData: FormData) {
 }
 
 export async function deletePost(id: string) {
-    await checkAdminSession();
+    try {
+        await checkAdminSession();
+        const supabaseAdmin = getSupabaseAdmin();
+        const { error } = await supabaseAdmin.from('blog_posts').delete().eq('id', id);
 
-    const { error } = await supabaseAdmin.from('blog_posts').delete().eq('id', id);
-
-    if (error) throw new Error(error.message);
-    safeRevalidate('/blog');
-    safeRevalidate('/vribesadmin/blog');
+        if (error) throw new Error(error.message);
+        safeRevalidate('/blog');
+        safeRevalidate('/vribesadmin/blog');
+    } catch (e) {
+        console.error('Delete error', e);
+        throw e;
+    }
 }
