@@ -95,6 +95,13 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
         });
 
         try {
+            // Diagnostic Ping
+            const healthCheck = await import('@/app/actions/blog').then(m => m.ping());
+            if (!healthCheck || !healthCheck.success) {
+                alert('CRITICAL: Server is unreachable (Ping Failed). Please check Cloudflare logs.');
+                return;
+            }
+
             let result;
             if (post) {
                 result = await updatePost(post.id, data);

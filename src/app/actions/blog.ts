@@ -21,6 +21,10 @@ export type BlogPost = {
 
 // --- PUBLIC ACTIONS ---
 
+export async function ping() {
+    return { success: true, message: 'Pong', timestamp: new Date().toISOString() };
+}
+
 export async function getPublishedPosts() {
     const { data, error } = await supabase
         .from('blog_posts')
