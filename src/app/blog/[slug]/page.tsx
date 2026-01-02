@@ -87,7 +87,7 @@ export default async function BlogPostPage({ params }: Props) {
             <article>
                 {/* Header */}
                 {/* Header */}
-                <header className="mb-12 md:mb-16 reveal">
+                <header className="mb-12 md:mb-16">
                     <div className="text-sm font-bold text-das-accent font-barlow tracking-widest uppercase mb-6 flex items-center gap-3">
                         <Link href="/blog" className="opacity-50 hover:opacity-100 transition-opacity">Blog</Link>
                         <span className="opacity-30">/</span>
@@ -105,7 +105,7 @@ export default async function BlogPostPage({ params }: Props) {
 
                 {/* Featured Image */}
                 {post.featured_image && (
-                    <div className="mb-16 -mx-6 md:mx-0 md:rounded-sm overflow-hidden bg-gray-50 reveal delay-100">
+                    <div className="mb-16 -mx-6 md:mx-0 md:rounded-sm overflow-hidden bg-gray-50">
                         <img
                             src={post.featured_image}
                             alt={post.title}
@@ -115,7 +115,7 @@ export default async function BlogPostPage({ params }: Props) {
                 )}
 
                 {/* Content - Optimized for Reading */}
-                <div className="prose prose-lg md:prose-xl max-w-none font-raleway text-gray-800 leading-loose reveal delay-200 
+                <div className="prose prose-lg md:prose-xl max-w-none font-raleway text-gray-800 leading-loose 
                     prose-headings:font-poppins prose-headings:font-bold prose-headings:text-das-dark
                     prose-p:mb-8 prose-p:leading-8
                     prose-li:marker:text-das-accent
