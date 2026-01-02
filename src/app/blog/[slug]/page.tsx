@@ -77,7 +77,7 @@ export default async function BlogPostPage({ params }: Props) {
     };
 
     return (
-        <div className="max-w-4xl mx-auto px-6 py-24">
+        <div className="max-w-3xl mx-auto px-6 py-12 md:py-24">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -85,17 +85,18 @@ export default async function BlogPostPage({ params }: Props) {
 
             <article>
                 {/* Header */}
-                <header className="text-center mb-16 reveal">
-                    <div className="text-xs font-bold text-das-accent font-barlow tracking-widest uppercase mb-6">
-                        {new Date(post.created_at).toLocaleDateString('es-ES', {
-                            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                        })}
+                {/* Header */}
+                <header className="mb-12 md:mb-16 reveal">
+                    <div className="text-sm font-bold text-das-accent font-barlow tracking-widest uppercase mb-6 flex items-center gap-3">
+                        <Link href="/blog" className="opacity-50 hover:opacity-100 transition-opacity">Blog</Link>
+                        <span className="opacity-30">/</span>
+                        <span>{new Date(post.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</span>
                     </div>
-                    <h1 className="font-poppins font-bold text-3xl md:text-5xl lg:text-6xl mb-8 leading-tight">
+                    <h1 className="font-poppins font-bold text-4xl md:text-5xl lg:text-6xl mb-8 leading-[1.1] text-das-dark">
                         {post.title}
                     </h1>
                     {post.excerpt && (
-                        <p className="text-xl text-gray-500 font-medium max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-xl md:text-2xl text-gray-500 font-raleway font-light leading-relaxed max-w-3xl">
                             {post.excerpt}
                         </p>
                     )}
@@ -103,28 +104,34 @@ export default async function BlogPostPage({ params }: Props) {
 
                 {/* Featured Image */}
                 {post.featured_image && (
-                    <div className="mb-16 rounded-sm overflow-hidden shadow-lg reveal delay-100">
+                    <div className="mb-16 -mx-6 md:mx-0 md:rounded-sm overflow-hidden bg-gray-50 reveal delay-100">
                         <img
                             src={post.featured_image}
                             alt={post.title}
-                            className="w-full h-auto object-cover"
+                            className="w-full h-auto object-cover max-h-[600px]"
                         />
                     </div>
                 )}
 
-                {/* Content */}
-                <div className="prose prose-lg max-w-none font-sans text-gray-700 leading-loose reveal delay-200">
+                {/* Content - Optimized for Reading */}
+                <div className="prose prose-lg md:prose-xl max-w-none font-raleway text-gray-800 leading-loose reveal delay-200 
+                    prose-headings:font-poppins prose-headings:font-bold prose-headings:text-das-dark
+                    prose-p:mb-8 prose-p:leading-8
+                    prose-li:marker:text-das-accent
+                    prose-img:rounded-sm prose-img:w-full prose-img:my-10
+                    prose-a:text-das-accent prose-a:no-underline prose-a:border-b prose-a:border-das-accent/30 hover:prose-a:border-das-accent hover:prose-a:text-das-accent/80 transition-all
+                    prose-blockquote:border-das-accent prose-blockquote:bg-gray-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:not-italic prose-blockquote:font-poppins prose-blockquote:text-gray-600
+                ">
                     <ReactMarkdown
                         components={{
-                            h2: ({ node, ...props }) => <h2 className="font-poppins font-bold text-3xl mt-12 mb-6 text-das-dark" {...props} />,
-                            h3: ({ node, ...props }) => <h3 className="font-poppins font-bold text-2xl mt-8 mb-4 text-das-dark" {...props} />,
-                            p: ({ node, ...props }) => <p className="mb-6" {...props} />,
-                            ul: ({ node, ...props }) => <ul className="list-disc pl-6 mb-6 space-y-2" {...props} />,
-                            ol: ({ node, ...props }) => <ol className="list-decimal pl-6 mb-6 space-y-2" {...props} />,
-                            li: ({ node, ...props }) => <li className="pl-2" {...props} />,
-                            blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-das-accent pl-6 italic text-xl text-gray-500 my-8 py-2" {...props} />,
-                            a: ({ node, ...props }) => <a className="text-das-accent font-bold hover:underline" {...props} />,
-                            img: ({ node, ...props }) => <img className="rounded-lg shadow-md my-8 w-full" {...props} />,
+                            h2: ({ node, ...props }) => <h2 className="text-3xl md:text-4xl mt-16 mb-8 tracking-tight" {...props} />,
+                            h3: ({ node, ...props }) => <h3 className="text-2xl md:text-3xl mt-12 mb-6" {...props} />,
+                            img: ({ node, ...props }) => (
+                                <figure className="my-10">
+                                    <img className="w-full rounded-sm" {...props} />
+                                    {props.alt && <figcaption className="text-center text-sm text-gray-500 mt-3 font-barlow italic">{props.alt}</figcaption>}
+                                </figure>
+                            ),
                         }}
                     >
                         {post.content}
@@ -133,9 +140,9 @@ export default async function BlogPostPage({ params }: Props) {
             </article>
 
             <div className="mt-20 pt-10 border-t border-gray-100 text-center">
-                <a href="/blog" className="btn inline-flex items-center gap-2 px-8 py-4 bg-gray-50 hover:bg-gray-100 text-das-dark font-barlow font-bold uppercase tracking-widest text-xs transition-colors rounded-sm">
-                    ← Volver al Blog
-                </a>
+                <Link href="/blog" className="inline-flex items-center gap-2 text-das-dark hover:text-das-accent font-barlow font-bold uppercase tracking-widest text-xs transition-colors">
+                    ← Volver a Insights
+                </Link>
             </div>
         </div>
     );
