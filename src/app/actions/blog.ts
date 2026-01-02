@@ -102,20 +102,25 @@ export async function createPost(formData: FormData) {
     const seo_title = formData.get('seo_title') as string;
     const seo_description = formData.get('seo_description') as string;
 
-    const { error } = await supabaseAdmin.from('blog_posts').insert({
-        title,
-        slug,
-        content,
-        excerpt,
-        status,
-        featured_image,
-        seo_title,
-        seo_description
-    });
+    try {
+        const { error } = await supabaseAdmin.from('blog_posts').insert({
+            title,
+            slug,
+            content,
+            excerpt,
+            status,
+            featured_image,
+            seo_title,
+            seo_description
+        });
 
-    if (error) throw new Error(error.message);
-    revalidatePath('/blog');
-    revalidatePath('/vribesadmin/blog');
+        if (error) throw new Error(error.message);
+        revalidatePath('/blog');
+        revalidatePath('/vribesadmin/blog');
+    } catch (e) {
+        console.error('Error in createPost:', e);
+        throw new Error('Failed to create post: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    }
 }
 
 export async function updatePost(id: string, formData: FormData) {
@@ -130,22 +135,27 @@ export async function updatePost(id: string, formData: FormData) {
     const seo_title = formData.get('seo_title') as string;
     const seo_description = formData.get('seo_description') as string;
 
-    const { error } = await supabaseAdmin.from('blog_posts').update({
-        title,
-        slug,
-        content,
-        excerpt,
-        status,
-        featured_image,
-        seo_title,
-        seo_description,
-        updated_at: new Date().toISOString()
-    }).eq('id', id);
+    try {
+        const { error } = await supabaseAdmin.from('blog_posts').update({
+            title,
+            slug,
+            content,
+            excerpt,
+            status,
+            featured_image,
+            seo_title,
+            seo_description,
+            updated_at: new Date().toISOString()
+        }).eq('id', id);
 
-    if (error) throw new Error(error.message);
-    revalidatePath('/blog');
-    revalidatePath('/vribesadmin/blog');
-    revalidatePath(`/blog/${slug}`);
+        if (error) throw new Error(error.message);
+        revalidatePath('/blog');
+        revalidatePath('/vribesadmin/blog');
+        revalidatePath(`/blog/${slug}`);
+    } catch (e) {
+        console.error('Error in updatePost:', e);
+        throw new Error('Failed to update post: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    }
 }
 
 export async function deletePost(id: string) {
