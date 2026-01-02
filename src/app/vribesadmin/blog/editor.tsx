@@ -95,10 +95,17 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
         });
 
         try {
-            // Diagnostic Ping
-            const healthCheck = await import('@/app/actions/blog').then(m => m.ping());
+            // Diagnostic Ping (Zero Dependency)
+            const healthCheck = await import('@/app/actions/debug').then(m => m.debugPing());
+
             if (!healthCheck || !healthCheck.success) {
-                alert('CRITICAL: Server is unreachable (Ping Failed). Please check Cloudflare logs.');
+                alert(`CRITICAL: Server Infrastructure Failed. Ping returned: ${JSON.stringify(healthCheck)}`);
+                return;
+            }
+
+            // Check if env vars are visible to the server
+            if (!healthCheck.env?.hasKey) {
+                alert('CRITICAL CONFIG ERROR: Server cannot see SUPABASE_SERVICE_ROLE_KEY. Check Cloudflare Dashboard > Settings > Variables.');
                 return;
             }
 
