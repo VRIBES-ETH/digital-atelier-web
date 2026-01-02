@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { logoutAdmin } from '@/app/actions/admin-auth';
-// processTranscript import removed to reduce client bundle size
-import type { AnalysisResult } from '@/app/actions/process-onboarding';
 import { LogOut, FileText, Sparkles, Download, Settings, Database, Loader2, Play } from 'lucide-react';
+
+// Types simplified for disabled state
+type AnalysisResult = any;
 
 export default function AdminDashboard() {
     // State
@@ -18,33 +19,9 @@ export default function AdminDashboard() {
     const [error, setError] = useState('');
 
     const handleProcess = async () => {
-        if (!transcript.trim()) return;
-
-        setLoading(true);
-        setError('');
-        setResult(null);
-
-        try {
-            const response = await fetch('/api/admin/process-onboarding', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ transcript, modelId: model })
-            });
-
-            const data = await response.json();
-
-            if (data.success && data.data) {
-                setResult(data.data);
-            } else {
-                setError(data.error || "Error desconocido");
-            }
-        } catch (e) {
-            setError("Error de conexión con el servidor.");
-        } finally {
-            setLoading(false);
-        }
+        // Feature temporarily disabled to optimize bundle size for Cloudflare Free Tier
+        setError("AI Suite disabled for optimization. Please contact support.");
+        return;
     };
 
     const downloadFile = (data: any, suffix: string) => {
