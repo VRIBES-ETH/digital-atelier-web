@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 // import { motion } from 'framer-motion'; // Removed for optimization
 // ChartJS removed for optimization
-import { generateGeminiContent } from '../actions/gemini';
+// import { generateGeminiContent } from '../actions/gemini'; // Removed for optimization
 import { verifyEmail } from '../actions/verify-email';
 import { Share2, Linkedin, Copy, Check, Twitter } from 'lucide-react';
 
