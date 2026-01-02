@@ -9,12 +9,14 @@ export const dynamicParams = false; // Disable fallback to ensure no worker logi
 export async function generateStaticParams() {
     try {
         const posts = await getPublishedPosts();
+        if (!posts || posts.length === 0) throw new Error("No posts found");
+
         return posts.map((post) => ({
             slug: post.slug,
         }));
     } catch (error) {
-        console.warn('Failed to generate static params (likely due to missing build env vars):', error);
-        return [];
+        console.warn('Build: Failed to fetch posts, generating placeholder page:', error);
+        return [{ slug: 'welcome' }];
     }
 }
 
@@ -48,7 +50,16 @@ export default async function BlogPostPage({ params }: Props) {
     const post = await getPostBySlug(slug);
 
     if (!post) {
-        notFound();
+        // Fallback for the 'welcome' placeholder or if fetch fails during valid build
+        return (
+            <div className="max-w-4xl mx-auto px-6 py-24 text-center">
+                <h1 className="font-poppins font-bold text-3xl mb-4">Blog</h1>
+                <p>Cargando contenido o configuración pendiente...</p>
+                <div className="mt-8">
+                    <a href="/blog" className="text-das-accent hover:underline">← Volver al índice</a>
+                </div>
+            </div>
+        );
     }
 
     const jsonLd = {
