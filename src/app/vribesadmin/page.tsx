@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { logoutAdmin } from '@/app/actions/admin-auth';
-import { processTranscript, type AnalysisResult } from '@/app/actions/process-onboarding';
+// processTranscript import removed to reduce client bundle size
+import type { AnalysisResult } from '@/app/actions/process-onboarding';
 import { LogOut, FileText, Sparkles, Download, Settings, Database, Loader2, Play } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -24,12 +25,20 @@ export default function AdminDashboard() {
         setResult(null);
 
         try {
-            const response = await processTranscript(transcript, model);
+            const response = await fetch('/api/admin/process-onboarding', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ transcript, modelId: model })
+            });
 
-            if (response.success && response.data) {
-                setResult(response.data);
+            const data = await response.json();
+
+            if (data.success && data.data) {
+                setResult(data.data);
             } else {
-                setError(response.error || "Error desconocido");
+                setError(data.error || "Error desconocido");
             }
         } catch (e) {
             setError("Error de conexión con el servidor.");
