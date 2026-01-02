@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 // import { motion } from 'framer-motion'; // Removed for optimization
 // ChartJS removed for optimization
 // import { generateGeminiContent } from '../actions/gemini'; // Removed for optimization
-import { verifyEmail } from '../actions/verify-email';
+// import { verifyEmail } from '../actions/verify-email'; // Logic moved to client
 import { Share2, Linkedin, Copy, Check, Twitter } from 'lucide-react';
 
 // --- CSS-only Components for lightweight charts ---
@@ -139,20 +139,43 @@ export default function ReportView() {
         return () => { document.body.style.overflow = 'auto'; };
     }, [showGate]);
 
+    // Client-side blacklist for immediate feedback
+    const BLACKLISTED_DOMAINS = [
+        'spam.spam', 'mailinator.com', 'temp-mail.org', 'guerrillamail.com',
+        '10minutemail.com', 'trashmail.com', 'yopmail.com', 'fools.com',
+        'falso.com', 'fake.com', 'example.com', 'test.com', 'sharklasers.com',
+        'getnada.com', 'spam.com', 'disposable.com'
+    ];
+
+    const validateEmailClient = (email: string) => {
+        if (!email || !email.includes('@')) return { valid: false, message: "El formato del correo no es válido." };
+
+        const [localPart, domain] = email.toLowerCase().split('@');
+
+        if (localPart.length < 2 || domain.length < 3) return { valid: false, message: "Por favor, utiliza un correo real y completo." };
+
+        if (BLACKLISTED_DOMAINS.includes(domain) || domain.includes('spam') || localPart === 'test') {
+            return { valid: false, message: "Este dominio de correo no está permitido." };
+        }
+
+        return { valid: true };
+    };
+
     // Handle Gate Submit
     const handleGateSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setGateLoading(true);
         setGateError('');
 
-        try {
-            const validation = await verifyEmail(gateForm.email);
-            if (!validation.valid) {
-                setGateError(validation.message!);
-                setGateLoading(false);
-                return;
-            }
+        // 1. Client-side Validation (No Server Action)
+        const validation = validateEmailClient(gateForm.email);
+        if (!validation.valid) {
+            setGateError(validation.message!);
+            setGateLoading(false);
+            return;
+        }
 
+        try {
             const formBody = "userGroup=Reporte2026&mailingLists=&email=" + encodeURIComponent(gateForm.email) + "&firstName=" + encodeURIComponent(gateForm.name);
 
             // POST to Loops
