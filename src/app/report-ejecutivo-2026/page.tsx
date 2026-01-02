@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     },
 };
 
-
+export const runtime = 'edge';
 
 export default function ReportPage() {
     return <ReportView />;

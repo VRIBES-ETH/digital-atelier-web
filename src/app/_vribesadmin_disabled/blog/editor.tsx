@@ -193,6 +193,9 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                                     onChange={handleChange}
                                     onPaste={async (e) => {
                                         const items = e.clipboardData.items;
+                                        const html = e.clipboardData.getData('text/html');
+
+                                        // 1. Handle Images
                                         for (const item of items) {
                                             if (item.type.indexOf('image') === 0) {
                                                 e.preventDefault();
@@ -205,12 +208,10 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                                                     const textBefore = formData.content.substring(0, cursorPos);
                                                     const textAfter = formData.content.substring(cursorPos);
 
-                                                    // Insert placeholder
                                                     const placeholder = `\n![Subiendo imagen...]()...\n`;
                                                     const newContentLoading = textBefore + placeholder + textAfter;
                                                     setFormData(prev => ({ ...prev, content: newContentLoading }));
 
-                                                    // Upload
                                                     const fileExt = file.name.split('.').pop() || 'png';
                                                     const fileName = `paste-${Math.random().toString(36).substring(2)}.${fileExt}`;
                                                     const { error: uploadError } = await supabase.storage
@@ -221,7 +222,6 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
 
                                                     const { data } = supabase.storage.from('blog-images').getPublicUrl(fileName);
 
-                                                    // Replace placeholder with actual link
                                                     const finalUrl = data.publicUrl;
                                                     setFormData(prev => ({
                                                         ...prev,
@@ -230,11 +230,58 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
 
                                                 } catch (err) {
                                                     alert('Error al pegar imagen: ' + err);
-                                                    // Revert placeholder on error if simpler, or just leave it for user to delete.
                                                 } finally {
                                                     setIsUploading(false);
                                                 }
+                                                return;
                                             }
+                                        }
+
+                                        // 2. Handle Rich Text (HTML) -> Markdown
+                                        if (html) {
+                                            e.preventDefault();
+
+                                            // Helper to convert DOM to Markdown
+                                            const turndown = (node: ChildNode): string => {
+                                                if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+                                                if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+                                                const el = node as HTMLElement;
+                                                let content = '';
+                                                el.childNodes.forEach(child => content += turndown(child));
+
+                                                switch (el.tagName.toLowerCase()) {
+                                                    case 'h1': return `\n# ${content}\n\n`;
+                                                    case 'h2': return `\n## ${content}\n\n`;
+                                                    case 'h3': return `\n### ${content}\n\n`;
+                                                    case 'p': return `${content}\n\n`;
+                                                    case 'strong':
+                                                    case 'b': return `**${content}**`;
+                                                    case 'em':
+                                                    case 'i': return `*${content}*`;
+                                                    case 'ul': return `\n${content}\n`;
+                                                    case 'ol': return `\n${content}\n`;
+                                                    case 'li': return `- ${content.trim()}\n`;
+                                                    case 'a': return `[${content}](${(el as HTMLAnchorElement).href})`;
+                                                    case 'code': return `\`${content}\``;
+                                                    case 'pre': return `\n\`\`\`\n${content}\n\`\`\`\n`;
+                                                    case 'br': return '\n';
+                                                    case 'div': return `${content}\n`;
+                                                    case 'blockquote': return `\n> ${content}\n`;
+                                                    default: return content;
+                                                }
+                                            };
+
+                                            const parser = new DOMParser();
+                                            const doc = parser.parseFromString(html, 'text/html');
+                                            let markdown = turndown(doc.body).trim();
+
+                                            // Insert converted markdown
+                                            const cursorPos = e.currentTarget.selectionStart;
+                                            const textBefore = formData.content.substring(0, cursorPos);
+                                            const textAfter = formData.content.substring(cursorPos);
+
+                                            setFormData(prev => ({ ...prev, content: textBefore + markdown + textAfter }));
                                         }
                                     }}
                                     className="w-full p-6 bg-black border border-zinc-800 rounded-lg focus:ring-1 focus:ring-orange-600 focus:border-orange-600 outline-none min-h-[600px] font-mono text-sm leading-relaxed text-gray-300 resize-none selection:bg-orange-900 selection:text-white"
@@ -243,7 +290,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                                 />
                             </div>
                             <div className="flex justify-between items-center mt-2">
-                                <p className="text-xs text-zinc-600">Tip: Pide a la IA el formato "Markdown Code" para copiar headers y negritas. Pega imágenes con Ctrl+V.</p>
+                                <p className="text-xs text-zinc-600">Tip: Pega texto con formato o imágenes directamente.</p>
                                 <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" className="text-xs text-orange-600 hover:underline">Guía de Markdown</a>
                             </div>
                         </div>
