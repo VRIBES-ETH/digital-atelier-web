@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getAllPostsAdmin, deletePost } from '@/app/actions/blog';
 import { Plus, Edit2, Trash2, ExternalLink, FileText } from 'lucide-react';
+import DeployButton from './DeployButton';
 
 export default async function AdminBlogPage() {
     const posts = await getAllPostsAdmin();
@@ -12,13 +13,16 @@ export default async function AdminBlogPage() {
                     <h1 className="text-3xl font-bold font-display text-white tracking-tight">Gestión del Blog</h1>
                     <p className="text-gray-500 mt-2 text-sm uppercase tracking-widest">Crea, edita y gestiona tus artículos</p>
                 </div>
-                <Link
-                    href="/vribesadmin/blog/create"
-                    className="btn bg-orange-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-orange-700 transition-all shadow-lg hover:shadow-orange-900/20 font-bold tracking-wide text-sm"
-                >
-                    <Plus className="w-4 h-4" />
-                    NUEVO ARTÍCULO
-                </Link>
+                <div className="flex gap-4">
+                    <DeployButton />
+                    <Link
+                        href="/vribesadmin/blog/create"
+                        className="btn bg-orange-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-orange-700 transition-all shadow-lg hover:shadow-orange-900/20 font-bold tracking-wide text-sm"
+                    >
+                        <Plus className="w-4 h-4" />
+                        NUEVO ARTÍCULO
+                    </Link>
+                </div>
             </div>
 
             <div className="bg-zinc-900 rounded-xl shadow-xl border border-zinc-800 overflow-hidden">

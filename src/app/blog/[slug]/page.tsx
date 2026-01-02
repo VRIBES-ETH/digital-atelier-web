@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
+import { Linkedin, Share2, ArrowRight } from "lucide-react";
+import NewsletterForm from "@/components/NewsletterForm";
 
 
 export const dynamicParams = false; // Disable fallback to ensure no worker logic is generated
@@ -53,15 +55,26 @@ export default async function BlogPostPage({ params }: Props) {
     if (!post) {
         // Fallback for the 'welcome' placeholder or if fetch fails during valid build
         return (
-            <div className="max-w-4xl mx-auto px-6 py-24 text-center">
-                <h1 className="font-poppins font-bold text-3xl mb-4">Blog</h1>
-                <p>Cargando contenido o configuración pendiente...</p>
-                <div className="mt-8">
-                    <a href="/blog" className="text-das-accent hover:underline">← Volver al índice</a>
+            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-white">
+                <div className="mb-6 opacity-20">
+                    <svg className="w-24 h-24 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
                 </div>
+                <h1 className="font-poppins font-bold text-3xl md:text-5xl mb-4 text-das-dark">Artículo No Encontrado</h1>
+                <p className="text-xl font-raleway text-gray-500 mb-8 max-w-md">
+                    Es posible que la URL haya cambiado o el artículo haya sido eliminado.
+                </p>
+                <Link href="/blog" className="bg-das-dark text-white font-bold px-8 py-3 rounded-full hover:bg-black transition-colors">
+                    Volver al Blog
+                </Link>
             </div>
         );
     }
+
+    const shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(`He estado leyendo "${post.title}" de Víctor Ribes.\n\nLectura recomendada para entender hacia dónde va el mercado.\n\nAquí: https://digitalateliersolutions.agency/blog/${slug}`)}`;
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -72,7 +85,8 @@ export default async function BlogPostPage({ params }: Props) {
         "dateModified": post.updated_at,
         "author": {
             "@type": "Person",
-            "name": "Digital Atelier Solutions" // Or dynamic based on author_id relationship
+            "name": "Víctor Ribes",
+            "url": "https://www.linkedin.com/in/vribes/"
         },
         "description": post.seo_description || post.excerpt
     };
@@ -86,13 +100,26 @@ export default async function BlogPostPage({ params }: Props) {
 
             <article>
                 {/* Header */}
-                {/* Header */}
                 <header className="mb-12 md:mb-16">
-                    <div className="text-sm font-bold text-das-accent font-barlow tracking-widest uppercase mb-6 flex items-center gap-3">
-                        <Link href="/blog" className="opacity-50 hover:opacity-100 transition-opacity">Blog</Link>
-                        <span className="opacity-30">/</span>
-                        <span>{new Date(post.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</span>
+                    <div className="text-sm font-bold text-das-accent font-barlow tracking-widest uppercase mb-6 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <Link href="/blog" className="opacity-50 hover:opacity-100 transition-opacity">Blog</Link>
+                            <span className="opacity-30">/</span>
+                            <span>{new Date(post.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</span>
+                        </div>
+
+                        {/* Share Button Top */}
+                        <a
+                            href={shareUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hidden md:flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-[#0a66c2] transition-colors border border-gray-200 hover:border-[#0a66c2] px-3 py-1.5 rounded-full"
+                        >
+                            <Linkedin className="w-3 h-3" />
+                            COMPARTIR
+                        </a>
                     </div>
+
                     <h1 className="font-poppins font-bold text-4xl md:text-5xl lg:text-6xl mb-8 leading-[1.1] text-das-dark">
                         {post.title}
                     </h1>
@@ -140,7 +167,76 @@ export default async function BlogPostPage({ params }: Props) {
                 </div>
             </article>
 
-            <div className="mt-20 pt-10 border-t border-gray-100 text-center">
+            {/* Author & Share Footer */}
+            <div className="mt-20 pt-10 border-t border-gray-200">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                    {/* Author */}
+                    <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 relative">
+                            {/* Placeholder for Victor's pic, using a generic confident gradient or check if there is a profile pic available in assets. Using gray fallback for now. */}
+                            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-black flex items-center justify-center text-white font-bold text-xl">VR</div>
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Escrito por</p>
+                            <h3 className="font-poppins font-bold text-das-dark text-lg">Víctor Ribes</h3>
+                            <a href="https://www.linkedin.com/in/vribes/" target="_blank" className="flex items-center gap-1 text-sm text-[#0a66c2] hover:underline mt-0.5">
+                                <Linkedin className="w-3 h-3" />
+                                <span>Conectar en LinkedIn</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Share */}
+                    <div>
+                        <a
+                            href={shareUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 bg-[#0a66c2] text-white px-6 py-3 rounded-sm font-bold shadow-lg hover:bg-[#004182] transition-colors"
+                        >
+                            <Share2 className="w-4 h-4" />
+                            Compartir Artículo
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {/* Newsletter Integration */}
+            <div className="mt-20 bg-das-dark text-white p-8 md:p-12 rounded-sm relative overflow-hidden">
+                <div className="relative z-10 max-w-xl">
+                    <h3 className="font-poppins font-bold text-2xl md:text-3xl mb-4">
+                        Inteligencia de Mercado Web3
+                    </h3>
+                    <p className="text-gray-400 font-raleway mb-8 leading-relaxed">
+                        Únete a otros ejecutivos que reciben mi análisis semanal sobre tokenización, regulación y estrategia corporativa. Sin ruido.
+                    </p>
+                    {/* Reusing existing component but forcing light mode styles via context or just wrapper if possible. 
+                        Since NewsletterForm has its own styles, we wrap it or trust it looks good. 
+                        Let's try to trust the component but if it has hardcoded dark/light, we might need a distinct one.
+                        Checking the view_file of NewsletterForm would confirm. Assuming it fits or I can inline a simple form if needed to match design.
+                        Actually, let's use a Direct Loops Form for maximum control here to ensure it fits the design.
+                    */}
+                    <form action="https://app.loops.so/api/newsletter-form/cm2rflmgu01h51390iumvl8na" method="POST" className="flex flex-col sm:flex-row gap-3">
+                        <input className="hidden" name="userGroup" value="Newsletter" />
+                        <input
+                            name="email"
+                            type="email"
+                            placeholder="tu@email.com"
+                            required
+                            className="bg-white/10 border border-white/20 text-white placeholder-gray-500 px-4 py-3 rounded-sm flex-1 outline-none focus:border-das-accent transition-colors"
+                        />
+                        <button type="submit" className="bg-das-accent text-white font-bold px-6 py-3 rounded-sm hover:bg-orange-700 transition-colors flex items-center justify-center gap-2">
+                            Suscribirse <ArrowRight className="w-4 h-4" />
+                        </button>
+                    </form>
+                    <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-widest">Cero Spam. Baja en 1 click.</p>
+                </div>
+
+                {/* Decorative background element */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-das-accent opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+            </div>
+
+            <div className="mt-12 text-center">
                 <Link href="/blog" className="inline-flex items-center gap-2 text-das-dark hover:text-das-accent font-barlow font-bold uppercase tracking-widest text-xs transition-colors">
                     ← Volver a Insights
                 </Link>
