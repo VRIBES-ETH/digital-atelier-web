@@ -12,7 +12,6 @@ export async function generateGeminiContent(prompt: string) {
         const { text } = await generateText({
             model: google('gemini-1.5-flash'), // or gemini-pro if preferred
             prompt: prompt,
-            maxTokens: 500,
             temperature: 0.7,
         });
 
