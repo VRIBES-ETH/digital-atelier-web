@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 
 
-export const dynamicParams = true; // Revert to true to be safe with edge fallback
+export const dynamicParams = false; // Disable fallback to ensure no worker logic is generated
 
 export async function generateStaticParams() {
     try {
