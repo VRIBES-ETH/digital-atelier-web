@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 // This is the specific hook for Digital Atelier Web (Admin Blog)
 const CLOUDFLARE_DEPLOY_HOOK = "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/322857bb-95f5-4ada-b109-7a77d20d97c3";
 
+export const runtime = 'edge';
+
 export async function POST() {
     try {
         const response = await fetch(CLOUDFLARE_DEPLOY_HOOK, {
