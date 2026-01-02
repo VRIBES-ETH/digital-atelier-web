@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createPost, updatePost, BlogPost } from '@/app/actions/blog';
+import { BlogPost } from '@/app/actions/blog';
 import { Loader2, Save, ArrowLeft, Image as ImageIcon, X, UploadCloud } from 'lucide-react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
