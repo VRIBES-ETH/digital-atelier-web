@@ -1,9 +1,17 @@
-import { getPostBySlug } from "@/app/actions/blog";
+import { getPublishedPosts, getPostBySlug } from "@/app/actions/blog";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 
-export const runtime = 'edge';
+// export const runtime = 'edge'; // Removed to allow Static Generation
+export const dynamicParams = true; // Allow generating new pages on demand (ISR-like on Vercel, but helps on CF)
+
+export async function generateStaticParams() {
+    const posts = await getPublishedPosts();
+    return posts.map((post) => ({
+        slug: post.slug,
+    }));
+}
 
 type Props = {
     params: Promise<{ slug: string }>;
