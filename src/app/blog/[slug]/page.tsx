@@ -1,5 +1,6 @@
 import { getPublishedPosts, getPostBySlug } from "@/app/actions/blog";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 
