@@ -36,8 +36,51 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://digitalateliersolutions.agency'),
-  title: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
-  description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas.",
+  title: {
+    default: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
+    template: "%s | DAS®"
+  },
+  description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas. Elevamos tu narrativa al estándar institucional.",
+  keywords: ["Ghostwriting", "Blockchain", "Web3", "Comunicación Estratégica", "Digital Assets", "Personal Branding", "Executive Communication", "Copywriting", "Finanzas Descentralizadas"],
+  authors: [{ name: "Victor Ribes", url: "https://www.linkedin.com/in/vribes/" }],
+  creator: "Digital Atelier Solutions",
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: "https://digitalateliersolutions.agency",
+    title: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
+    description: "Comunicación estratégica para infraestructura blockchain y finanzas descentralizadas.",
+    siteName: "Digital Atelier Solutions",
+    images: [
+      {
+        url: "/images/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Digital Atelier Solutions - Strategic Web3 Communication",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Digital Atelier Solutions | DAS®",
+    description: "Comunicación estratégica para infraestructura blockchain y finanzas descentralizadas.",
+    images: ["/images/og-default.jpg"],
+    creator: "@vribes_eth",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: '/',
+  },
   appleWebApp: {
     title: "DAS®",
     statusBarStyle: "default",
@@ -59,6 +102,40 @@ export default function RootLayout({
         <TopLoader />
         {children}
         <CookieBanner />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ProfessionalService",
+              "name": "Digital Atelier Solutions",
+              "image": "https://digitalateliersolutions.agency/images/og-default.jpg",
+              "@id": "https://digitalateliersolutions.agency",
+              "url": "https://digitalateliersolutions.agency",
+              "telephone": "",
+              "priceRange": "$$$",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "ES"
+              },
+              "founder": {
+                "@type": "Person",
+                "name": "Víctor Ribes",
+                "url": "https://www.linkedin.com/in/vribes/",
+                "sameAs": [
+                  "https://twitter.com/vribes_eth",
+                  "https://www.linkedin.com/in/vribes/"
+                ]
+              },
+              "sameAs": [
+                "https://www.linkedin.com/company/digital-atelier-solutions",
+                "https://twitter.com/vribes_eth"
+              ],
+              "description": "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas.",
+              "knowsAbout": ["Blockchain", "Web3", "Ghostwriting", "Corporate Communication", "DeFi", "RWA"]
+            })
+          }}
+        />
       </body>
     </html>
   );
