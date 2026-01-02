@@ -126,7 +126,7 @@ export async function createPost(formData: FormData) {
 
     // 1. Env Check
     const envError = await checkEnvVars();
-    if (envError) throw new Error(`Server Configuration Error: ${envError}`);
+    if (envError) return { success: false, message: `Server Config Error: ${envError}` };
 
     try {
         const { error } = await supabaseAdmin.from('blog_posts').insert({
@@ -140,13 +140,14 @@ export async function createPost(formData: FormData) {
             seo_description
         });
 
-        if (error) throw new Error(error.message);
+        if (error) return { success: false, message: error.message };
 
         safeRevalidate('/blog');
         safeRevalidate('/vribesadmin/blog');
+        return { success: true };
     } catch (e) {
         console.error('Error in createPost:', e);
-        throw new Error('Failed to create post: ' + (e instanceof Error ? e.message : 'Unknown error'));
+        return { success: false, message: 'Exception: ' + (e instanceof Error ? e.message : String(e)) };
     }
 }
 
@@ -164,7 +165,7 @@ export async function updatePost(id: string, formData: FormData) {
 
     // 1. Env Check
     const envError = await checkEnvVars();
-    if (envError) throw new Error(`Server Configuration Error: ${envError}`);
+    if (envError) return { success: false, message: `Server Config Error: ${envError}` };
 
     try {
         const { error } = await supabaseAdmin.from('blog_posts').update({
@@ -179,14 +180,15 @@ export async function updatePost(id: string, formData: FormData) {
             updated_at: new Date().toISOString()
         }).eq('id', id);
 
-        if (error) throw new Error(error.message);
+        if (error) return { success: false, message: error.message };
 
         safeRevalidate('/blog');
         safeRevalidate('/vribesadmin/blog');
         safeRevalidate(`/blog/${slug}`);
+        return { success: true };
     } catch (e) {
         console.error('Error in updatePost:', e);
-        throw new Error('Failed to update post: ' + (e instanceof Error ? e.message : 'Unknown error'));
+        return { success: false, message: 'Exception: ' + (e instanceof Error ? e.message : String(e)) };
     }
 }
 

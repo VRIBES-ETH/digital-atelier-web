@@ -95,11 +95,18 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
         });
 
         try {
+            let result;
             if (post) {
-                await updatePost(post.id, data);
+                result = await updatePost(post.id, data);
             } else {
-                await createPost(data);
+                result = await createPost(data);
             }
+
+            if (result && !result.success) {
+                alert('Error del servidor: ' + result.message);
+                return;
+            }
+
             router.push('/vribesadmin/blog');
             router.refresh();
         } catch (error) {
