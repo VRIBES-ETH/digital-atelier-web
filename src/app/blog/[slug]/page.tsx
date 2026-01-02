@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 
+export const runtime = 'edge';
+
 type Props = {
     params: Promise<{ slug: string }>;
 };
