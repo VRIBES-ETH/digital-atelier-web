@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 
-export const runtime = 'edge';
+
 export const dynamicParams = true; // Revert to true to be safe with edge fallback
 
 export async function generateStaticParams() {
