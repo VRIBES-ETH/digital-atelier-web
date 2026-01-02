@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { revalidatePath } from 'next/cache';
 
+export const runtime = 'edge'; // Required for Cloudflare Pages
+
 // Helper for Safe Revalidation
 function safeRevalidate(path: string) {
     try {
