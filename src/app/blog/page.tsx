@@ -2,7 +2,7 @@ import { getPublishedPosts, BlogPost } from "@/app/actions/blog";
 import Link from "next/link";
 import { Metadata } from "next";
 
-
+export const runtime = 'edge';
 
 export const metadata: Metadata = {
     title: "Blog | Digital Atelier Solutions",

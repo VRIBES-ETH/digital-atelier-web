@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 
-// export const runtime = 'edge'; // Removed for pure static generation
-export const dynamicParams = false; // Disable fallback to ensure no worker logic is generated // Allow generating new pages on demand (ISR-like on Vercel, but helps on CF)
+export const runtime = 'edge';
+export const dynamicParams = true; // Revert to true to be safe with edge fallback
 
 export async function generateStaticParams() {
     try {
