@@ -94,37 +94,31 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
             data.append(key, value);
         });
 
+        if (post) {
+            data.append('_action', 'update');
+            data.append('id', post.id);
+        } else {
+            data.append('_action', 'create');
+        }
+
         try {
-            // Diagnostic Ping (Zero Dependency)
-            const healthCheck = await import('@/app/actions/debug').then(m => m.debugPing());
+            const response = await fetch('/api/admin/blog', {
+                method: 'POST',
+                body: data,
+            });
 
-            if (!healthCheck || !healthCheck.success) {
-                alert(`CRITICAL: Server Infrastructure Failed. Ping returned: ${JSON.stringify(healthCheck)}`);
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                alert('Error del servidor: ' + (result.message || 'Error desconocido'));
                 return;
             }
 
-            // Check if env vars are visible to the server
-            if (!healthCheck.env?.hasKey) {
-                alert('CRITICAL CONFIG ERROR: Server cannot see SUPABASE_SERVICE_ROLE_KEY. Check Cloudflare Dashboard > Settings > Variables.');
-                return;
-            }
-
-            let result;
-            if (post) {
-                result = await updatePost(post.id, data);
-            } else {
-                result = await createPost(data);
-            }
-
-            if (result && !result.success) {
-                alert('Error del servidor: ' + result.message);
-                return;
-            }
-
+            // Success
             router.push('/vribesadmin/blog');
             router.refresh();
         } catch (error) {
-            alert('Error saving post: ' + error);
+            alert('Error de conexión: ' + error);
         } finally {
             setIsSaving(false);
         }
