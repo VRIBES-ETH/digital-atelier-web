@@ -3,14 +3,19 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 
-// export const runtime = 'edge'; // Removed to allow Static Generation
+export const runtime = 'edge';
 export const dynamicParams = true; // Allow generating new pages on demand (ISR-like on Vercel, but helps on CF)
 
 export async function generateStaticParams() {
-    const posts = await getPublishedPosts();
-    return posts.map((post) => ({
-        slug: post.slug,
-    }));
+    try {
+        const posts = await getPublishedPosts();
+        return posts.map((post) => ({
+            slug: post.slug,
+        }));
+    } catch (error) {
+        console.warn('Failed to generate static params (likely due to missing build env vars):', error);
+        return [];
+    }
 }
 
 type Props = {

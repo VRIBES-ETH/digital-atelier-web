@@ -1,6 +1,8 @@
-import { getPublishedPosts } from "@/app/actions/blog";
+import { getPublishedPosts, BlogPost } from "@/app/actions/blog";
 import Link from "next/link";
 import { Metadata } from "next";
+
+export const runtime = 'edge';
 
 export const metadata: Metadata = {
     title: "Blog | Digital Atelier Solutions",
@@ -12,7 +14,14 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogIndexPage() {
-    const posts = await getPublishedPosts();
+    let posts: BlogPost[] = [];
+
+    try {
+        posts = await getPublishedPosts();
+    } catch (error) {
+        console.warn('Failed to fetch posts during build:', error);
+        // Fallback to empty array, page will render with "No posts content"
+    }
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-24">
