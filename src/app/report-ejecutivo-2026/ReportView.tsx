@@ -1,106 +1,89 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// import { motion } from 'framer-motion'; // Removed for optimization
-// ChartJS removed for optimization
-// import { generateGeminiContent } from '../actions/gemini'; // Removed for optimization
-// import { verifyEmail } from '../actions/verify-email'; // Logic moved to client
-import { Share2, Linkedin, Copy, Check, Twitter } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    RadialLinearScale,
+    PointElement,
+    LineElement,
+} from 'chart.js';
+import { Bar, Doughnut } from 'react-chartjs-2';
+import { generateGeminiContent } from '../actions/gemini';
+import { Sparkles, Lock, Unlock } from 'lucide-react';
 
-// --- CSS-only Components for lightweight charts ---
+// Register ChartJS components
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    RadialLinearScale,
+    PointElement,
+    LineElement
+);
 
-const SimpleBarChart = ({ data, labels, colors }: { data: number[], labels: string[], colors: string[] | string }) => {
-    const max = Math.max(...data);
-    return (
-        <div className="w-full h-full flex items-end justify-between gap-2 pt-6 pb-2">
-            {data.map((value, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-2 group cursor-default">
-                    <div className="relative w-full flex items-end justify-center h-[200px]">
-                        <div
-                            style={{
-                                height: `${(value / max) * 100}%`,
-                                backgroundColor: Array.isArray(colors) ? colors[i % colors.length] : colors
-                            }}
-                            className="w-full max-w-[40px] rounded-t-sm opacity-90 group-hover:opacity-100 transition-all relative"
-                        >
-                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity">{value}%</span>
-                        </div>
-                    </div>
-                    <span className="text-[9px] text-gray-500 uppercase tracking-wider text-center h-8 flex items-center">{labels[i]}</span>
-                </div>
-            ))}
-        </div>
-    );
+// --- Charts Configuration ---
+
+const barOptions = {
+    responsive: true,
+    plugins: {
+        legend: { display: false },
+        tooltip: {
+            backgroundColor: '#1f1f1f',
+            titleColor: '#fff',
+            bodyColor: '#ccc',
+            borderColor: '#333',
+            borderWidth: 1,
+        }
+    },
+    scales: {
+        y: {
+            beginAtZero: true,
+            grid: { color: '#333' },
+            ticks: { color: '#888' }
+        },
+        x: {
+            grid: { display: false },
+            ticks: { color: '#888' }
+        }
+    }
 };
 
-const SimpleSkillList = ({ data, labels }: { data: number[], labels: string[] }) => {
-    return (
-        <div className="space-y-4 py-4">
-            {labels.map((label, i) => (
-                <div key={i}>
-                    <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-300 font-medium">{label}</span>
-                        <span className="text-orange-500 font-bold">{data[i]}%</span>
-                    </div>
-                    <div className="w-full bg-zinc-800 rounded-full h-1.5">
-                        <div className="bg-orange-600 h-1.5 rounded-full" style={{ width: `${data[i]}%` }}></div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-}
-
-const SimpleDonut = ({ data, labels, colors }: { data: number[], labels: string[], colors: string[] }) => {
-    // Basic CSS implementation using conic-gradient
-    let accumulated = 0;
-    const gradients = data.map((val, i) => {
-        const start = accumulated;
-        accumulated += val;
-        return `${colors[i]} ${start}% ${accumulated}%`;
-    }).join(', ');
-
-    return (
-        <div className="flex items-center justify-center gap-8">
-            <div
-                className="w-40 h-40 rounded-full relative"
-                style={{ background: `conic-gradient(${gradients})` }}
-            >
-                <div className="absolute inset-4 bg-atelier-card rounded-full"></div>
-            </div>
-            <div className="space-y-2">
-                {labels.map((label, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs text-gray-400">
-                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[i] }}></span>
-                        <span>{label} ({data[i]}%)</span>
-                    </div>
-                ))}
-            </div>
-        </div>
-    )
-}
-
+const donutOptions = {
+    responsive: true,
+    plugins: {
+        legend: {
+            position: 'right' as const,
+            labels: { color: '#ccc', font: { size: 12 } }
+        }
+    },
+    cutout: '70%',
+    elements: {
+        arc: { borderWidth: 0 }
+    }
+};
 
 export default function ReportView() {
     // State for Report Logic
     const [modalOpen, setModalOpen] = useState(false);
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalContent, setModalContent] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [linkCopied, setLinkCopied] = useState(false);
-    const [currentUrl, setCurrentUrl] = useState('');
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setCurrentUrl(window.location.href);
-        }
-    }, []);
-
+    // AI State
     const [profileInput, setProfileInput] = useState('');
-    const [currentRole, setCurrentRole] = useState('');
-    const [goal2026, setGoal2026] = useState('');
+    const [aiAnalysis, setAiAnalysis] = useState('');
+    const [aiLoading, setAiLoading] = useState(false);
 
-    // State for Lead Gate
+    // Gate State
     const [isUnlocked, setIsUnlocked] = useState(false);
     const [showGate, setShowGate] = useState(false);
     const [gateForm, setGateForm] = useState({ name: '', email: '' });
@@ -115,31 +98,22 @@ export default function ReportView() {
         }
     }, []);
 
-    // Effect: Scroll Listener for Gate
     useEffect(() => {
         if (isUnlocked) return;
-
         const handleScroll = () => {
-            if (window.scrollY > 200 && !showGate) {
-                setShowGate(true);
-            }
+            if (window.scrollY > 400 && !showGate) setShowGate(true);
         };
-
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [isUnlocked, showGate]);
 
-    // Effect: Lock Body Scroll when Gate is Open
     useEffect(() => {
-        if (showGate) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
+        if (showGate) document.body.style.overflow = 'hidden';
+        else document.body.style.overflow = 'auto';
         return () => { document.body.style.overflow = 'auto'; };
     }, [showGate]);
 
-    // Client-side blacklist for immediate feedback
+    // Client-side Email Validation
     const BLACKLISTED_DOMAINS = [
         'spam.spam', 'mailinator.com', 'temp-mail.org', 'guerrillamail.com',
         '10minutemail.com', 'trashmail.com', 'yopmail.com', 'fools.com',
@@ -148,26 +122,18 @@ export default function ReportView() {
     ];
 
     const validateEmailClient = (email: string) => {
-        if (!email || !email.includes('@')) return { valid: false, message: "El formato del correo no es válido." };
-
+        if (!email || !email.includes('@')) return { valid: false, message: "Email inválido." };
         const [localPart, domain] = email.toLowerCase().split('@');
-
-        if (localPart.length < 2 || domain.length < 3) return { valid: false, message: "Por favor, utiliza un correo real y completo." };
-
-        if (BLACKLISTED_DOMAINS.includes(domain) || domain.includes('spam') || localPart === 'test') {
-            return { valid: false, message: "Este dominio de correo no está permitido." };
-        }
-
+        if (localPart.length < 2 || domain.length < 3) return { valid: false, message: "Email incompleto." };
+        if (BLACKLISTED_DOMAINS.includes(domain) || domain.includes('spam')) return { valid: false, message: "Dominio no permitido." };
         return { valid: true };
     };
 
-    // Handle Gate Submit
     const handleGateSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setGateLoading(true);
         setGateError('');
 
-        // 1. Client-side Validation (No Server Action)
         const validation = validateEmailClient(gateForm.email);
         if (!validation.valid) {
             setGateError(validation.message!);
@@ -177,14 +143,10 @@ export default function ReportView() {
 
         try {
             const formBody = "userGroup=Reporte2026&mailingLists=&email=" + encodeURIComponent(gateForm.email) + "&firstName=" + encodeURIComponent(gateForm.name);
-
-            // POST to Loops
             const res = await fetch("https://app.loops.so/api/newsletter-form/cm2rflmgu01h51390iumvl8na", {
                 method: "POST",
                 body: formBody,
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
             });
 
             if (res.ok) {
@@ -192,46 +154,48 @@ export default function ReportView() {
                 setIsUnlocked(true);
                 setShowGate(false);
             } else {
-                setGateError("Hubo un error. Por favor intenta nuevamente.");
+                setGateError("Error al suscribir. Intenta de nuevo.");
             }
-        } catch (error) {
-            setGateError("Error de conexión. Intenta nuevamente.");
+        } catch {
+            setGateError("Error de conexión.");
         } finally {
             setGateLoading(false);
         }
     };
 
-    // Modal Handlers
-    const openModal = () => setModalOpen(true);
-    const closeModal = () => setModalOpen(false);
+    const handleGeminiAnalysis = async () => {
+        if (!profileInput.trim()) return;
+        setAiLoading(true);
+        const prompt = `Actúa como un consultor de marca personal experto en Web3. Analiza este perfil brevemente y da 3 consejos accionables para 2026: "${profileInput}"`;
+        const res = await generateGeminiContent(prompt);
+        if (res.success) setAiAnalysis(res.text || 'Sin respuesta.');
+        else setAiAnalysis('Error conectando con la IA.');
+        setAiLoading(false);
+    }
 
-    // Gemini Logic commented out/simplified if needed, but keeping for now as it's server-side action call usually.
-    // Assuming generateGeminiContent is a server action that works fine without heavy client libs
-    const handleAnalyzeProfile = async () => {
-        if (!profileInput.trim()) {
-            alert("Por favor ingresa un texto.");
-            return;
-        }
-        // ... (Logic kept same, omitting visual details for brevity, assumed working with stripped UI)
-        alert("La IA está desactivada temporalmente por optimización de carga. Disculpa las molestias.");
+    // Chart Data
+    const dataSkills = {
+        labels: ['Regulación', 'IA', 'Riesgos', 'Ventas', 'Solidity'],
+        datasets: [{
+            data: [35, 30, 25, 20, 5],
+            backgroundColor: ['#ea580c', '#f97316', '#fb923c', '#71717a', '#3f3f46'],
+        }]
     };
 
-    const handleGenerateStrategy = async () => {
-        if (!currentRole.trim() || !goal2026.trim()) {
-            alert("Por favor completa ambos campos.");
-            return;
-        }
-        alert("La IA está desactivada temporalmente por optimización de carga. Disculpa las molestias.");
+    const dataSectors = {
+        labels: ['Finanzas', 'Logística', 'Gobierno', 'Gaming', 'Salud'],
+        datasets: [{
+            data: [42, 25, 15, 12, 6],
+            backgroundColor: ['#ea580c', '#d97706', '#f59e0b', '#71717a', '#27272a'],
+            borderWidth: 0,
+        }]
     };
-
 
     return (
-        <div className="bg-atelier-bg min-h-screen font-sans text-atelier-text selection:bg-atelier-accent selection:text-white pb-20">
-            {/* Simple Background */}
-            <div className="fixed inset-0 pointer-events-none z-0 opacity-10" style={{
-                backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)',
-                backgroundSize: '40px 40px'
-            }}></div>
+        <div className="bg-atelier-bg min-h-screen font-sans text-atelier-text selection:bg-atelier-accent selection:text-white pb-20 overflow-x-hidden">
+
+            {/* Background Grid */}
+            <div className="fixed inset-0 pointer-events-none z-0 opacity-10" style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
 
             {/* Navbar */}
             <nav className="w-full border-b border-atelier-border bg-atelier-bg/95 backdrop-blur z-50 sticky top-0">
@@ -240,153 +204,163 @@ export default function ReportView() {
                         <span className="text-lg font-display font-bold tracking-tight text-white leading-none">DIGITAL ATELIER</span>
                         <span className="text-sm uppercase tracking-[0.3em] text-atelier-accent leading-none mt-1">SOLUTIONS</span>
                     </div>
-                    <div className="text-right">
-                        <p className="text-[10px] text-atelier-muted uppercase tracking-wider">Informe Privado</p>
-                        <p className="text-sm font-bold text-white">Víctor Ribes</p>
+                    <div className="flex gap-4 items-center">
+                        {!isUnlocked && <Lock className="w-4 h-4 text-orange-500" />}
+                        {isUnlocked && <Unlock className="w-4 h-4 text-green-500" />}
                     </div>
                 </div>
             </nav>
 
-            {/* Header */}
-            <header className="w-full py-20 px-6 border-b border-atelier-border relative z-10 text-center">
-                <span className="inline-block py-1 px-3 border border-atelier-border rounded text-atelier-muted text-xs font-bold tracking-widest mb-6 uppercase bg-atelier-card">
-                    Reporte de Mercado 2026
-                </span>
-                <h1 className="text-4xl md:text-7xl font-extrabold mb-6 text-white tracking-tight leading-tight font-display">
-                    El Ejecutivo <span className="text-atelier-accent">Blockchain</span>
-                </h1>
-                <p className="text-xl text-atelier-muted max-w-2xl mx-auto font-light leading-relaxed">
-                    Análisis de tendencias en Digital Assets, RWA y Desarrollo de Marca Profesional.
-                </p>
+            <header className="w-full py-24 px-6 relative z-10 text-center">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+                    <span className="inline-block py-1 px-3 border border-atelier-border rounded text-atelier-muted text-xs font-bold tracking-widest mb-6 uppercase bg-atelier-card">
+                        Reporte de Mercado 2026
+                    </span>
+                    <h1 className="text-5xl md:text-8xl font-extrabold mb-8 text-white tracking-tight leading-tight font-display">
+                        El Ejecutivo <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Blockchain</span>
+                    </h1>
+                    <p className="text-xl md:text-2xl text-atelier-muted max-w-3xl mx-auto font-light leading-relaxed">
+                        Análisis de tendencias en Digital Assets, RWA y Desarrollo de Marca Profesional.
+                    </p>
+                </motion.div>
             </header>
 
-            {/* Main Content */}
-            <main className="max-w-7xl mx-auto px-6 mt-12 relative z-10 space-y-20">
+            <main className="max-w-7xl mx-auto px-6 mt-12 relative z-10 space-y-24">
 
-                {/* Stats Grid */}
+                {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-atelier-card border border-atelier-border p-6">
-                        <h3 className="text-atelier-muted text-xs font-bold uppercase tracking-wider">Demanda Ejecutiva (YoY)</h3>
-                        <div className="mt-4 flex items-baseline gap-2">
-                            <span className="text-4xl font-extrabold text-white font-display">+45%</span>
-                        </div>
-                    </div>
-                    <div className="bg-atelier-card border border-atelier-border p-6">
-                        <h3 className="text-atelier-muted text-xs font-bold uppercase tracking-wider">Salario Base Promedio</h3>
-                        <div className="mt-4 flex items-baseline gap-2">
-                            <span className="text-4xl font-extrabold text-white font-display">$320k</span>
-                        </div>
-                    </div>
-                    <div className="bg-atelier-card border border-atelier-border p-6">
-                        <h3 className="text-atelier-muted text-xs font-bold uppercase tracking-wider">Modalidad Híbrida</h3>
-                        <div className="mt-4 flex items-baseline gap-2">
-                            <span className="text-3xl font-extrabold text-white font-display">DOMINANTE</span>
-                        </div>
-                    </div>
+                    {[
+                        { label: 'Demanda Ejecutiva (YoY)', value: '+45%' },
+                        { label: 'Salario Base Promedio', value: '$320k' },
+                        { label: 'Modalidad Híbrida', value: 'DOMINANTE' }
+                    ].map((stat, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.1 }}
+                            className="bg-atelier-card border border-atelier-border p-6 hover:border-atelier-accent/50 transition-colors"
+                        >
+                            <h3 className="text-atelier-muted text-xs font-bold uppercase tracking-wider">{stat.label}</h3>
+                            <div className="mt-4 text-4xl font-extrabold text-white font-display">{stat.value}</div>
+                        </motion.div>
+                    ))}
                 </div>
 
-                {/* GATE OVERLAY */}
-                {!isUnlocked && showGate && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                        <div className="bg-atelier-card border border-atelier-border p-8 rounded-lg max-w-md w-full shadow-2xl relative">
-                            <div className="text-center mb-6">
-                                <h3 className="text-2xl font-bold text-white mb-2">Desbloquear Reporte Completo</h3>
-                                <p className="text-atelier-muted text-sm">Acceso exclusivo para profesionales del sector.</p>
-                            </div>
-                            <form onSubmit={handleGateSubmit} className="space-y-4">
-                                <div>
+                {/* Gate Overlay */}
+                <AnimatePresence>
+                    {!isUnlocked && showGate && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+                        >
+                            <div className="bg-atelier-card border border-atelier-border p-8 rounded-2xl max-w-md w-full shadow-2xl relative">
+                                <div className="text-center mb-6">
+                                    <h3 className="text-2xl font-bold text-white mb-2">Informe Privado</h3>
+                                    <p className="text-atelier-muted text-sm">Acceso exclusivo para profesionales.</p>
+                                </div>
+                                <form onSubmit={handleGateSubmit} className="space-y-4">
                                     <input
                                         type="text"
                                         placeholder="Tu Nombre"
                                         required
                                         value={gateForm.name}
                                         onChange={(e) => setGateForm({ ...gateForm, name: e.target.value })}
-                                        className="w-full bg-atelier-bg border border-atelier-border rounded p-3 text-white focus:outline-none focus:border-atelier-accent transition-colors"
+                                        className="w-full bg-atelier-bg border border-atelier-border rounded-lg p-3 text-white focus:outline-none focus:border-atelier-accent"
                                     />
-                                </div>
-                                <div>
                                     <input
                                         type="email"
                                         placeholder="Tu Email Profesional"
                                         required
                                         value={gateForm.email}
                                         onChange={(e) => setGateForm({ ...gateForm, email: e.target.value })}
-                                        className="w-full bg-atelier-bg border border-atelier-border rounded p-3 text-white focus:outline-none focus:border-atelier-accent transition-colors"
+                                        className="w-full bg-atelier-bg border border-atelier-border rounded-lg p-3 text-white focus:outline-none focus:border-atelier-accent"
                                     />
-                                </div>
-                                {gateError && <p className="text-red-500 text-xs text-center">{gateError}</p>}
-                                <button
-                                    type="submit"
-                                    disabled={gateLoading}
-                                    className="w-full bg-atelier-accent hover:bg-orange-600 text-white font-bold py-3 rounded transition-colors disabled:opacity-50"
-                                >
-                                    {gateLoading ? 'Verificando...' : 'Leer Reporte 2026'}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                )}
+                                    {gateError && <p className="text-red-500 text-xs text-center">{gateError}</p>}
+                                    <button
+                                        type="submit"
+                                        disabled={gateLoading}
+                                        className="w-full bg-atelier-accent hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-orange-900/20"
+                                    >
+                                        {gateLoading ? 'Verificando...' : 'Leer Reporte Completo'}
+                                    </button>
+                                </form>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                {/* Content Wrapper */}
-                <div className={`space-y-20 transition-all duration-500 ${!isUnlocked ? 'filter blur-md opacity-20 pointer-events-none' : ''}`}>
+                {/* Content */}
+                <div className={`space-y-20 transition-all duration-700 ${!isUnlocked ? 'filter blur-lg opacity-30 pointer-events-none' : ''}`}>
 
-                    {/* Section 1: LinkedIn Talent Insights */}
+                    {/* Charts Section */}
                     <section className="bg-atelier-card/50 border border-atelier-border p-8 rounded-2xl">
-                        <h3 className="text-2xl font-bold text-white mb-8 border-b border-gray-800 pb-4">LinkedIn Talent Insights 2025</h3>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                            <div className="bg-atelier-bg border border-atelier-border p-6 rounded-xl h-[350px]">
-                                <h4 className="text-xs font-bold text-atelier-muted uppercase mb-6 text-center tracking-widest">Habilidades con Mayor Crecimiento (YoY)</h4>
-                                <SimpleBarChart
-                                    data={[35, 30, 25, 20, 5]}
-                                    labels={['Regulación', 'IA', 'Riesgos', 'Ventas', 'Solidity']}
-                                    colors={['#ea580c', '#f97316', '#fb923c', '#71717a', '#3f3f46']}
-                                />
+                        <h3 className="text-2xl font-bold text-white mb-8 border-b border-gray-800 pb-4 flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-atelier-accent" />
+                            LinkedIn Talent Insights 2025
+                        </h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                            <div className="h-[300px] w-full bg-atelier-bg/50 p-4 rounded-xl border border-atelier-border">
+                                <Bar data={dataSkills} options={barOptions} />
                             </div>
-                            <div className="space-y-6 flex flex-col justify-center">
-                                <div className="pl-4 border-l-2 border-atelier-accent">
-                                    <h4 className="font-bold text-white">El fin del "Crypto Nomad"</h4>
-                                    <p className="text-sm text-gray-400 mt-1">Migración masiva hacia jurisdicciones reguladas. Presencialidad estratégica.</p>
+                            <div className="space-y-8">
+                                <div className="border-l-4 border-atelier-accent pl-6 py-2">
+                                    <h4 className="font-bold text-white text-lg">El fin del "Crypto Nomad"</h4>
+                                    <p className="text-gray-400 mt-2 leading-relaxed">Migración masiva hacia jurisdicciones reguladas. La presencialidad vuelve a ser un factor clave de diferenciación.</p>
                                 </div>
-                                <div className="pl-4 border-l-2 border-gray-600">
-                                    <h4 className="font-bold text-white uppercase">IA como Estándar</h4>
-                                    <p className="text-sm text-gray-400 mt-1">El 14% de las descripciones de trabajo C-Level exigen competencia en flujos IA.</p>
+                                <div className="border-l-4 border-gray-700 pl-6 py-2">
+                                    <h4 className="font-bold text-white text-lg font-display uppercase tracking-widest">Sectorización</h4>
+                                    <div className="h-[200px] w-[200px] mt-4">
+                                        <Doughnut data={dataSectors} options={donutOptions} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </section>
 
-                    {/* Section 2: Job Titles & Skills */}
-                    <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="bg-atelier-card border border-atelier-border p-8 rounded-xl h-[450px]">
-                            <h3 className="text-white font-bold mb-6">Evolución de Roles</h3>
-                            <SimpleBarChart
-                                data={[95, 80, 65, 55, 45]}
-                                labels={['Head DA', 'Tokenomics', 'Chief Web3', 'Auditor', 'Dev Lead']}
-                                colors="#ea580c"
-                            />
-                            <p className="text-center text-xs text-gray-500 mt-4">Demanda relativa 2025</p>
+                    {/* AI Analysis Section */}
+                    <section className="border border-atelier-border rounded-2xl overflow-hidden">
+                        <div className="bg-gradient-to-r from-atelier-card to-zinc-900 p-8 border-b border-atelier-border">
+                            <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-purple-400" />
+                                Auditoría IA de Perfil
+                            </h3>
+                            <p className="text-gray-400 text-sm">Pega tu "About" de LinkedIn para recibir 3 consejos estratégicos basados en los datos del reporte.</p>
                         </div>
-                        <div className="bg-atelier-card border border-atelier-border p-8 rounded-xl h-[450px]">
-                            <h3 className="text-white font-bold mb-6">Matriz de Habilidades 2026</h3>
-                            <SimpleSkillList
-                                labels={['Tech Core', 'Compliance/Legal', 'Finanzas Trad.', 'Negocio', 'Ciberseguridad']}
-                                data={[50, 95, 85, 90, 75]}
+                        <div className="p-8 bg-atelier-bg">
+                            <textarea
+                                value={profileInput}
+                                onChange={(e) => setProfileInput(e.target.value)}
+                                placeholder="Pega tu bio aquí..."
+                                className="w-full bg-black border border-atelier-border rounded-lg p-4 text-gray-300 min-h-[100px] focus:border-purple-500 outline-none transition-colors"
                             />
+                            <div className="mt-4 flex justify-end">
+                                <button
+                                    onClick={handleGeminiAnalysis}
+                                    disabled={aiLoading}
+                                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2"
+                                >
+                                    {aiLoading ? <Sparkles className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                    Analizar con Gemini
+                                </button>
+                            </div>
+                            {aiAnalysis && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    className="mt-6 p-6 bg-zinc-900/50 border border-purple-500/20 rounded-lg"
+                                >
+                                    <h4 className="text-purple-400 font-bold mb-2 uppercase text-xs tracking-widest">Resultado de la IA</h4>
+                                    <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">{aiAnalysis}</p>
+                                </motion.div>
+                            )}
                         </div>
-                    </section>
-
-                    {/* Section 3: Sector Distribution */}
-                    <section className="bg-atelier-card border border-atelier-border p-12 rounded-xl flex flex-col items-center">
-                        <h3 className="text-white font-bold mb-10">Panorama Laboral por Sector</h3>
-                        <SimpleDonut
-                            data={[42, 25, 15, 12, 6]}
-                            labels={['Finanzas', 'Logística', 'Gobierno', 'Gaming', 'Salud']}
-                            colors={['#ea580c', '#d97706', '#f59e0b', '#71717a', '#27272a']}
-                        />
                     </section>
 
                 </div>
-
             </main>
         </div>
     );

@@ -181,16 +181,69 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
 
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Contenido (Markdown)</label>
-                            <textarea
-                                name="content"
-                                value={formData.content}
-                                onChange={handleChange}
-                                className="w-full p-6 bg-black border border-zinc-800 rounded-lg focus:ring-1 focus:ring-orange-600 focus:border-orange-600 outline-none min-h-[600px] font-mono text-sm leading-relaxed text-gray-300 resize-none selection:bg-orange-900 selection:text-white"
-                                placeholder="# Empieza a escribir tu historia..."
-                                required
-                            />
+                            <div className="relative">
+                                {isUploading && (
+                                    <div className="absolute top-2 right-2 bg-orange-600 text-white text-xs px-2 py-1 rounded animate-pulse">
+                                        Subiendo imagen...
+                                    </div>
+                                )}
+                                <textarea
+                                    name="content"
+                                    value={formData.content}
+                                    onChange={handleChange}
+                                    onPaste={async (e) => {
+                                        const items = e.clipboardData.items;
+                                        for (const item of items) {
+                                            if (item.type.indexOf('image') === 0) {
+                                                e.preventDefault();
+                                                const file = item.getAsFile();
+                                                if (!file) return;
+
+                                                try {
+                                                    setIsUploading(true);
+                                                    const cursorPos = e.currentTarget.selectionStart;
+                                                    const textBefore = formData.content.substring(0, cursorPos);
+                                                    const textAfter = formData.content.substring(cursorPos);
+
+                                                    // Insert placeholder
+                                                    const placeholder = `\n![Subiendo imagen...]()...\n`;
+                                                    const newContentLoading = textBefore + placeholder + textAfter;
+                                                    setFormData(prev => ({ ...prev, content: newContentLoading }));
+
+                                                    // Upload
+                                                    const fileExt = file.name.split('.').pop() || 'png';
+                                                    const fileName = `paste-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                                                    const { error: uploadError } = await supabase.storage
+                                                        .from('blog-images')
+                                                        .upload(fileName, file);
+
+                                                    if (uploadError) throw uploadError;
+
+                                                    const { data } = supabase.storage.from('blog-images').getPublicUrl(fileName);
+
+                                                    // Replace placeholder with actual link
+                                                    const finalUrl = data.publicUrl;
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        content: prev.content.replace(placeholder, `\n![Imagen](${finalUrl})\n`)
+                                                    }));
+
+                                                } catch (err) {
+                                                    alert('Error al pegar imagen: ' + err);
+                                                    // Revert placeholder on error if simpler, or just leave it for user to delete.
+                                                } finally {
+                                                    setIsUploading(false);
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    className="w-full p-6 bg-black border border-zinc-800 rounded-lg focus:ring-1 focus:ring-orange-600 focus:border-orange-600 outline-none min-h-[600px] font-mono text-sm leading-relaxed text-gray-300 resize-none selection:bg-orange-900 selection:text-white"
+                                    placeholder="# Empieza a escribir... (Puedes pegar imágenes directamente con Ctrl+V)"
+                                    required
+                                />
+                            </div>
                             <div className="flex justify-between items-center mt-2">
-                                <p className="text-xs text-zinc-600">Soporta Markdown, imágenes y HTML básico.</p>
+                                <p className="text-xs text-zinc-600">Tip: Pide a la IA el formato "Markdown Code" para copiar headers y negritas. Pega imágenes con Ctrl+V.</p>
                                 <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" className="text-xs text-orange-600 hover:underline">Guía de Markdown</a>
                             </div>
                         </div>
