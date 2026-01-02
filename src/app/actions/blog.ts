@@ -53,11 +53,32 @@ export async function getPostBySlug(slug: string) {
 
 // --- ADMIN ACTIONS ---
 
-async function checkAdminSession() {
-    const cookieStore = await cookies();
-    const session = cookieStore.get('das_admin_session');
-    if (!session || session.value !== 'authenticated') {
-        throw new Error('Unauthorized access');
+const cookieStore = await cookies();
+const session = cookieStore.get('das_admin_session');
+if (!session || session.value !== 'authenticated') {
+    throw new Error('Unauthorized access: invalid session');
+}
+}
+
+// Helper to debug Env Vars safely
+async function checkEnvVars() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!url) return 'Missing NEXT_PUBLIC_SUPABASE_URL';
+    if (!key) return 'Missing SUPABASE_SERVICE_ROLE_KEY';
+    if (url.includes('placeholder')) return 'NEXT_PUBLIC_SUPABASE_URL is placeholder';
+    if (key === 'placeholder-key') return 'SUPABASE_SERVICE_ROLE_KEY is placeholder';
+    return null;
+}
+
+// Safe revalidate helper
+function safeRevalidate(path: string) {
+    try {
+        revalidatePath(path);
+    } catch (e) {
+        console.error(`Revalidation failed for ${path}:`, e);
+        // Do not throw, just log. This prevents the "Unexpected response" crash if revalidation fails.
     }
 }
 
@@ -90,72 +111,58 @@ export async function getPostByIdAdmin(id: string) {
     return data as BlogPost;
 }
 
-export async function createPost(formData: FormData) {
-    await checkAdminSession();
+// 1. Env Check
+const envError = await checkEnvVars();
+if (envError) throw new Error(`Server Configuration Error: ${envError}`);
 
-    const title = formData.get('title') as string;
-    const slug = formData.get('slug') as string;
-    const content = formData.get('content') as string;
-    const excerpt = formData.get('excerpt') as string;
-    const status = formData.get('status') as 'draft' | 'published';
-    const featured_image = formData.get('featured_image') as string;
-    const seo_title = formData.get('seo_title') as string;
-    const seo_description = formData.get('seo_description') as string;
+try {
+    const { error } = await supabaseAdmin.from('blog_posts').insert({
+        title,
+        slug,
+        content,
+        excerpt,
+        status,
+        featured_image,
+        seo_title,
+        seo_description
+    });
 
-    try {
-        const { error } = await supabaseAdmin.from('blog_posts').insert({
-            title,
-            slug,
-            content,
-            excerpt,
-            status,
-            featured_image,
-            seo_title,
-            seo_description
-        });
+    if (error) throw new Error(error.message);
 
-        if (error) throw new Error(error.message);
-        revalidatePath('/blog');
-        revalidatePath('/vribesadmin/blog');
-    } catch (e) {
-        console.error('Error in createPost:', e);
-        throw new Error('Failed to create post: ' + (e instanceof Error ? e.message : 'Unknown error'));
-    }
+    safeRevalidate('/blog');
+    safeRevalidate('/vribesadmin/blog');
+} catch (e) {
+    console.error('Error in createPost:', e);
+    throw new Error('Failed to create post: ' + (e instanceof Error ? e.message : 'Unknown error'));
+}
 }
 
-export async function updatePost(id: string, formData: FormData) {
-    await checkAdminSession();
+// 1. Env Check
+const envError = await checkEnvVars();
+if (envError) throw new Error(`Server Configuration Error: ${envError}`);
 
-    const title = formData.get('title') as string;
-    const slug = formData.get('slug') as string;
-    const content = formData.get('content') as string;
-    const excerpt = formData.get('excerpt') as string;
-    const status = formData.get('status') as 'draft' | 'published';
-    const featured_image = formData.get('featured_image') as string;
-    const seo_title = formData.get('seo_title') as string;
-    const seo_description = formData.get('seo_description') as string;
+try {
+    const { error } = await supabaseAdmin.from('blog_posts').update({
+        title,
+        slug,
+        content,
+        excerpt,
+        status,
+        featured_image,
+        seo_title,
+        seo_description,
+        updated_at: new Date().toISOString()
+    }).eq('id', id);
 
-    try {
-        const { error } = await supabaseAdmin.from('blog_posts').update({
-            title,
-            slug,
-            content,
-            excerpt,
-            status,
-            featured_image,
-            seo_title,
-            seo_description,
-            updated_at: new Date().toISOString()
-        }).eq('id', id);
+    if (error) throw new Error(error.message);
 
-        if (error) throw new Error(error.message);
-        revalidatePath('/blog');
-        revalidatePath('/vribesadmin/blog');
-        revalidatePath(`/blog/${slug}`);
-    } catch (e) {
-        console.error('Error in updatePost:', e);
-        throw new Error('Failed to update post: ' + (e instanceof Error ? e.message : 'Unknown error'));
-    }
+    safeRevalidate('/blog');
+    safeRevalidate('/vribesadmin/blog');
+    safeRevalidate(`/blog/${slug}`);
+} catch (e) {
+    console.error('Error in updatePost:', e);
+    throw new Error('Failed to update post: ' + (e instanceof Error ? e.message : 'Unknown error'));
+}
 }
 
 export async function deletePost(id: string) {
