@@ -163,6 +163,7 @@ export default async function BlogPostPage({ params }: Props) {
                         components={{
                             h2: ({ node, ...props }) => <h2 className="text-3xl md:text-4xl mt-16 mb-8 tracking-tight font-playfair" {...props} />,
                             h3: ({ node, ...props }) => <h3 className="text-2xl md:text-3xl mt-12 mb-6 font-playfair" {...props} />,
+                            p: ({ node, ...props }) => <div className="mb-8 leading-8 text-lg md:text-xl md:leading-9 text-gray-800 font-raleway" {...props} />,
                             img: ({ node, ...props }) => (
                                 <figure className="my-12 md:-mx-12">
                                     <img className="w-full rounded-sm shadow-sm" {...props} />

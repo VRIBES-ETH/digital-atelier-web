@@ -277,6 +277,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                                                 components={{
                                                     h2: ({ node, ...props }) => <h2 className="text-3xl mt-16 mb-8 tracking-tight font-playfair" {...props} />,
                                                     h3: ({ node, ...props }) => <h3 className="text-2xl mt-12 mb-6 font-playfair" {...props} />,
+                                                    p: ({ node, ...props }) => <div className="mb-8 leading-8 text-lg" {...props} />,
                                                     img: ({ node, ...props }) => (
                                                         <figure className="my-12">
                                                             <img className="w-full rounded-sm shadow-sm" {...props} />
