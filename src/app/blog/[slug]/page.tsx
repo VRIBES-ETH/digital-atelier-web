@@ -173,13 +173,12 @@ export default async function BlogPostPage({ params }: Props) {
                     {/* Author */}
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 relative">
-                            {/* Placeholder for Victor's pic, using a generic confident gradient or check if there is a profile pic available in assets. Using gray fallback for now. */}
-                            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-black flex items-center justify-center text-white font-bold text-xl">VR</div>
+                            <img src="/images/victor-ribes.jpg" alt="Víctor Ribes" className="w-full h-full object-cover" />
                         </div>
                         <div>
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Escrito por</p>
                             <h3 className="font-poppins font-bold text-das-dark text-lg">Víctor Ribes</h3>
-                            <a href="https://www.linkedin.com/in/vribes/" target="_blank" className="flex items-center gap-1 text-sm text-[#0a66c2] hover:underline mt-0.5">
+                            <a href="https://www.linkedin.com/in/victorribes/" target="_blank" className="flex items-center gap-1 text-sm text-[#0a66c2] hover:underline mt-0.5">
                                 <Linkedin className="w-3 h-3" />
                                 <span>Conectar en LinkedIn</span>
                             </a>
@@ -205,10 +204,10 @@ export default async function BlogPostPage({ params }: Props) {
             <div className="mt-20 bg-das-dark text-white p-8 md:p-12 rounded-sm relative overflow-hidden">
                 <div className="relative z-10 max-w-xl">
                     <h3 className="font-poppins font-bold text-2xl md:text-3xl mb-4">
-                        Inteligencia de Mercado Web3
+                        Inteligencia de Mercado Blockchain
                     </h3>
                     <p className="text-gray-400 font-raleway mb-8 leading-relaxed">
-                        Únete a otros ejecutivos que reciben mi análisis semanal sobre tokenización, regulación y estrategia corporativa. Sin ruido.
+                        Únete a +700 ejecutivos que reciben mis análisis sobre blockchain, digital assets, tokenización y su impacto en los mercados de capitales.
                     </p>
                     {/* Reusing existing component but forcing light mode styles via context or just wrapper if possible. 
                         Since NewsletterForm has its own styles, we wrap it or trust it looks good. 
