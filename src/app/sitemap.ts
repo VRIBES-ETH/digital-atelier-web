@@ -1,9 +1,12 @@
 import { MetadataRoute } from 'next'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+import { getPublishedPosts } from '@/app/actions/blog'
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://digitalateliersolutions.agency'
 
-    return [
+    // Static Routes
+    const routes: MetadataRoute.Sitemap = [
         {
             url: baseUrl,
             lastModified: new Date(),
@@ -11,17 +14,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 1,
         },
         {
+            url: `${baseUrl}/blog`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.8,
+        },
+        {
             url: `${baseUrl}/aviso-legal`,
             lastModified: new Date(),
             changeFrequency: 'yearly',
-            priority: 0.5,
+            priority: 0.3,
         },
         {
             url: `${baseUrl}/privacidad`,
             lastModified: new Date(),
             changeFrequency: 'yearly',
-            priority: 0.5,
+            priority: 0.3,
         },
-        // Add other public routes here as they are created
     ]
+
+    // Dynamic Blog Posts
+    try {
+        const posts = await getPublishedPosts()
+        const postRoutes = posts.map((post) => ({
+            url: `${baseUrl}/blog/${post.slug}`,
+            lastModified: new Date(post.updated_at || post.created_at),
+            changeFrequency: 'never' as const, // Content usually static after simple updates
+            priority: 0.7,
+        }))
+        return [...routes, ...postRoutes]
+    } catch (error) {
+        console.warn('Sitemap: Failed to fetch posts', error)
+        return routes
+    }
 }
