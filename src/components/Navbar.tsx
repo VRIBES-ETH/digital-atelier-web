@@ -64,15 +64,34 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Menu Overlay */}
-            <div className={`fixed inset-0 bg-das-light z-40 flex flex-col justify-center items-center transition-opacity duration-300 ${isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
-                <div className="flex flex-col gap-8 text-center font-poppins text-2xl font-bold">
-                    <Link href="/#expertise" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Expertise</Link>
-                    <Link href="/#servicios" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Servicios</Link>
-                    <Link href="/blockchain" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Blockcha-in</Link>
-                    <Link href="/#proceso" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Proceso</Link>
-                    <Link href="/report-ejecutivo-2026" onClick={closeMenu} className="text-orange-600 hover:text-orange-700 transition-colors">Reporte 2026</Link>
-                    <Link href="/blog" onClick={closeMenu} className="hover:text-gray-500 transition-colors">Blog</Link>
-                    <a href="mailto:info@digitalateliersolutions.agency" className="mt-4 bg-das-dark text-white px-8 py-3 rounded-sm">Contacto</a>
+            <div className={`fixed inset-0 bg-das-dark/95 backdrop-blur-xl z-50 flex flex-col transition-all duration-500 ease-in-out ${isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"}`}>
+
+                {/* Mobile Header (Logo + Close) */}
+                <div className="flex justify-between items-center px-6 h-20 border-b border-white/10">
+                    <div className="flex flex-col leading-none text-white">
+                        <span className="font-poppins font-bold text-xl tracking-tighter">DIGITAL ATELIER</span>
+                        <span className="font-barlow text-[10px] tracking-[0.2em] text-gray-400 uppercase">Solutions</span>
+                    </div>
+                    <button onClick={toggleMenu} className="p-2 text-white hover:bg-white/10 rounded-full transition-colors">
+                        <X className="w-8 h-8" />
+                    </button>
+                </div>
+
+                {/* Mobile Links */}
+                <div className="flex flex-col justify-center items-center flex-1 gap-8">
+                    <Link href="/#expertise" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Expertise</Link>
+                    <Link href="/#servicios" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Servicios</Link>
+                    <Link href="/blockchain" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Blockcha-in</Link>
+                    <Link href="/#proceso" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Proceso</Link>
+                    <Link href="/report-ejecutivo-2026" onClick={closeMenu} className="text-3xl font-playfair font-bold text-orange-500 hover:text-orange-400 transition-colors tracking-tight">Reporte 2026</Link>
+                    <Link href="/blog" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Blog</Link>
+                </div>
+
+                {/* Mobile Footer (CTA) */}
+                <div className="p-8 border-t border-white/10 pb-12">
+                    <a href="mailto:info@digitalateliersolutions.agency" className="block w-full text-center bg-white text-das-dark font-barlow font-bold uppercase tracking-widest py-4 rounded-sm hover:bg-gray-200 transition-colors">
+                        Iniciar Proyecto
+                    </a>
                 </div>
             </div>
         </nav>
