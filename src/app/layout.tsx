@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Raleway, Barlow, Inter, Manrope } from "next/font/google";
+import { Poppins, Raleway, Barlow, Inter, Manrope, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import TopLoader from "@/components/TopLoader";
 import CookieBanner from "@/components/CookieBanner";
@@ -34,6 +34,12 @@ const manrope = Manrope({
   weight: ["400", "600", "700", "800"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://digitalateliersolutions.agency'),
   title: {
@@ -42,7 +48,7 @@ export const metadata: Metadata = {
   },
   description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas. Elevamos tu narrativa al estándar institucional.",
   keywords: ["Ghostwriting", "Blockchain", "Web3", "Comunicación Estratégica", "Digital Assets", "Personal Branding", "Executive Communication", "Copywriting", "Finanzas Descentralizadas"],
-  authors: [{ name: "Victor Ribes", url: "https://www.linkedin.com/in/vribes/" }],
+  authors: [{ name: "Victor Ribes", url: "https://www.linkedin.com/in/victorribes/" }],
   creator: "Digital Atelier Solutions",
   openGraph: {
     type: "website",
@@ -95,9 +101,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${poppins.variable} ${raleway.variable} ${barlow.variable} scroll-smooth`} suppressHydrationWarning>
+    <html lang="es" className={`${poppins.variable} ${raleway.variable} ${barlow.variable} ${playfair.variable} scroll-smooth`} suppressHydrationWarning>
       <body
-        className={`${poppins.variable} ${raleway.variable} ${barlow.variable} ${inter.variable} ${manrope.variable} antialiased bg-das-light text-das-dark font-raleway`}
+        className={`${poppins.variable} ${raleway.variable} ${barlow.variable} ${inter.variable} ${manrope.variable} ${playfair.variable} antialiased bg-das-light text-das-dark font-raleway`}
       >
         <TopLoader />
         {children}

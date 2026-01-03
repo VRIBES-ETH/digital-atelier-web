@@ -99,65 +99,74 @@ export default async function BlogPostPage({ params }: Props) {
             />
 
             <article>
-                {/* Header */}
-                <header className="mb-12 md:mb-16">
-                    <div className="text-sm font-bold text-das-accent font-barlow tracking-widest uppercase mb-6 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                            <Link href="/blog" className="opacity-50 hover:opacity-100 transition-opacity">Blog</Link>
-                            <span className="opacity-30">/</span>
-                            <span>{new Date(post.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</span>
+                {/* Header - Editorial Style */}
+                <header className="mb-12 md:mb-16 text-center max-w-4xl mx-auto">
+                    {/* Meta Bar */}
+                    <div className="border-t border-b border-gray-200 py-3 mb-8 md:mb-10 flex items-center justify-center gap-6 md:gap-8">
+                        <Link href="/blog" className="text-xs md:text-sm font-bold text-das-accent font-barlow tracking-[0.2em] uppercase hover:text-black transition-colors">
+                            Market Intelligence
+                        </Link>
+                        <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                        <div className="text-xs md:text-sm font-medium text-gray-500 font-barlow tracking-widest uppercase">
+                            {new Date(post.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
                         </div>
+                        <span className="w-1 h-1 rounded-full bg-gray-300 hidden md:block"></span>
 
                         {/* Share Button Top */}
                         <a
                             href={shareUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hidden md:flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-[#0a66c2] transition-colors border border-gray-200 hover:border-[#0a66c2] px-3 py-1.5 rounded-full"
+                            className="hidden md:flex items-center gap-2 text-[10px] font-bold text-gray-400 hover:text-[#0a66c2] transition-colors uppercase tracking-widest"
                         >
                             <Linkedin className="w-3 h-3" />
-                            COMPARTIR
+                            Share
                         </a>
                     </div>
 
-                    <h1 className="font-poppins font-bold text-4xl md:text-5xl lg:text-6xl mb-8 leading-[1.1] text-das-dark">
+                    {/* Title with Serif Font */}
+                    <h1 className="font-playfair font-bold text-4xl md:text-6xl lg:text-7xl mb-6 md:mb-8 leading-[1.1] text-das-dark tracking-tight">
                         {post.title}
                     </h1>
+
+                    {/* Excerpt / Lead */}
                     {post.excerpt && (
-                        <p className="text-xl md:text-2xl text-gray-500 font-raleway font-light leading-relaxed max-w-3xl">
+                        <p className="text-xl md:text-2xl text-gray-500 font-raleway font-light leading-relaxed max-w-2xl mx-auto italic">
                             {post.excerpt}
                         </p>
                     )}
                 </header>
 
-                {/* Featured Image */}
+                {/* Featured Image - Cinema Width */}
                 {post.featured_image && (
-                    <div className="mb-16 -mx-6 md:mx-0 md:rounded-sm overflow-hidden bg-gray-50">
+                    <div className="mb-16 md:-mx-24 lg:-mx-48 xl:-mx-64 md:rounded-sm overflow-hidden bg-gray-50 shadow-sm relative group">
+                        <div className="absolute inset-0 border border-black/5 rounded-sm z-10 pointer-events-none"></div>
                         <img
                             src={post.featured_image}
                             alt={post.title}
-                            className="w-full h-auto object-cover max-h-[600px]"
+                            className="w-full h-auto object-cover max-h-[700px]"
                         />
                     </div>
                 )}
 
                 {/* Content - Optimized for Reading */}
-                <div className="prose prose-lg md:prose-xl max-w-none font-raleway text-gray-800 leading-loose 
-                    prose-headings:font-poppins prose-headings:font-bold prose-headings:text-das-dark
-                    prose-p:mb-8 prose-p:leading-8
+                <div className="prose prose-lg md:prose-xl max-w-2xl mx-auto font-raleway text-gray-800 leading-loose 
+                    prose-headings:font-playfair prose-headings:font-bold prose-headings:text-das-dark
+                    prose-p:mb-8 prose-p:leading-8 prose-p:text-lg md:prose-p:text-xl md:prose-p:leading-9
                     prose-li:marker:text-das-accent
-                    prose-img:rounded-sm prose-img:w-full prose-img:my-10
+                    prose-img:rounded-sm prose-img:w-full prose-img:my-12 prose-img:shadow-sm
                     prose-a:text-das-accent prose-a:no-underline prose-a:border-b prose-a:border-das-accent/30 hover:prose-a:border-das-accent hover:prose-a:text-das-accent/80 transition-all
-                    prose-blockquote:border-das-accent prose-blockquote:bg-gray-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:not-italic prose-blockquote:font-poppins prose-blockquote:text-gray-600
+                    prose-blockquote:border-l-4 prose-blockquote:border-das-accent prose-blockquote:bg-transparent prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:italic prose-blockquote:font-playfair prose-blockquote:text-2xl prose-blockquote:text-das-dark
+                    first-letter:float-left first-letter:text-6xl first-letter:pr-4 first-letter:font-playfair first-letter:font-bold first-letter:text-das-dark first-letter:-mt-2
                 ">
                     <ReactMarkdown
                         components={{
-                            h2: ({ node, ...props }) => <h2 className="text-3xl md:text-4xl mt-16 mb-8 tracking-tight" {...props} />,
-                            h3: ({ node, ...props }) => <h3 className="text-2xl md:text-3xl mt-12 mb-6" {...props} />,
+                            h2: ({ node, ...props }) => <h2 className="text-3xl md:text-4xl mt-16 mb-8 tracking-tight font-playfair" {...props} />,
+                            h3: ({ node, ...props }) => <h3 className="text-2xl md:text-3xl mt-12 mb-6 font-playfair" {...props} />,
                             img: ({ node, ...props }) => (
-                                <figure className="my-10">
-                                    <img className="w-full rounded-sm" {...props} />
-                                    {props.alt && <figcaption className="text-center text-sm text-gray-500 mt-3 font-barlow italic">{props.alt}</figcaption>}
+                                <figure className="my-12 md:-mx-12">
+                                    <img className="w-full rounded-sm shadow-sm" {...props} />
+                                    {props.alt && <figcaption className="text-center text-sm text-gray-500 mt-4 font-barlow uppercase tracking-widest">{props.alt}</figcaption>}
                                 </figure>
                             ),
                         }}
