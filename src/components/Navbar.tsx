@@ -94,15 +94,15 @@ export default function Navbar() {
                         <Link href="/#servicios" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Servicios</Link>
                         <Link href="/blockchain" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Blockcha-in</Link>
                         <Link href="/#proceso" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Proceso</Link>
-                        <Link href="/report-ejecutivo-2026" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-orange-600 hover:text-orange-700 transition-colors">Reporte 2026</Link>
                         <div className="h-px bg-gray-200 w-full my-2"></div>
+                        <Link href="/report-ejecutivo-2026" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-orange-600 hover:text-orange-700 transition-colors">Reporte 2026</Link>
                         <Link href="/blog" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Blog</Link>
                     </div>
 
                     {/* Footer CTA */}
                     <div className="p-6 border-t border-gray-200 bg-gray-50 shrink-0">
                         <a href="mailto:info@digitalateliersolutions.agency" className="block w-full text-center bg-das-dark text-white font-barlow font-bold uppercase tracking-widest py-3 text-xs rounded-sm hover:bg-gray-800 transition-colors shadow-sm">
-                            Iniciar Proyecto
+                            Contacto
                         </a>
                     </div>
                 </div>
