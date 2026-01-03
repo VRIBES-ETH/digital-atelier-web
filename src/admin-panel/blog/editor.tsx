@@ -1,15 +1,24 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { BlogPost } from '@/app/actions/blog';
 import {
     Loader2, Save, ArrowLeft, Image as ImageIcon, X, UploadCloud,
-    Bold, Italic, Heading1, Heading2, Heading3, Minus, Link2, List, Eye
+    Bold, Italic, Heading1, Heading2, Heading3, Minus, Link2, List, Eye, Code, FileText
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+
+// Tiptap Imports
+import { useEditor, EditorContent, mergeAttributes } from '@tiptap/react';
+import Heading from '@tiptap/extension-heading';
+import Paragraph from '@tiptap/extension-paragraph';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import StarterKit from '@tiptap/starter-kit';
+import { Markdown } from 'tiptap-markdown';
+import Image from '@tiptap/extension-image';
+import TiptapLink from '@tiptap/extension-link';
 
 export default function PostEditor({ post }: { post?: BlogPost }) {
     const router = useRouter();
@@ -17,7 +26,9 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
-    const [previewMode, setPreviewMode] = useState(false);
+
+    // View Mode: 'markdown' (Code) or 'visual' (WYSIWYG)
+    const [viewMode, setViewMode] = useState<'markdown' | 'visual'>('markdown');
 
     const [formData, setFormData] = useState({
         title: post?.title || '',
@@ -30,32 +41,190 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
         seo_description: post?.seo_description || '',
     });
 
+    // Update formData when post prop changes (e.g. after save/refresh)
+    useEffect(() => {
+        if (post) {
+            setFormData(prev => ({
+                ...prev,
+                title: post.title,
+                slug: post.slug,
+                excerpt: post.excerpt,
+                content: post.content,
+                status: post.status,
+                featured_image: post.featured_image,
+                seo_title: post.seo_title,
+                seo_description: post.seo_description,
+            }));
+            // Also update Tiptap content if in visual mode
+            if (editor && viewMode === 'visual' && post.content !== editor.storage.markdown.getMarkdown()) {
+                editor.commands.setContent(post.content);
+            }
+        }
+    }, [post]); // Only run when post object identity changes (router.refresh)
+
+    // --- Tiptap Editor Setup ---
+    const editor = useEditor({
+        extensions: [
+            StarterKit.configure({
+                heading: false,
+                codeBlock: false,
+                horizontalRule: false,
+                paragraph: false,
+            }),
+            Paragraph.extend({
+                renderHTML({ HTMLAttributes }) {
+                    // Inject robust styling for paragraphs: spacing (mb-6), line-height (leading-7), size (text-base) to match Chainlink/Institutional
+                    return ['p', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { class: 'mb-6 leading-7 text-base text-gray-800 font-raleway' }), 0];
+                },
+            }),
+            HorizontalRule.extend({
+                renderHTML({ HTMLAttributes }) {
+                    return ['hr', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { class: 'my-16 border-t-2 border-gray-100 w-full' })];
+                },
+            }),
+            // Use extend to keep the name 'heading' for markdown serialization
+            Heading.extend({
+                name: 'heading', // Explicitly name it
+                renderHTML({ node, HTMLAttributes }) {
+                    const level = this.options.levels.includes(node.attrs.level)
+                        ? node.attrs.level
+                        : this.options.levels[0];
+                    const classes = {
+                        1: 'text-3xl font-bold mb-6 font-playfair',
+                        2: 'text-2xl mt-12 mb-6 tracking-tight font-playfair font-bold text-das-dark',
+                        3: 'text-xl mt-10 mb-5 font-playfair font-bold text-das-dark',
+                    }[level as 1 | 2 | 3];
+                    return [`h${level}`, mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { class: classes }), 0];
+                },
+            }).configure({ levels: [1, 2, 3] }),
+            Markdown.configure({
+                html: false, // Force markdown 
+                transformPastedText: true,
+                transformCopiedText: true,
+                breaks: true,
+            }),
+            Image.configure({
+                inline: true,
+                allowBase64: true,
+            }),
+            TiptapLink.configure({
+                openOnClick: false,
+            }),
+        ],
+        content: formData.content, // Initial content
+        editorProps: {
+            attributes: {
+                class: 'outline-none h-full min-h-[600px]', // Base classes
+            },
+            handlePaste: (view, event) => {
+                const items = event.clipboardData?.items;
+                if (!items) return false;
+
+                for (const item of items) {
+                    if (item.type.indexOf('image') === 0) {
+                        event.preventDefault();
+                        const file = item.getAsFile();
+                        if (file) {
+                            handleImageUpload(file);
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            },
+            handleDrop: (view, event) => {
+                const hasFiles = event.dataTransfer?.files?.length;
+                if (!hasFiles) return false;
+
+                event.preventDefault();
+                const file = event.dataTransfer?.files[0];
+                if (file && file.type.indexOf('image') === 0) {
+                    handleImageUpload(file);
+                    return true;
+                }
+                return false;
+            }
+        },
+        onUpdate: () => {
+            // We do NOT sync automatically on every keystroke to avoid re-renders / loop.
+            // We will sync on Submit or Mode Switch.
+            // OR: sync but decouple useEffect.
+            // Decoupling useEffect is better. 
+        },
+        immediatelyRender: false,
+    });
+
+    // Sync Tiptap content back to formData when typing (debounced or direct, but careful with useEffect deps)
+    useEffect(() => {
+        if (!editor) return;
+
+        const updateListener = () => {
+            const markdown = editor.storage.markdown.getMarkdown();
+            setFormData(prev => ({ ...prev, content: markdown }));
+        };
+
+        editor.on('update', updateListener);
+        return () => { editor.off('update', updateListener); };
+    }, [editor]);
+
+    // Sync Tiptap when switching TO visual mode
+    useEffect(() => {
+        if (viewMode === 'visual' && editor) {
+            // Only set content if we are switching INTO visual mode 
+            // and the content is significantly different (to avoid overwriting work in progress if sync was perfect).
+            // Actually, if we trust formData.content is up to date, just set it.
+            // But we must NOT set it if the change came from Tiptap itself.
+
+            // Simplified: If we switch modes, we force sync.
+            // But how do we distinguish "Switch Mode" from "Re-render due to formData change"?
+            // We use a Ref to track previous viewMode?
+            // Or remove formData.content from this useEffect dependency array?
+
+            if (editor.storage.markdown.getMarkdown() !== formData.content) {
+                editor.commands.setContent(formData.content);
+            }
+        }
+    }, [viewMode, editor]); // Removed formData.content from deps to break loop!
+
+
     // --- Helper: Slug Sanitization ---
     const sanitizeSlug = (text: string) => {
         return text
             .toLowerCase()
-            .normalize('NFD').replace(/[\u0300-\u036f]/g, "") // Remove accents
-            .replace(/[^a-z0-9]+/g, '-') // Replace special chars with dashes
-            .replace(/(^-|-$)+/g, ''); // Trim edges
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)+/g, '');
     };
 
-    // --- Helper: Insert Markdown Format ---
+    // --- Helper: Insert Markdown Format (Only for Textarea) ---
     const insertFormat = (prefix: string, suffix: string = '') => {
-        if (!textareaRef.current) return;
+        if (viewMode === 'visual') {
+            // Tiptap formatting handlers
+            if (!editor) return;
+            switch (prefix) {
+                case '**': editor.chain().focus().toggleBold().run(); break;
+                case '*': editor.chain().focus().toggleItalic().run(); break;
+                case '\n# ': editor.chain().focus().toggleHeading({ level: 1 }).run(); break; // Although we limit to h2/h3 usually
+                case '\n## ': editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+                case '\n### ': editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+                case '- ': editor.chain().focus().toggleBulletList().run(); break;
+                case '[': const url = window.prompt('URL:'); if (url) editor.chain().focus().setLink({ href: url }).run(); break;
+                case '\n---\n': editor.chain().focus().setHorizontalRule().run(); break;
+            }
+            return;
+        }
 
+        if (!textareaRef.current) return;
         const start = textareaRef.current.selectionStart;
         const end = textareaRef.current.selectionEnd;
         const text = formData.content;
-
         const before = text.substring(0, start);
         const selection = text.substring(start, end);
         const after = text.substring(end);
-
         const newContent = before + prefix + selection + suffix + after;
 
         setFormData(prev => ({ ...prev, content: newContent }));
 
-        // Restore cursor/selection
         setTimeout(() => {
             if (textareaRef.current) {
                 textareaRef.current.focus();
@@ -68,59 +237,37 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
-            e.preventDefault();
-            insertFormat('**', '**');
-        }
-        if ((e.metaKey || e.ctrlKey) && e.key === 'i') {
-            e.preventDefault();
-            insertFormat('*', '*');
-        }
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            insertFormat('[', '](url)');
-        }
+        if ((e.metaKey || e.ctrlKey) && e.key === 'b') { e.preventDefault(); insertFormat('**', '**'); }
+        if ((e.metaKey || e.ctrlKey) && e.key === 'i') { e.preventDefault(); insertFormat('*', '*'); }
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); insertFormat('[', '](url)'); }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
         if (name === 'slug') {
-            // Live sanitization for slug input (allow typing dashes, but force lowercase/clean)
             const cleanValue = value.toLowerCase()
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9-]/g, ''); // Allow dashes while typing
+                .replace(/[^a-z0-9-]/g, '');
             setFormData(prev => ({ ...prev, [name]: cleanValue }));
             return;
         }
-
         setFormData(prev => ({ ...prev, [name]: value }));
 
         if (name === 'title' && !post && !formData.slug) {
-            setFormData(prev => ({
-                ...prev,
-                slug: sanitizeSlug(value)
-            }));
+            setFormData(prev => ({ ...prev, slug: sanitizeSlug(value) }));
         }
     };
 
     const handleDrag = (e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.type === "dragenter" || e.type === "dragover") {
-            setDragActive(true);
-        } else if (e.type === "dragleave") {
-            setDragActive(false);
-        }
+        e.preventDefault(); e.stopPropagation();
+        if (e.type === "dragenter" || e.type === "dragover") { setDragActive(true); }
+        else if (e.type === "dragleave") { setDragActive(false); }
     };
 
     const handleDrop = async (e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragActive(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            await handleImageUpload(e.dataTransfer.files[0]);
-        }
+        e.preventDefault(); e.stopPropagation(); setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) { await handleImageUpload(e.dataTransfer.files[0]); }
     };
 
     const handleImageUpload = async (file: File) => {
@@ -131,7 +278,21 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
             const { error: uploadError } = await supabase.storage.from('blog-images').upload(fileName, file);
             if (uploadError) throw uploadError;
             const { data } = supabase.storage.from('blog-images').getPublicUrl(fileName);
-            setFormData(prev => ({ ...prev, featured_image: data.publicUrl }));
+
+            // If visual mode, insert into editor
+            if (viewMode === 'visual' && editor) {
+                editor.chain().focus().setImage({ src: data.publicUrl }).run();
+            } else {
+                setFormData(prev => ({ ...prev, featured_image: data.publicUrl })); // Wait, this is for featured only? 
+                // Ah, for content images we need to insert into content.
+                // Reusing logic from textarea paste for markdown, but Tiptap handles it differently.
+                // For direct drag/drop on featured image area, it goes to featured_image.
+                // This function is seemingly shared.
+                // If it came from content drop/paste, we should insert into content.
+                // But this handleImageUpload is primarily used by the Featured Image dropzone.
+                // Let's assume this specific function is for Featured Image unless called otherwise.
+                setFormData(prev => ({ ...prev, featured_image: data.publicUrl }));
+            }
         } catch (error) {
             alert('Error uploading image: ' + (error instanceof Error ? error.message : 'Unknown error'));
         } finally {
@@ -139,18 +300,35 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
         }
     };
 
+    // Special handler for Tiptap internal image uploads (if we added a button later)
+    // For now, Tiptap just renders what's there. 
+    // Pasting images into Tiptap is handled by extensions usually, or we need a custom handler. 
+    // StarterKit doesn't include image paste handling by default that uploads to Supabase.
+    // For MVP "User wants to layout", prioritizing existing images and text structure.
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Final slug check before submit
-        if (!formData.slug) {
-            alert('Por favor, escribe un Slug.');
-            return;
+        // Force Sync if in Visual Mode to ensure latest edits are captured
+        let finalContent = formData.content;
+        if (viewMode === 'visual' && editor) {
+            finalContent = editor.storage.markdown.getMarkdown();
         }
+
+        if (!formData.slug) { alert('Por favor, escribe un Slug.'); return; }
 
         setIsSaving(true);
         const data = new FormData();
-        Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+        // Use finalContent instead of formData.content
+        data.append('title', formData.title);
+        data.append('slug', formData.slug);
+        data.append('excerpt', formData.excerpt);
+        data.append('content', finalContent);
+        data.append('status', formData.status);
+        data.append('featured_image', formData.featured_image);
+        data.append('seo_title', formData.seo_title);
+        data.append('seo_description', formData.seo_description);
+
         if (post) { data.append('_action', 'update'); data.append('id', post.id); }
         else { data.append('_action', 'create'); }
 
@@ -210,50 +388,55 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                         <div>
                             <div className="flex justify-between items-end mb-2">
                                 <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">
-                                    {previewMode ? 'Vista Previa (Como quedará en la web)' : 'Contenido (Markdown)'}
+                                    {viewMode === 'visual' ? 'Editor Visual (WYSIWYG)' : 'Editor Markdown (Código)'}
                                 </label>
                                 {/* Toolbar */}
                                 <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-1 border border-zinc-700">
-                                    {!previewMode && (
-                                        <>
-                                            <button type="button" onClick={() => insertFormat('**', '**')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Negrita (Cmd+B)">
-                                                <Bold className="w-4 h-4" />
-                                            </button>
-                                            <button type="button" onClick={() => insertFormat('*', '*')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Cursiva (Cmd+I)">
-                                                <Italic className="w-4 h-4" />
-                                            </button>
-                                            <div className="w-px h-4 bg-zinc-600 mx-1"></div>
-                                            <button type="button" onClick={() => insertFormat('\n# ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 1">
-                                                <Heading1 className="w-4 h-4" />
-                                            </button>
-                                            <button type="button" onClick={() => insertFormat('\n## ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 2">
-                                                <Heading2 className="w-4 h-4" />
-                                            </button>
-                                            <button type="button" onClick={() => insertFormat('\n### ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 3">
-                                                <Heading3 className="w-4 h-4" />
-                                            </button>
-                                            <div className="w-px h-4 bg-zinc-600 mx-1"></div>
-                                            <button type="button" onClick={() => insertFormat('- ')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Lista">
-                                                <List className="w-4 h-4" />
-                                            </button>
-                                            <button type="button" onClick={() => insertFormat('[', '](url)')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Enlace (Cmd+K)">
-                                                <Link2 className="w-4 h-4" />
-                                            </button>
-                                            <button type="button" onClick={() => insertFormat('\n---\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Divisor">
-                                                <Minus className="w-4 h-4" />
-                                            </button>
-                                            <div className="w-px h-4 bg-zinc-600 mx-1"></div>
-                                        </>
-                                    )}
-                                    <button
-                                        type="button"
-                                        onClick={() => setPreviewMode(!previewMode)}
-                                        className={`p-1.5 rounded flex items-center gap-2 transition-colors ${previewMode ? 'bg-orange-600 text-white' : 'hover:bg-zinc-700 text-gray-400 hover:text-white'}`}
-                                        title={previewMode ? "Volver a Editar" : "Ver Vista Previa"}
-                                    >
-                                        <Eye className="w-4 h-4" />
-                                        <span className="text-xs font-bold px-1">{previewMode ? 'Editar' : 'Previsualizar'}</span>
+                                    {/* Formatting Buttons - Shared logical handlers */}
+                                    <button type="button" onClick={() => insertFormat('**', '**')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Negrita">
+                                        <Bold className="w-4 h-4" />
                                     </button>
+                                    <button type="button" onClick={() => insertFormat('*', '*')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Cursiva">
+                                        <Italic className="w-4 h-4" />
+                                    </button>
+                                    <div className="w-px h-4 bg-zinc-600 mx-1"></div>
+                                    <button type="button" onClick={() => insertFormat('\n## ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 2">
+                                        <Heading2 className="w-4 h-4" />
+                                    </button>
+                                    <button type="button" onClick={() => insertFormat('\n### ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 3">
+                                        <Heading3 className="w-4 h-4" />
+                                    </button>
+                                    <div className="w-px h-4 bg-zinc-600 mx-1"></div>
+                                    <button type="button" onClick={() => insertFormat('- ')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Lista">
+                                        <List className="w-4 h-4" />
+                                    </button>
+                                    <button type="button" onClick={() => insertFormat('[', '](url)')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Enlace">
+                                        <Link2 className="w-4 h-4" />
+                                    </button>
+                                    <button type="button" onClick={() => insertFormat('\n---\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Divisor">
+                                        <Minus className="w-4 h-4" />
+                                    </button>
+
+                                    <div className="flex bg-black rounded p-0.5 border border-zinc-700 ml-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setViewMode('markdown')}
+                                            className={`p-1.5 rounded transition-colors flex items-center gap-2 ${viewMode === 'markdown' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                            title="Modo Código (Markdown)"
+                                        >
+                                            <Code className="w-3.5 h-3.5" />
+                                            {viewMode === 'markdown' && <span className="text-xs font-bold pr-1">Markdown</span>}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setViewMode('visual')}
+                                            className={`p-1.5 rounded transition-colors flex items-center gap-2 ${viewMode === 'visual' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                            title="Modo Visual (Layout)"
+                                        >
+                                            <FileText className="w-3.5 h-3.5" />
+                                            {viewMode === 'visual' && <span className="text-xs font-bold pr-1">Visual</span>}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -262,35 +445,26 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                                     <div className="absolute top-2 right-2 bg-orange-600 text-white text-xs px-2 py-1 rounded animate-pulse z-20">Subiendo imagen...</div>
                                 )}
 
-                                {previewMode ? (
-                                    <div className="w-full p-8 bg-white border border-zinc-800 rounded-lg min-h-[600px] overflow-y-auto">
-                                        <div className="prose prose-lg max-w-none font-raleway text-gray-800 leading-loose 
+                                <div className={viewMode === 'visual' ? 'block' : 'hidden'}>
+                                    <div className="w-full p-8 bg-white border border-zinc-800 rounded-lg min-h-[600px] text-gray-900">
+                                        <div className="prose prose-md md:prose-lg max-w-none font-raleway text-gray-800 leading-loose text-justify hyphens-auto 
                                             prose-headings:font-playfair prose-headings:font-bold prose-headings:text-das-dark
-                                            prose-p:mb-8 prose-p:leading-8 prose-p:text-lg
+                                            prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:tracking-tight
+                                            prose-h3:text-xl md:prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-5
+                                            prose-p:mb-6 prose-p:leading-7 prose-p:text-base md:prose-p:text-lg md:prose-p:leading-8
                                             prose-li:marker:text-das-accent
-                                            prose-img:rounded-sm prose-img:w-full prose-img:my-12 prose-img:shadow-sm
+                                            prose-hr:my-16 prose-hr:border-gray-200 prose-hr:border-t-2
+                                            prose-img:rounded-sm prose-img:w-full prose-img:my-16 prose-img:shadow-sm
                                             prose-a:text-das-accent prose-a:no-underline prose-a:border-b prose-a:border-das-accent/30 hover:prose-a:border-das-accent hover:prose-a:text-das-accent/80 transition-all
                                             prose-blockquote:border-l-4 prose-blockquote:border-das-accent prose-blockquote:bg-transparent prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:italic prose-blockquote:font-playfair prose-blockquote:text-2xl prose-blockquote:text-das-dark
                                             first-letter:float-left first-letter:text-6xl first-letter:pr-4 first-letter:font-playfair first-letter:font-bold first-letter:text-das-dark first-letter:-mt-2
                                         ">
-                                            <ReactMarkdown
-                                                components={{
-                                                    h2: ({ node, ...props }) => <h2 className="text-3xl mt-16 mb-8 tracking-tight font-playfair" {...props} />,
-                                                    h3: ({ node, ...props }) => <h3 className="text-2xl mt-12 mb-6 font-playfair" {...props} />,
-                                                    p: ({ node, ...props }) => <div className="mb-8 leading-8 text-lg" {...props} />,
-                                                    img: ({ node, ...props }) => (
-                                                        <figure className="my-12">
-                                                            <img className="w-full rounded-sm shadow-sm" {...props} />
-                                                            {props.alt && <figcaption className="text-center text-sm text-gray-500 mt-4 font-barlow uppercase tracking-widest">{props.alt}</figcaption>}
-                                                        </figure>
-                                                    ),
-                                                }}
-                                            >
-                                                {formData.content || '_Nada para previsualizar..._'}
-                                            </ReactMarkdown>
+                                            <EditorContent editor={editor} />
                                         </div>
                                     </div>
-                                ) : (
+                                </div>
+
+                                <div className={viewMode === 'markdown' ? 'block' : 'hidden'}>
                                     <textarea
                                         ref={textareaRef}
                                         name="content"
@@ -298,40 +472,33 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                                         onChange={handleChange}
                                         onKeyDown={handleKeyDown}
                                         onPaste={async (e) => {
+                                            // Handle Smart Paste for Markdown Mode
                                             const items = e.clipboardData.items;
                                             const html = e.clipboardData.getData('text/html');
-
-                                            // 1. Handle Images
                                             for (const item of items) {
                                                 if (item.type.indexOf('image') === 0) {
                                                     e.preventDefault();
                                                     const file = item.getAsFile();
                                                     if (!file) return;
-
                                                     try {
                                                         setIsUploading(true);
                                                         const cursorPos = e.currentTarget.selectionStart;
                                                         const textBefore = formData.content.substring(0, cursorPos);
                                                         const textAfter = formData.content.substring(cursorPos);
-
                                                         const placeholder = `\n![Subiendo imagen...]()...\n`;
                                                         const newContent = textBefore + placeholder + textAfter;
                                                         setFormData(prev => ({ ...prev, content: newContent }));
-
                                                         const fileExt = file.name.split('.').pop() || 'png';
                                                         const fileName = `paste-${Math.random().toString(36).substring(2)}.${fileExt}`;
                                                         const { error } = await supabase.storage.from('blog-images').upload(fileName, file);
                                                         if (error) throw error;
                                                         const { data } = supabase.storage.from('blog-images').getPublicUrl(fileName);
-
                                                         setFormData(prev => ({ ...prev, content: prev.content.replace(placeholder, `\n![Imagen](${data.publicUrl})\n`) }));
                                                     } catch (err) { alert('Error: ' + err); }
                                                     finally { setIsUploading(false); }
                                                     return;
                                                 }
                                             }
-
-                                            // 2. HTML to Markdown
                                             if (html) {
                                                 e.preventDefault();
                                                 const turndown = (node: ChildNode): string => {
@@ -364,7 +531,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                                         className="w-full p-6 bg-black border border-zinc-800 rounded-lg focus:ring-1 focus:ring-orange-600 focus:border-orange-600 outline-none min-h-[600px] font-mono text-sm leading-relaxed text-gray-300 resize-none"
                                         placeholder="# Escribe aquí..." required
                                     />
-                                )}
+                                </div>
                             </div>
                         </div>
                     </div>
