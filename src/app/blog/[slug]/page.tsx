@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
-import { Linkedin, Share2, ArrowRight } from "lucide-react";
-import NewsletterForm from "@/components/NewsletterForm";
+import { Linkedin, Share2 } from "lucide-react";
+import BlogNewsletterForm from "@/components/BlogNewsletterForm";
 
 
 export const dynamicParams = false; // Disable fallback to ensure no worker logic is generated
@@ -215,20 +215,7 @@ export default async function BlogPostPage({ params }: Props) {
                         Checking the view_file of NewsletterForm would confirm. Assuming it fits or I can inline a simple form if needed to match design.
                         Actually, let's use a Direct Loops Form for maximum control here to ensure it fits the design.
                     */}
-                    <form action="https://app.loops.so/api/newsletter-form/cm2rflmgu01h51390iumvl8na" method="POST" className="flex flex-col sm:flex-row gap-3">
-                        <input className="hidden" name="userGroup" value="Newsletter" />
-                        <input
-                            name="email"
-                            type="email"
-                            placeholder="tu@email.com"
-                            required
-                            className="bg-white/10 border border-white/20 text-white placeholder-gray-500 px-4 py-3 rounded-sm flex-1 outline-none focus:border-das-accent transition-colors"
-                        />
-                        <button type="submit" className="bg-das-accent text-white font-bold px-6 py-3 rounded-sm hover:bg-orange-700 transition-colors flex items-center justify-center gap-2">
-                            Suscribirse <ArrowRight className="w-4 h-4" />
-                        </button>
-                    </form>
-                    <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-widest">Cero Spam. Baja en 1 click.</p>
+                    <BlogNewsletterForm />                    <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-widest">Cero Spam. Baja en 1 click.</p>
                 </div>
 
                 {/* Decorative background element */}
