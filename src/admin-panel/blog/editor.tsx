@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { BlogPost } from '@/app/actions/blog';
 import {
     Loader2, Save, ArrowLeft, Image as ImageIcon, X, UploadCloud,
-    Bold, Italic, Heading1, Heading2, Heading3, Minus, Link2, List
+    Bold, Italic, Heading1, Heading2, Heading3, Minus, Link2, List, Eye
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
@@ -16,6 +17,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
+    const [previewMode, setPreviewMode] = useState(false);
 
     const [formData, setFormData] = useState({
         title: post?.title || '',
@@ -207,115 +209,161 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
 
                         <div>
                             <div className="flex justify-between items-end mb-2">
-                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">Contenido (Markdown)</label>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">
+                                    {previewMode ? 'Vista Previa (Como quedará en la web)' : 'Contenido (Markdown)'}
+                                </label>
                                 {/* Toolbar */}
                                 <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-1 border border-zinc-700">
-                                    <button type="button" onClick={() => insertFormat('**', '**')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Negrita (Cmd+B)">
-                                        <Bold className="w-4 h-4" />
-                                    </button>
-                                    <button type="button" onClick={() => insertFormat('*', '*')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Cursiva (Cmd+I)">
-                                        <Italic className="w-4 h-4" />
-                                    </button>
-                                    <div className="w-px h-4 bg-zinc-600 mx-1"></div>
-                                    <button type="button" onClick={() => insertFormat('\n# ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 1">
-                                        <Heading1 className="w-4 h-4" />
-                                    </button>
-                                    <button type="button" onClick={() => insertFormat('\n## ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 2">
-                                        <Heading2 className="w-4 h-4" />
-                                    </button>
-                                    <button type="button" onClick={() => insertFormat('\n### ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 3">
-                                        <Heading3 className="w-4 h-4" />
-                                    </button>
-                                    <div className="w-px h-4 bg-zinc-600 mx-1"></div>
-                                    <button type="button" onClick={() => insertFormat('- ')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Lista">
-                                        <List className="w-4 h-4" />
-                                    </button>
-                                    <button type="button" onClick={() => insertFormat('[', '](url)')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Enlace (Cmd+K)">
-                                        <Link2 className="w-4 h-4" />
-                                    </button>
-                                    <button type="button" onClick={() => insertFormat('\n---\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Divisor">
-                                        <Minus className="w-4 h-4" />
+                                    {!previewMode && (
+                                        <>
+                                            <button type="button" onClick={() => insertFormat('**', '**')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Negrita (Cmd+B)">
+                                                <Bold className="w-4 h-4" />
+                                            </button>
+                                            <button type="button" onClick={() => insertFormat('*', '*')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Cursiva (Cmd+I)">
+                                                <Italic className="w-4 h-4" />
+                                            </button>
+                                            <div className="w-px h-4 bg-zinc-600 mx-1"></div>
+                                            <button type="button" onClick={() => insertFormat('\n# ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 1">
+                                                <Heading1 className="w-4 h-4" />
+                                            </button>
+                                            <button type="button" onClick={() => insertFormat('\n## ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 2">
+                                                <Heading2 className="w-4 h-4" />
+                                            </button>
+                                            <button type="button" onClick={() => insertFormat('\n### ', '\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Título 3">
+                                                <Heading3 className="w-4 h-4" />
+                                            </button>
+                                            <div className="w-px h-4 bg-zinc-600 mx-1"></div>
+                                            <button type="button" onClick={() => insertFormat('- ')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Lista">
+                                                <List className="w-4 h-4" />
+                                            </button>
+                                            <button type="button" onClick={() => insertFormat('[', '](url)')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Enlace (Cmd+K)">
+                                                <Link2 className="w-4 h-4" />
+                                            </button>
+                                            <button type="button" onClick={() => insertFormat('\n---\n')} className="p-1.5 hover:bg-zinc-700 text-gray-400 hover:text-white rounded" title="Divisor">
+                                                <Minus className="w-4 h-4" />
+                                            </button>
+                                            <div className="w-px h-4 bg-zinc-600 mx-1"></div>
+                                        </>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => setPreviewMode(!previewMode)}
+                                        className={`p-1.5 rounded flex items-center gap-2 transition-colors ${previewMode ? 'bg-orange-600 text-white' : 'hover:bg-zinc-700 text-gray-400 hover:text-white'}`}
+                                        title={previewMode ? "Volver a Editar" : "Ver Vista Previa"}
+                                    >
+                                        <Eye className="w-4 h-4" />
+                                        <span className="text-xs font-bold px-1">{previewMode ? 'Editar' : 'Previsualizar'}</span>
                                     </button>
                                 </div>
                             </div>
 
                             <div className="relative">
                                 {isUploading && (
-                                    <div className="absolute top-2 right-2 bg-orange-600 text-white text-xs px-2 py-1 rounded animate-pulse">Subiendo imagen...</div>
+                                    <div className="absolute top-2 right-2 bg-orange-600 text-white text-xs px-2 py-1 rounded animate-pulse z-20">Subiendo imagen...</div>
                                 )}
-                                <textarea
-                                    ref={textareaRef}
-                                    name="content"
-                                    value={formData.content}
-                                    onChange={handleChange}
-                                    onKeyDown={handleKeyDown}
-                                    onPaste={async (e) => {
-                                        const items = e.clipboardData.items;
-                                        const html = e.clipboardData.getData('text/html');
 
-                                        // 1. Handle Images
-                                        for (const item of items) {
-                                            if (item.type.indexOf('image') === 0) {
-                                                e.preventDefault();
-                                                const file = item.getAsFile();
-                                                if (!file) return;
+                                {previewMode ? (
+                                    <div className="w-full p-8 bg-white border border-zinc-800 rounded-lg min-h-[600px] overflow-y-auto">
+                                        <div className="prose prose-lg max-w-none font-raleway text-gray-800 leading-loose 
+                                            prose-headings:font-playfair prose-headings:font-bold prose-headings:text-das-dark
+                                            prose-p:mb-8 prose-p:leading-8 prose-p:text-lg
+                                            prose-li:marker:text-das-accent
+                                            prose-img:rounded-sm prose-img:w-full prose-img:my-12 prose-img:shadow-sm
+                                            prose-a:text-das-accent prose-a:no-underline prose-a:border-b prose-a:border-das-accent/30 hover:prose-a:border-das-accent hover:prose-a:text-das-accent/80 transition-all
+                                            prose-blockquote:border-l-4 prose-blockquote:border-das-accent prose-blockquote:bg-transparent prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:italic prose-blockquote:font-playfair prose-blockquote:text-2xl prose-blockquote:text-das-dark
+                                            first-letter:float-left first-letter:text-6xl first-letter:pr-4 first-letter:font-playfair first-letter:font-bold first-letter:text-das-dark first-letter:-mt-2
+                                        ">
+                                            <ReactMarkdown
+                                                components={{
+                                                    h2: ({ node, ...props }) => <h2 className="text-3xl mt-16 mb-8 tracking-tight font-playfair" {...props} />,
+                                                    h3: ({ node, ...props }) => <h3 className="text-2xl mt-12 mb-6 font-playfair" {...props} />,
+                                                    img: ({ node, ...props }) => (
+                                                        <figure className="my-12">
+                                                            <img className="w-full rounded-sm shadow-sm" {...props} />
+                                                            {props.alt && <figcaption className="text-center text-sm text-gray-500 mt-4 font-barlow uppercase tracking-widest">{props.alt}</figcaption>}
+                                                        </figure>
+                                                    ),
+                                                }}
+                                            >
+                                                {formData.content || '_Nada para previsualizar..._'}
+                                            </ReactMarkdown>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <textarea
+                                        ref={textareaRef}
+                                        name="content"
+                                        value={formData.content}
+                                        onChange={handleChange}
+                                        onKeyDown={handleKeyDown}
+                                        onPaste={async (e) => {
+                                            const items = e.clipboardData.items;
+                                            const html = e.clipboardData.getData('text/html');
 
-                                                try {
-                                                    setIsUploading(true);
-                                                    const cursorPos = e.currentTarget.selectionStart;
-                                                    const textBefore = formData.content.substring(0, cursorPos);
-                                                    const textAfter = formData.content.substring(cursorPos);
+                                            // 1. Handle Images
+                                            for (const item of items) {
+                                                if (item.type.indexOf('image') === 0) {
+                                                    e.preventDefault();
+                                                    const file = item.getAsFile();
+                                                    if (!file) return;
 
-                                                    const placeholder = `\n![Subiendo imagen...]()...\n`;
-                                                    const newContent = textBefore + placeholder + textAfter;
-                                                    setFormData(prev => ({ ...prev, content: newContent }));
+                                                    try {
+                                                        setIsUploading(true);
+                                                        const cursorPos = e.currentTarget.selectionStart;
+                                                        const textBefore = formData.content.substring(0, cursorPos);
+                                                        const textAfter = formData.content.substring(cursorPos);
 
-                                                    const fileExt = file.name.split('.').pop() || 'png';
-                                                    const fileName = `paste-${Math.random().toString(36).substring(2)}.${fileExt}`;
-                                                    const { error } = await supabase.storage.from('blog-images').upload(fileName, file);
-                                                    if (error) throw error;
-                                                    const { data } = supabase.storage.from('blog-images').getPublicUrl(fileName);
+                                                        const placeholder = `\n![Subiendo imagen...]()...\n`;
+                                                        const newContent = textBefore + placeholder + textAfter;
+                                                        setFormData(prev => ({ ...prev, content: newContent }));
 
-                                                    setFormData(prev => ({ ...prev, content: prev.content.replace(placeholder, `\n![Imagen](${data.publicUrl})\n`) }));
-                                                } catch (err) { alert('Error: ' + err); }
-                                                finally { setIsUploading(false); }
-                                                return;
-                                            }
-                                        }
+                                                        const fileExt = file.name.split('.').pop() || 'png';
+                                                        const fileName = `paste-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                                                        const { error } = await supabase.storage.from('blog-images').upload(fileName, file);
+                                                        if (error) throw error;
+                                                        const { data } = supabase.storage.from('blog-images').getPublicUrl(fileName);
 
-                                        // 2. HTML to Markdown
-                                        if (html) {
-                                            e.preventDefault();
-                                            const turndown = (node: ChildNode): string => {
-                                                if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
-                                                if (node.nodeType !== Node.ELEMENT_NODE) return '';
-                                                const el = node as HTMLElement;
-                                                let content = '';
-                                                el.childNodes.forEach(child => content += turndown(child));
-                                                switch (el.tagName.toLowerCase()) {
-                                                    case 'h1': return `\n# ${content}\n\n`;
-                                                    case 'h2': return `\n## ${content}\n\n`;
-                                                    case 'h3': return `\n### ${content}\n\n`;
-                                                    case 'p': return `${content}\n\n`;
-                                                    case 'strong': case 'b': return `**${content}**`;
-                                                    case 'em': case 'i': return `*${content}*`;
-                                                    case 'li': return `- ${content.trim()}\n`;
-                                                    case 'a': return `[${content}](${(el as HTMLAnchorElement).href})`;
-                                                    case 'br': return '\n';
-                                                    default: return content;
+                                                        setFormData(prev => ({ ...prev, content: prev.content.replace(placeholder, `\n![Imagen](${data.publicUrl})\n`) }));
+                                                    } catch (err) { alert('Error: ' + err); }
+                                                    finally { setIsUploading(false); }
+                                                    return;
                                                 }
-                                            };
-                                            const doc = new DOMParser().parseFromString(html, 'text/html');
-                                            const markdown = turndown(doc.body).trim();
-                                            const start = e.currentTarget.selectionStart;
-                                            const before = formData.content.substring(0, start);
-                                            const after = formData.content.substring(start);
-                                            setFormData(prev => ({ ...prev, content: before + markdown + after }));
-                                        }
-                                    }}
-                                    className="w-full p-6 bg-black border border-zinc-800 rounded-lg focus:ring-1 focus:ring-orange-600 focus:border-orange-600 outline-none min-h-[600px] font-mono text-sm leading-relaxed text-gray-300 resize-none"
-                                    placeholder="# Escribe aquí..." required
-                                />
+                                            }
+
+                                            // 2. HTML to Markdown
+                                            if (html) {
+                                                e.preventDefault();
+                                                const turndown = (node: ChildNode): string => {
+                                                    if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+                                                    if (node.nodeType !== Node.ELEMENT_NODE) return '';
+                                                    const el = node as HTMLElement;
+                                                    let content = '';
+                                                    el.childNodes.forEach(child => content += turndown(child));
+                                                    switch (el.tagName.toLowerCase()) {
+                                                        case 'h1': return `\n# ${content}\n\n`;
+                                                        case 'h2': return `\n## ${content}\n\n`;
+                                                        case 'h3': return `\n### ${content}\n\n`;
+                                                        case 'p': return `${content}\n\n`;
+                                                        case 'strong': case 'b': return `**${content}**`;
+                                                        case 'em': case 'i': return `*${content}*`;
+                                                        case 'li': return `- ${content.trim()}\n`;
+                                                        case 'a': return `[${content}](${(el as HTMLAnchorElement).href})`;
+                                                        case 'br': return '\n';
+                                                        default: return content;
+                                                    }
+                                                };
+                                                const doc = new DOMParser().parseFromString(html, 'text/html');
+                                                const markdown = turndown(doc.body).trim();
+                                                const start = e.currentTarget.selectionStart;
+                                                const before = formData.content.substring(0, start);
+                                                const after = formData.content.substring(start);
+                                                setFormData(prev => ({ ...prev, content: before + markdown + after }));
+                                            }
+                                        }}
+                                        className="w-full p-6 bg-black border border-zinc-800 rounded-lg focus:ring-1 focus:ring-orange-600 focus:border-orange-600 outline-none min-h-[600px] font-mono text-sm leading-relaxed text-gray-300 resize-none"
+                                        placeholder="# Escribe aquí..." required
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>
