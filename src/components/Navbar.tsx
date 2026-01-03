@@ -74,7 +74,7 @@ export default function Navbar() {
 
                 {/* Drawer */}
                 <div
-                    className={`relative h-full w-[300px] bg-das-light shadow-2xl flex flex-col transform transition-transform duration-300 ease-out z-50 border-l border-das-border ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
+                    className={`relative h-full w-[300px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-out z-50 border-l border-gray-100 ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
                 >
                     {/* Header */}
                     <div className="flex justify-between items-center px-6 h-16 border-b border-gray-200 shrink-0">
