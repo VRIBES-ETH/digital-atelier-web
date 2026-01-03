@@ -64,7 +64,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Menu Backdrop & Drawer */}
-            <div className={`fixed inset-0 z-50 flex justify-end transition-visibility duration-300 ${isMenuOpen ? "visible pointer-events-auto" : "invisible pointer-events-none delay-300"}`}>
+            <div className={`fixed inset-0 z-[60] flex justify-end transition-visibility duration-300 ${isMenuOpen ? "visible pointer-events-auto" : "invisible pointer-events-none delay-300"}`}>
 
                 {/* Backdrop */}
                 <div
@@ -74,11 +74,11 @@ export default function Navbar() {
 
                 {/* Drawer */}
                 <div
-                    style={{ backgroundColor: "#ffffff" }}
-                    className={`relative h-full w-[300px] !bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-out z-50 border-l border-gray-100 ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
+                    style={{ backgroundColor: "#ffffff", isolation: "isolate" }}
+                    className={`relative h-full w-[300px] !bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-out z-[70] border-l border-gray-100 ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
                 >
                     {/* Header */}
-                    <div className="flex justify-between items-center px-6 h-16 border-b border-gray-200 shrink-0">
+                    <div className="flex justify-between items-center px-6 h-16 border-b border-gray-200 shrink-0 bg-white">
                         <div className="flex flex-col leading-none">
                             <span className="font-poppins font-bold text-lg tracking-tighter text-das-dark">DIGITAL ATELIER</span>
                             <span className="font-barlow text-[9px] tracking-[0.2em] text-gray-500 uppercase">Solutions</span>
@@ -89,7 +89,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Links - Centered & Flexible */}
-                    <div className="flex flex-col flex-1 justify-center px-8 gap-5">
+                    <div className="flex flex-col flex-1 justify-center px-8 gap-5 bg-white">
                         <Link href="/#expertise" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Expertise</Link>
                         <Link href="/#servicios" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Servicios</Link>
                         <Link href="/blockchain" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Blockcha-in</Link>
