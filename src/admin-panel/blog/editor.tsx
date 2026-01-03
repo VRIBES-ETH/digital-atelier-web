@@ -56,7 +56,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                 seo_description: post.seo_description || '',
             }));
             // Also update Tiptap content if in visual mode
-            if (editor && viewMode === 'visual' && post.content !== editor.storage.markdown.getMarkdown()) {
+            if (editor && viewMode === 'visual' && post.content !== (editor.storage as any).markdown.getMarkdown()) {
                 editor.commands.setContent(post.content);
             }
         }
