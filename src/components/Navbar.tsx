@@ -63,35 +63,44 @@ export default function Navbar() {
                 </button>
             </div>
 
-            {/* Mobile Menu Overlay */}
-            <div className={`fixed inset-0 bg-das-dark/95 backdrop-blur-xl z-50 flex flex-col transition-all duration-500 ease-in-out ${isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"}`}>
+            {/* Mobile Menu Backdrop & Drawer */}
+            <div className={`fixed inset-0 z-50 flex justify-end transition-visibility duration-300 ${isMenuOpen ? "visible pointer-events-auto" : "invisible pointer-events-none delay-300"}`}>
 
-                {/* Mobile Header (Logo + Close) */}
-                <div className="flex justify-between items-center px-6 h-20 border-b border-white/10">
-                    <div className="flex flex-col leading-none text-white">
-                        <span className="font-poppins font-bold text-xl tracking-tighter">DIGITAL ATELIER</span>
-                        <span className="font-barlow text-[10px] tracking-[0.2em] text-gray-400 uppercase">Solutions</span>
+                {/* Backdrop */}
+                <div
+                    className={`absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${isMenuOpen ? "opacity-100" : "opacity-0"}`}
+                    onClick={closeMenu}
+                ></div>
+
+                {/* Drawer */}
+                <div
+                    className={`relative h-full w-[300px] bg-das-dark shadow-2xl flex flex-col transform transition-transform duration-300 ease-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
+                >
+                    {/* Header */}
+                    <div className="flex justify-between items-center p-6 border-b border-white/10">
+                        <span className="font-poppins font-bold text-lg text-white tracking-widest uppercase">Menú</span>
+                        <button onClick={toggleMenu} className="p-2 text-white hover:bg-white/10 rounded-full transition-colors">
+                            <X className="w-5 h-5" />
+                        </button>
                     </div>
-                    <button onClick={toggleMenu} className="p-2 text-white hover:bg-white/10 rounded-full transition-colors">
-                        <X className="w-8 h-8" />
-                    </button>
-                </div>
 
-                {/* Mobile Links */}
-                <div className="flex flex-col justify-center items-center flex-1 gap-8">
-                    <Link href="/#expertise" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Expertise</Link>
-                    <Link href="/#servicios" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Servicios</Link>
-                    <Link href="/blockchain" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Blockcha-in</Link>
-                    <Link href="/#proceso" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Proceso</Link>
-                    <Link href="/report-ejecutivo-2026" onClick={closeMenu} className="text-3xl font-playfair font-bold text-orange-500 hover:text-orange-400 transition-colors tracking-tight">Reporte 2026</Link>
-                    <Link href="/blog" onClick={closeMenu} className="text-3xl font-playfair font-bold text-white hover:text-das-accent transition-colors tracking-tight">Blog</Link>
-                </div>
+                    {/* Links */}
+                    <div className="flex flex-col py-8 px-6 gap-6 overflow-y-auto">
+                        <Link href="/#expertise" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Expertise</Link>
+                        <Link href="/#servicios" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Servicios</Link>
+                        <Link href="/blockchain" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Blockcha-in</Link>
+                        <Link href="/#proceso" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Proceso</Link>
+                        <Link href="/report-ejecutivo-2026" onClick={closeMenu} className="text-lg font-raleway font-bold text-orange-400 hover:text-orange-300 hover:translate-x-1 transition-all">Reporte 2026</Link>
+                        <div className="h-px bg-white/10 w-full"></div>
+                        <Link href="/blog" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Blog</Link>
+                    </div>
 
-                {/* Mobile Footer (CTA) */}
-                <div className="p-8 border-t border-white/10 pb-12">
-                    <a href="mailto:info@digitalateliersolutions.agency" className="block w-full text-center bg-white text-das-dark font-barlow font-bold uppercase tracking-widest py-4 rounded-sm hover:bg-gray-200 transition-colors">
-                        Iniciar Proyecto
-                    </a>
+                    {/* Footer CTA */}
+                    <div className="mt-auto p-6 border-t border-white/10 bg-black/20">
+                        <a href="mailto:info@digitalateliersolutions.agency" className="block w-full text-center bg-white text-das-dark font-barlow font-bold uppercase tracking-widest py-3 text-xs rounded-sm hover:bg-gray-200 transition-colors">
+                            Iniciar Proyecto
+                        </a>
+                    </div>
                 </div>
             </div>
         </nav>
