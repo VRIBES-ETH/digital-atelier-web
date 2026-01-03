@@ -26,19 +26,10 @@ export default async function BlogIndexPage() {
 
     return (
         <div className="min-h-screen bg-white">
-            <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
-                {/* Minimalist Header */}
-                <div className="mb-16 md:mb-24 reveal">
-                    <h1 className="font-poppins font-bold text-5xl md:text-7xl mb-6 tracking-tight text-das-dark">
-                        Insights.
-                    </h1>
-                    <p className="font-raleway text-xl md:text-2xl text-gray-500 max-w-2xl leading-relaxed">
-                        Narrativa corporativa, identidad digital y el futuro de la comunicación estratégica.
-                    </p>
-                </div>
+            <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6 pb-24 md:pt-12">
 
                 {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
                     {posts.map((post) => (
                         <Link
                             key={post.id}
@@ -47,7 +38,8 @@ export default async function BlogIndexPage() {
                         >
                             <article className="flex flex-col h-full">
                                 {post.featured_image && (
-                                    <div className="aspect-[4/3] overflow-hidden mb-6 bg-gray-50 rounded-sm">
+                                    <div className="aspect-[3/2] overflow-hidden mb-6 bg-gray-100 relative">
+                                        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
                                         <img
                                             src={post.featured_image}
                                             alt={post.title}
@@ -55,21 +47,18 @@ export default async function BlogIndexPage() {
                                         />
                                     </div>
                                 )}
-                                <div className="flex-1 flex flex-col">
-                                    <div className="text-xs font-bold text-gray-400 font-barlow tracking-widest uppercase mb-3">
+                                <div className="flex-1 flex flex-col pt-2">
+                                    <div className="text-[10px] font-bold text-gray-400 font-barlow tracking-[0.2em] uppercase mb-4">
                                         {new Date(post.created_at).toLocaleDateString('es-ES', {
                                             month: 'long', year: 'numeric'
                                         })}
                                     </div>
-                                    <h2 className="font-poppins font-bold text-2xl mb-3 text-das-dark group-hover:text-das-accent transition-colors leading-tight">
+                                    <h2 className="font-playfair font-bold text-2xl mb-3 text-das-dark group-hover:text-das-accent transition-colors leading-[1.15]">
                                         {post.title}
                                     </h2>
-                                    <p className="text-gray-500 font-raleway text-base leading-relaxed line-clamp-3 mb-4 flex-1">
+                                    <p className="text-gray-500 font-raleway text-sm leading-relaxed line-clamp-3">
                                         {post.excerpt}
                                     </p>
-                                    <span className="text-das-accent text-sm font-bold border-b border-transparent group-hover:border-das-accent self-start transition-all pb-0.5">
-                                        Leer más
-                                    </span>
                                 </div>
                             </article>
                         </Link>
@@ -77,8 +66,8 @@ export default async function BlogIndexPage() {
                 </div>
 
                 {posts.length === 0 && (
-                    <div className="py-20 text-center">
-                        <p className="text-gray-400 font-raleway text-lg">Próximamente.</p>
+                    <div className="py-20 text-center opacity-50">
+                        <p className="text-gray-400 font-barlow uppercase tracking-widest text-sm">Próximamente</p>
                     </div>
                 )}
             </div>
