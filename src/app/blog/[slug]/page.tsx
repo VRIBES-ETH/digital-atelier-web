@@ -161,6 +161,20 @@ export default async function BlogPostPage({ params }: Props) {
 
             {/* Main Content Grid */}
             <main className="max-w-[1400px] mx-auto px-4 md:px-8 pb-24">
+
+                {/* Mobile Share Button (Visible only on small screens) */}
+                <div className="lg:hidden mb-10 flex justify-center">
+                    <a
+                        href={shareUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-3 text-gray-600 hover:text-[#0a66c2] transition-colors group bg-gray-50 border border-gray-100 px-6 py-2.5 rounded-full shadow-sm"
+                    >
+                        <Linkedin className="w-4 h-4 text-[#0a66c2]" />
+                        <span className="text-xs font-bold uppercase tracking-widest">Compartir en LinkedIn</span>
+                    </a>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
 
                     {/* Left Sidebar (TOC) - Desktop Only */}
