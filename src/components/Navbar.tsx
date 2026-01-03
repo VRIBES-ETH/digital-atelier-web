@@ -27,7 +27,7 @@ export default function Navbar() {
                 </Link>
 
                 {/* Desktop Menu */}
-                <div className="hidden md:flex items-center gap-8 font-barlow font-medium text-xs tracking-[0.15em] uppercase text-gray-600">
+                <div className="hidden lg:flex items-center gap-8 font-barlow font-medium text-xs tracking-[0.15em] uppercase text-gray-600">
                     <Link href="/#expertise" className="hover:text-das-dark transition-colors relative group">
                         Expertise
                         <span className="absolute -bottom-1 left-0 w-0 h-px bg-das-dark transition-all group-hover:w-full"></span>
@@ -58,7 +58,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Mobile Menu Button */}
-                <button onClick={toggleMenu} className="md:hidden p-2 text-das-dark z-50 relative">
+                <button onClick={toggleMenu} className="lg:hidden p-2 text-das-dark z-50 relative">
                     {isMenuOpen ? <X /> : <Menu />}
                 </button>
             </div>

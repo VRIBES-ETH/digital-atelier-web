@@ -133,13 +133,13 @@ export default async function BlogPostPage({ params }: Props) {
                 </div>
 
                 {/* Title */}
-                <h1 className="font-playfair font-bold text-4xl md:text-6xl lg:text-7xl mb-8 leading-[1.1] text-das-dark tracking-tight max-w-4xl mx-auto">
+                <h1 className="font-playfair font-bold text-3xl md:text-5xl lg:text-6xl mb-6 leading-[1.1] text-das-dark tracking-tight max-w-4xl mx-auto">
                     {post.title}
                 </h1>
 
                 {/* Excerpt */}
                 {post.excerpt && (
-                    <p className="text-xl md:text-2xl text-gray-500 font-raleway font-light leading-relaxed max-w-2xl mx-auto italic">
+                    <p className="text-xl md:text-2xl text-gray-600 font-raleway font-normal leading-relaxed max-w-3xl mx-auto">
                         {post.excerpt}
                     </p>
                 )}
