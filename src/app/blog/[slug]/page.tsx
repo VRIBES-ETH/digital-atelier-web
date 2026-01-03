@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 import { Linkedin, Share2 } from "lucide-react";
 import BlogNewsletterForm from "@/components/BlogNewsletterForm";
+import BlogShareButton from "@/components/BlogShareButton";
 
 
 export const dynamicParams = false; // Disable fallback to ensure no worker logic is generated
@@ -94,7 +95,9 @@ export default async function BlogPostPage({ params }: Props) {
         );
     }
 
-    const shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(`He estado leyendo "${post.title}" de Víctor Ribes.\n\nLectura recomendada para entender hacia dónde va el mercado.\n\nAquí: https://digitalateliersolutions.agency/blog/${slug}`)}`;
+    const shareText = `He estado leyendo "${post.title}" de Víctor Ribes.\n\nLectura recomendada para entender hacia dónde va el mercado.`;
+    const postUrl = `https://digitalateliersolutions.agency/blog/${slug}`;
+    const shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(`${shareText}\n\nAquí: ${postUrl}`)}`;
     const headings = getHeadings(post.content);
 
     const jsonLd = {
@@ -164,15 +167,11 @@ export default async function BlogPostPage({ params }: Props) {
 
                 {/* Mobile Share Button (Visible only on small screens) */}
                 <div className="lg:hidden mb-10 flex justify-center">
-                    <a
-                        href={shareUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-3 text-gray-600 hover:text-[#0a66c2] transition-colors group bg-gray-50 border border-gray-100 px-6 py-2.5 rounded-full shadow-sm"
-                    >
-                        <Linkedin className="w-4 h-4 text-[#0a66c2]" />
-                        <span className="text-xs font-bold uppercase tracking-widest">Compartir en LinkedIn</span>
-                    </a>
+                    <BlogShareButton
+                        title={post.title}
+                        text={shareText}
+                        url={postUrl}
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
@@ -222,15 +221,11 @@ export default async function BlogPostPage({ params }: Props) {
 
                         {/* Mobile Share Button (Bottom) */}
                         <div className="lg:hidden mt-12 mb-8 flex justify-center">
-                            <a
-                                href={shareUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-3 text-gray-600 hover:text-[#0a66c2] transition-colors group bg-gray-50 border border-gray-100 px-6 py-2.5 rounded-full shadow-sm"
-                            >
-                                <Linkedin className="w-4 h-4 text-[#0a66c2]" />
-                                <span className="text-xs font-bold uppercase tracking-widest">Compartir en LinkedIn</span>
-                            </a>
+                            <BlogShareButton
+                                title={post.title}
+                                text={shareText}
+                                url={postUrl}
+                            />
                         </div>
 
                         {/* Author Footer (Inside Content Column) */}
