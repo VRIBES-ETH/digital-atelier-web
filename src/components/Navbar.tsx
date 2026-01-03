@@ -74,30 +74,34 @@ export default function Navbar() {
 
                 {/* Drawer */}
                 <div
-                    className={`relative h-full w-[300px] bg-das-dark shadow-2xl flex flex-col transform transition-transform duration-300 ease-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
+                    className={`relative h-full w-[300px] bg-das-light shadow-2xl flex flex-col transform transition-transform duration-300 ease-out z-50 border-l border-das-border ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
                 >
                     {/* Header */}
-                    <div className="flex justify-between items-center p-6 border-b border-white/10">
-                        <span className="font-poppins font-bold text-lg text-white tracking-widest uppercase">Menú</span>
-                        <button onClick={toggleMenu} className="p-2 text-white hover:bg-white/10 rounded-full transition-colors">
+                    <div className="flex justify-between items-center px-6 h-20 border-b border-gray-200">
+                        {/* Logo inside Drawer for consistency */}
+                        <div className="flex flex-col leading-none">
+                            <span className="font-poppins font-bold text-lg tracking-tighter text-das-dark">DIGITAL ATELIER</span>
+                            <span className="font-barlow text-[9px] tracking-[0.2em] text-gray-500 uppercase">Solutions</span>
+                        </div>
+                        <button onClick={toggleMenu} className="p-2 text-das-dark hover:bg-gray-200 rounded-full transition-colors">
                             <X className="w-5 h-5" />
                         </button>
                     </div>
 
                     {/* Links */}
                     <div className="flex flex-col py-8 px-6 gap-6 overflow-y-auto">
-                        <Link href="/#expertise" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Expertise</Link>
-                        <Link href="/#servicios" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Servicios</Link>
-                        <Link href="/blockchain" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Blockcha-in</Link>
-                        <Link href="/#proceso" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Proceso</Link>
-                        <Link href="/report-ejecutivo-2026" onClick={closeMenu} className="text-lg font-raleway font-bold text-orange-400 hover:text-orange-300 hover:translate-x-1 transition-all">Reporte 2026</Link>
-                        <div className="h-px bg-white/10 w-full"></div>
-                        <Link href="/blog" onClick={closeMenu} className="text-lg font-raleway font-medium text-white/90 hover:text-white hover:translate-x-1 transition-all">Blog</Link>
+                        <Link href="/#expertise" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Expertise</Link>
+                        <Link href="/#servicios" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Servicios</Link>
+                        <Link href="/blockchain" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Blockcha-in</Link>
+                        <Link href="/#proceso" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Proceso</Link>
+                        <Link href="/report-ejecutivo-2026" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-orange-600 hover:text-orange-700 transition-colors">Reporte 2026</Link>
+                        <div className="h-px bg-gray-200 w-full"></div>
+                        <Link href="/blog" onClick={closeMenu} className="text-sm font-barlow font-bold tracking-[0.15em] uppercase text-gray-700 hover:text-das-dark transition-colors">Blog</Link>
                     </div>
 
                     {/* Footer CTA */}
-                    <div className="mt-auto p-6 border-t border-white/10 bg-black/20">
-                        <a href="mailto:info@digitalateliersolutions.agency" className="block w-full text-center bg-white text-das-dark font-barlow font-bold uppercase tracking-widest py-3 text-xs rounded-sm hover:bg-gray-200 transition-colors">
+                    <div className="mt-auto p-6 border-t border-gray-200 bg-gray-50">
+                        <a href="mailto:info@digitalateliersolutions.agency" className="block w-full text-center bg-das-dark text-white font-barlow font-bold uppercase tracking-widest py-3 text-xs rounded-sm hover:bg-gray-800 transition-colors shadow-sm">
                             Iniciar Proyecto
                         </a>
                     </div>
