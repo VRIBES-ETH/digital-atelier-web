@@ -220,6 +220,19 @@ export default async function BlogPostPage({ params }: Props) {
                             </ReactMarkdown>
                         </article>
 
+                        {/* Mobile Share Button (Bottom) */}
+                        <div className="lg:hidden mt-12 mb-8 flex justify-center">
+                            <a
+                                href={shareUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-3 text-gray-600 hover:text-[#0a66c2] transition-colors group bg-gray-50 border border-gray-100 px-6 py-2.5 rounded-full shadow-sm"
+                            >
+                                <Linkedin className="w-4 h-4 text-[#0a66c2]" />
+                                <span className="text-xs font-bold uppercase tracking-widest">Compartir en LinkedIn</span>
+                            </a>
+                        </div>
+
                         {/* Author Footer (Inside Content Column) */}
                         <div className="mt-20 pt-10 border-t border-gray-200">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
