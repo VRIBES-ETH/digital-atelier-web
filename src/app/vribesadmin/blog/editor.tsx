@@ -51,9 +51,9 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                 excerpt: post.excerpt,
                 content: post.content,
                 status: post.status,
-                featured_image: post.featured_image,
-                seo_title: post.seo_title,
-                seo_description: post.seo_description,
+                featured_image: post.featured_image || '',
+                seo_title: post.seo_title || '',
+                seo_description: post.seo_description || '',
             }));
             // Also update Tiptap content if in visual mode
             if (editor && viewMode === 'visual' && post.content !== editor.storage.markdown.getMarkdown()) {
