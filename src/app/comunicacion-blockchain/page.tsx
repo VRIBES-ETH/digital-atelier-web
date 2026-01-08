@@ -105,7 +105,7 @@ export default function CorporatePage() {
                                 <div className="border-l-2 border-das-dark pl-6">
                                     <h3 className="font-bold text-lg mb-2">Digital Asset Treasuries (DATs)</h3>
                                     <p className="text-sm text-gray-600">
-                                        Empresas cotizadas con Bitcoin/Stablecoins en balance. Comunicamos la estrategia de tesorería a accionistas tradicionales sin generar fricción, alineando la narrativa con MSTR/Tesla practices.
+                                        Empresas cotizadas con Bitcoin/Ethereum/Solana/XRP en balance. Comunicamos la estrategia de tesorería a accionistas tradicionales sin generar fricción, alineando la narrativa como lo hacen MSTR y Tesla.
                                     </p>
                                 </div>
                                 <div className="border-l-2 border-gray-200 pl-6">
