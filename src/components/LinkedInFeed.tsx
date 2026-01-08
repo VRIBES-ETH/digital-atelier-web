@@ -72,7 +72,7 @@ export default function LinkedInFeed() {
                             href={post.url || "#"}
                             target="_blank"
                             key={post.id}
-                            className={`bg-white border border-gray-100 p-6 rounded-sm shadow-sm hover:shadow-md transition-shadow reveal active flex flex-col group cursor-pointer`}
+                            className={`bg-white border border-gray-200 p-6 rounded-sm shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 reveal active flex flex-col group cursor-pointer`}
                         >
                             {/* Header */}
                             <div className="flex gap-4 mb-4">
