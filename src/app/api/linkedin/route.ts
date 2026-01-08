@@ -90,15 +90,56 @@ export async function GET(request: Request) {
 
     const data = await response.json();
 
+    // Helper to clean LinkedIn raw text
+    const cleanText = (text: string) => {
+      return text
+        .replace(/@\[([^\]]+)\]\(urn:li:[^)]+\)/g, '$1') // Remove mentions formatting
+        .replace(/\\n/g, '\n'); // Fix escaped newlines if any
+    };
+
+    // Helper to fetch image URL
+    const fetchImage = async (imageUrn: string): Promise<string | undefined> => {
+      try {
+        const encodedUrn = encodeURIComponent(imageUrn);
+        const imgRes = await fetch(`https://api.linkedin.com/rest/images/${encodedUrn}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'LinkedIn-Version': '202510',
+            'X-Restli-Protocol-Version': '2.0.0'
+          }
+        });
+        if (!imgRes.ok) return undefined;
+        const imgData = await imgRes.json();
+        // content.downloadUrl is usually where the public URL is
+        return imgData.ingestOptions?.ingestUrl || imgData.downloadUrl; // Fallback check
+      } catch (e) {
+        console.error("Error fetching image:", e);
+        return undefined;
+      }
+    };
+
     // Transform data safely
-    const posts = data.elements?.map((item: any) => ({
-      id: item.id,
-      content: item.commentary || "Contenido no disponible", // 'commentary' is the field in rest/posts
-      date: new Date(item.createdAt || Date.now()).toLocaleDateString(),
-      likes: 0, // Likes require a separate call or different projection in new API, keeping 0 for now to avoid complexity
-      comments: 0,
-      url: `https://www.linkedin.com/feed/update/${item.id}` // Construct URL from ID
-    })) || [];
+    const postsPromises = data.elements?.map(async (item: any) => {
+      let imageUrl = undefined;
+      const mediaId = item.content?.media?.id;
+      if (mediaId && mediaId.startsWith("urn:li:image:")) {
+        // Fetch image details
+        // We can do this in parallel but let's await inside map for simplicity then Promise.all the map
+        imageUrl = await fetchImage(mediaId);
+      }
+
+      return {
+        id: item.id,
+        content: cleanText(item.commentary || "Contenido no disponible"),
+        date: new Date(item.createdAt || Date.now()).toLocaleDateString(),
+        likes: 0,
+        comments: 0,
+        url: `https://www.linkedin.com/feed/update/${item.id}`,
+        imageUrl: imageUrl
+      };
+    }) || [];
+
+    const posts = await Promise.all(postsPromises);
 
     return NextResponse.json({ posts });
 

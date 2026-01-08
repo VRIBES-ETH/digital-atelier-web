@@ -10,6 +10,7 @@ interface LinkedInPost {
     date: string;
     likes: number;
     comments: number;
+    imageUrl?: string;
     url?: string;
 }
 
@@ -61,7 +62,7 @@ export default function LinkedInFeed() {
 
                 <div className="grid md:grid-cols-3 gap-8">
                     {posts.map((post, index) => (
-                        <div key={post.id} className={`bg-white border border-gray-100 p-6 rounded-sm shadow-sm hover:shadow-md transition-shadow reveal active`}>
+                        <div key={post.id} className={`bg-white border border-gray-100 p-6 rounded-sm shadow-sm hover:shadow-md transition-shadow reveal active flex flex-col`}>
                             {/* Header */}
                             <div className="flex gap-4 mb-4">
                                 <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden shrink-0">
@@ -84,9 +85,16 @@ export default function LinkedInFeed() {
                             </div>
 
                             {/* Content */}
-                            <p className="text-sm text-gray-600 leading-relaxed mb-6 font-raleway line-clamp-4 min-h-[5em]">
+                            <p className="text-sm text-gray-600 leading-relaxed mb-4 font-raleway line-clamp-4 min-h-[5em] whitespace-pre-wrap">
                                 {post.content}
                             </p>
+
+                            {/* Image */}
+                            {post.imageUrl && (
+                                <div className="mb-4 rounded-md overflow-hidden border border-gray-100 bg-gray-50 flex-1">
+                                    <img src={post.imageUrl} alt="Post media" className="w-full h-32 object-cover hover:scale-105 transition-transform duration-500" />
+                                </div>
+                            )}
 
                             {/* Footer / Stats */}
                             <div className="pt-4 border-t border-gray-50 flex justify-between items-center text-gray-400 text-xs">
