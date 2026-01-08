@@ -1,7 +1,31 @@
+"use client";
+
 import SimpleNavbar from "@/components/SimpleNavbar";
-import { Building2, FileText, Megaphone, Users, ShieldCheck, ArrowRight, Network } from "lucide-react";
+import { Building2, FileText, Megaphone, Users, ShieldCheck, ArrowRight, Network, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
 export default function CorporatePage() {
+    const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+    const faqs = [
+        {
+            question: "¿Cómo garantizan el cumplimiento regulatorio (MiCA/CNMV)?",
+            answer: "Nuestra metodología 'Compliance-First' incluye un filtrado de términos de riesgo financiero. No redactamos consejos de inversión ni promesas de retorno. Nos alineamos estrictamente con las directrices de comunicación de la CNMV para criptoactivos y la normativa MiCA europea."
+        },
+        {
+            question: "¿En qué se diferencian de una agencia de 'Crypto PR'?",
+            answer: "Las agencias tradicionales se enfocan en distribución masiva de notas de prensa (volumen). Nosotros nos enfocamos en **Gestión de Marca Corporativa** y **Comunicación Técnica** (calidad y autoridad). Construimos su narrativa en LinkedIn y sus documentos técnicos, donde realmente operan los inversores institucionales."
+        },
+        {
+            question: "Gestión de Tesorería Digital (DATs): ¿Entienden la sensibilidad?",
+            answer: "Absolutamente. Trabajamos con empresas cotizadas y entendemos los periodos de 'quiet period' y las obligaciones de disclosure. Comunicamos la estrategia de Bitcoin/Stablecoins como una ventaja de tesorería operativa, alejándonos de la especulación."
+        },
+        {
+            question: "¿Cuál es el ROI de la gestión de LinkedIn Corporativo?",
+            answer: "El ROI se mide en **Deal Flow** y **Atracción de Talento**. Una Company Page activa y técnica valida la empresa ante VCs y socios bancarios. Además, los programas de Employee Advocacy multiplican el alcance orgánico x10 comparado con la publicidad pagada."
+        }
+    ];
+
     return (
         <main className="bg-white min-h-screen font-sans selection:bg-das-dark selection:text-white">
             <SimpleNavbar />
@@ -208,6 +232,45 @@ export default function CorporatePage() {
                                 <li>• One-Pagers para Inversores</li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQ SECTION (GEO OPTIMIZATION) */}
+            <section className="py-24 px-6 bg-gray-50">
+                <div className="max-w-3xl mx-auto">
+                    <h2 className="text-3xl font-bold mb-12 text-center text-das-dark">Preguntas Frecuentes (Institucional)</h2>
+
+                    <div className="space-y-4">
+                        {faqs.map((faq, index) => (
+                            <div
+                                key={index}
+                                className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 transition-colors"
+                            >
+                                <button
+                                    className="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none"
+                                    onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                                >
+                                    <span className="font-bold text-gray-800">{faq.question}</span>
+                                    {openIndex === index ? (
+                                        <ChevronUp className="w-5 h-5 text-das-dark flex-shrink-0" />
+                                    ) : (
+                                        <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                    )}
+                                </button>
+
+                                {openIndex === index && (
+                                    <div className="px-6 pb-6 animate-fade-in">
+                                        <div className="text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-4">
+                                            {/* Render HTML for bold text support inside answers */}
+                                            <div dangerouslySetInnerHTML={{
+                                                __html: faq.answer.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                            }} />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
