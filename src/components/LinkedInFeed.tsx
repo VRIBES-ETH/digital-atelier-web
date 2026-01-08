@@ -66,7 +66,7 @@ export default function LinkedInFeed() {
                     </Link>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {posts.map((post) => (
                         <Link
                             href={post.url || "#"}
@@ -81,11 +81,11 @@ export default function LinkedInFeed() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start">
-                                        <div>
+                                        <div className="min-w-0 pr-2">
                                             <h4 className="font-bold text-sm font-poppins truncate group-hover:text-blue-600 transition-colors">Digital Atelier Solutions</h4>
                                             <p className="text-xs text-gray-400 truncate">Blockchain Institutional Communication</p>
                                         </div>
-                                        <Linkedin className="w-4 h-4 text-[#0077b5]" />
+                                        <Linkedin className="w-4 h-4 text-[#0077b5] shrink-0" />
                                     </div>
                                     <div className="flex items-center gap-1 text-[10px] text-gray-400 mt-1">
                                         <span>{post.date}</span>
