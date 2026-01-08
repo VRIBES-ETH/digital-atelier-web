@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useChat } from 'ai/react';
+
 import { Loader2, Play, FileText, Download, LogOut, FileJson, Check } from 'lucide-react';
 import Link from 'next/link';
 
