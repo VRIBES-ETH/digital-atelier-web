@@ -24,7 +24,7 @@ export default function CorporatePage() {
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up delay-200">
                         <a
-                            href="https://www.blockcha-in.com/corporate"
+                            href="https://cal.com/vribes/consultoria-inicial-das"
                             className="bg-das-dark text-white px-8 py-4 rounded-full font-bold hover:bg-black transition-all flex items-center gap-2 group"
                         >
                             Agendar Consultoría Corporativa
@@ -220,7 +220,7 @@ export default function CorporatePage() {
                         Sin compromiso. Solo una conversación honesta sobre cómo alinear tu comunicación con tus objetivos de negocio en 2026.
                     </p>
                     <a
-                        href="https://www.blockcha-in.com/corporate"
+                        href="https://cal.com/vribes/consultoria-inicial-das"
                         className="inline-block bg-white text-das-dark px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors"
                     >
                         Solicitar Propuesta B2B
