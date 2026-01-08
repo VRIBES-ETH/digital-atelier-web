@@ -56,7 +56,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
                 seo_description: post.seo_description || '',
             }));
             // Also update Tiptap content if in visual mode
-            if (editor && viewMode === 'visual' && post.content !== editor.storage.markdown.getMarkdown()) {
+            if (editor && viewMode === 'visual' && post.content !== (editor.storage as any).markdown.getMarkdown()) {
                 editor.commands.setContent(post.content);
             }
         }
@@ -159,7 +159,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
         if (!editor) return;
 
         const updateListener = () => {
-            const markdown = editor.storage.markdown.getMarkdown();
+            const markdown = (editor.storage as any).markdown.getMarkdown();
             setFormData(prev => ({ ...prev, content: markdown }));
         };
 
@@ -180,7 +180,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
             // We use a Ref to track previous viewMode?
             // Or remove formData.content from this useEffect dependency array?
 
-            if (editor.storage.markdown.getMarkdown() !== formData.content) {
+            if ((editor.storage as any).markdown.getMarkdown() !== formData.content) {
                 editor.commands.setContent(formData.content);
             }
         }
@@ -312,7 +312,7 @@ export default function PostEditor({ post }: { post?: BlogPost }) {
         // Force Sync if in Visual Mode to ensure latest edits are captured
         let finalContent = formData.content;
         if (viewMode === 'visual' && editor) {
-            finalContent = editor.storage.markdown.getMarkdown();
+            finalContent = (editor.storage as any).markdown.getMarkdown();
         }
 
         if (!formData.slug) { alert('Por favor, escribe un Slug.'); return; }
