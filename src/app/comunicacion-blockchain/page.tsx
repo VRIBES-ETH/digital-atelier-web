@@ -1,11 +1,20 @@
 "use client";
 
 import SimpleNavbar from "@/components/SimpleNavbar";
+
 import { Building2, FileText, Megaphone, Users, ShieldCheck, ArrowRight, Network, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getCalApi } from "@calcom/embed-react";
 
 export default function CorporatePage() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+    useEffect(() => {
+        (async function () {
+            const cal = await getCalApi({ "namespace": "consultoria-inicial-das" });
+            cal("ui", { "styles": { "branding": { "brandColor": "#000000" } }, "hideEventTypeDetails": false, "layout": "month_view" });
+        })();
+    }, []);
 
     const faqs = [
         {
@@ -47,13 +56,15 @@ export default function CorporatePage() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up delay-200">
-                        <a
-                            href="https://cal.com/vribes/consultoria-inicial-das"
-                            className="bg-das-dark text-white px-8 py-4 rounded-full font-bold hover:bg-black transition-all flex items-center gap-2 group"
+                        <button
+                            data-cal-namespace="consultoria-inicial-das"
+                            data-cal-link="vribes/consultoria-inicial-das"
+                            data-cal-config='{"layout":"month_view"}'
+                            className="bg-das-dark text-white px-8 py-4 rounded-full font-bold hover:bg-black transition-all flex items-center gap-2 group cursor-pointer"
                         >
                             Agendar Consultoría Corporativa
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </a>
+                        </button>
                         <span className="text-xs text-gray-400">Solo proyectos con entidad legal verificada.</span>
                     </div>
                 </div>
@@ -282,12 +293,14 @@ export default function CorporatePage() {
                     <p className="text-gray-400 mb-8">
                         Sin compromiso. Solo una conversación honesta sobre cómo alinear tu comunicación con tus objetivos de negocio en 2026.
                     </p>
-                    <a
-                        href="https://cal.com/vribes/consultoria-inicial-das"
-                        className="inline-block bg-white text-das-dark px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors"
+                    <button
+                        data-cal-namespace="consultoria-inicial-das"
+                        data-cal-link="vribes/consultoria-inicial-das"
+                        data-cal-config='{"layout":"month_view"}'
+                        className="inline-block bg-white text-das-dark px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors cursor-pointer"
                     >
                         Solicitar Propuesta B2B
-                    </a>
+                    </button>
                 </div>
             </section>
         </main>
