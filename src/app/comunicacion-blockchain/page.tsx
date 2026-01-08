@@ -102,25 +102,25 @@ export default function CorporatePage() {
                             </p>
 
                             <div className="space-y-6">
-                                <div className="border-l-2 border-das-dark pl-6">
+                                <div className="border-l-2 border-gray-200 hover:border-das-dark pl-6 transition-colors duration-300">
                                     <h3 className="font-bold text-lg mb-2">Digital Asset Treasuries (DATs)</h3>
                                     <p className="text-sm text-gray-600">
                                         Empresas cotizadas con Bitcoin/Ethereum/Solana/XRP en balance. Comunicamos la estrategia de tesorería a accionistas tradicionales sin generar fricción, alineando la narrativa como lo hacen MSTR y Tesla.
                                     </p>
                                 </div>
-                                <div className="border-l-2 border-gray-200 pl-6">
+                                <div className="border-l-2 border-gray-200 hover:border-das-dark pl-6 transition-colors duration-300">
                                     <h3 className="font-bold text-lg mb-2">Tokenización (RWA)</h3>
                                     <p className="text-sm text-gray-600">
                                         Real Estate, Bonos y Crédito Privado on-chain. Traducimos la eficiencia tecnológica en ventajas financieras tangibles para inversores institucionales (BlackRock narrative).
                                     </p>
                                 </div>
-                                <div className="border-l-2 border-gray-200 pl-6">
+                                <div className="border-l-2 border-gray-200 hover:border-das-dark pl-6 transition-colors duration-300">
                                     <h3 className="font-bold text-lg mb-2">Stablecoins & Pagos B2B</h3>
                                     <p className="text-sm text-gray-600">
                                         Integración de USDC/EURC en flujos de caja corporativos. Explicamos la eficiencia operativa y liquidación transfronteriza (Settlement) más allá de la especulación.
                                     </p>
                                 </div>
-                                <div className="border-l-2 border-gray-200 pl-6">
+                                <div className="border-l-2 border-gray-200 hover:border-das-dark pl-6 transition-colors duration-300">
                                     <h3 className="font-bold text-lg mb-2">Infraestructura & L2s</h3>
                                     <p className="text-sm text-gray-600">
                                         Rollups, Modularidad y ZK-Proofs. Explicamos la escalabilidad técnica como ventaja competitiva de negocio, no solo como código.
