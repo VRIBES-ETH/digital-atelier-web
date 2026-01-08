@@ -138,15 +138,15 @@ export default function CorporatePage() {
                                 <ul className="space-y-3">
                                     <li className="flex gap-2">
                                         <ArrowRight className="w-4 h-4 mt-0.5 text-das-dark" />
-                                        <span>**Auditoría de Lenguaje:** Eliminación sistemática de términos absolutistas ("Garantizado", "Seguro", "Moon") que activan alertas regulatorias.</span>
+                                        <span><strong>Auditoría de Lenguaje:</strong> Eliminación sistemática de términos absolutistas ("Garantizado", "Seguro", "Moon") que activan alertas regulatorias.</span>
                                     </li>
                                     <li className="flex gap-2">
                                         <ArrowRight className="w-4 h-4 mt-0.5 text-das-dark" />
-                                        <span>**Tono Institucional:** Elevamos el discurso del "Slang de Discord" a "Comunicados para el Consejo de Administración".</span>
+                                        <span><strong>Tono Institucional:</strong> Elevamos el discurso del "Slang de Discord" a "Comunicados para el Consejo de Administración".</span>
                                     </li>
                                     <li className="flex gap-2">
                                         <ArrowRight className="w-4 h-4 mt-0.5 text-das-dark" />
-                                        <span>**Gestión de FUD:** Protocolos pre-aprobados para responder a crisis de liquidez, hacks o volatilidad con transparencia y control.</span>
+                                        <span><strong>Gestión de FUD:</strong> Protocolos pre-aprobados para responder a crisis de liquidez, hacks o volatilidad con transparencia y control.</span>
                                     </li>
                                 </ul>
                             </div>
