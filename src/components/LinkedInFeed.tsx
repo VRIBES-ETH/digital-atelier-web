@@ -77,7 +77,7 @@ export default function LinkedInFeed() {
                             {/* Header */}
                             <div className="flex gap-4 mb-4">
                                 <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden shrink-0">
-                                    <img src="/images/ceo_avatar.png" alt="Digital Atelier Solutions" className="w-full h-full object-cover" />
+                                    <img src="/images/das-logo.png" alt="Digital Atelier Solutions" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start">
