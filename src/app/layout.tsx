@@ -49,10 +49,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://digitalateliersolutions.agency'),
   title: {
-    default: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
+    default: "DAS® | Copywriting & Ghostwriting Blockchain",
     template: "%s | DAS®"
   },
-  description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
+  description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional. Expertos en posicionamiento ejecutivo, contenido técnico y liderazgo de pensamiento para la industria Web3.",
   keywords: ["Ghostwriting", "Blockchain", "Comunicación Estratégica", "Digital Assets", "Personal Branding", "Executive Communication", "Copywriting", "Finanzas Descentralizadas"],
   authors: [{ name: "Victor Ribes", url: "https://www.linkedin.com/in/victorribes/" }],
   creator: "Digital Atelier Solutions",
@@ -60,8 +60,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_ES",
     url: "https://digitalateliersolutions.agency",
-    title: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
-    description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
+    title: "DAS® | Copywriting & Ghostwriting Blockchain",
+    description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional. Expertos en posicionamiento ejecutivo, contenido técnico y liderazgo de pensamiento para la industria Web3.",
     siteName: "Digital Atelier Solutions",
     images: [
       {
