@@ -2,11 +2,42 @@
 
 import SimpleNavbar from "@/components/SimpleNavbar";
 // import AuditModal from "@/components/AuditModal"; // Removed for Web-only build
-import { Lock, XCircle, AlertOctagon, Check, CheckCircle, TrendingUp, Crown, Search, Target, MessageSquare, ArrowRight } from "lucide-react";
+import { Lock, XCircle, AlertOctagon, Check, CheckCircle, TrendingUp, Crown, Search, Target, MessageSquare, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
 
+const FAQS = [
+    {
+        question: "¿Qué hace exactamente un Ghostwriter Blockchain?",
+        answer: "Un <strong>Escritor Fantasma (Ghostwriter)</strong> especializado en Blockchain traduce tu conocimiento técnico y visión estratégica en contenido de alto impacto para LinkedIn. A diferencia de un redactor generalista, entiendo la diferencia entre PoS y PoW, las implicaciones de MiCA y el lenguaje que esperan los inversores institucionales."
+    },
+    {
+        question: "¿Es seguro para CEOs de empresas reguladas (Fintech)?",
+        answer: "Absolutamente. Mi metodología <strong>Compliance-First</strong> implica que ningún contenido se publica sin tu validación final. Entiendo las líneas rojas de la CNMV/SEC y redacto con la prudencia necesaria para evitar riesgos reputacionales, enfocándome en liderazgo de pensamiento (Thought Leadership) y no en consejos financieros."
+    },
+    {
+        question: "¿Por qué LinkedIn y no Twitter/X?",
+        answer: "Twitter es para el \"degen\" y la especulación rápida. <strong>LinkedIn es donde están el capital institucional, los partners estratégicos y el talento senior.</strong> Si tu objetivo es levantar una ronda Serie A/B o cerrar acuerdos B2B, tu reputación debe construirse en LinkedIn."
+    },
+    {
+        question: "¿Cuánto tiempo requiere de mí? (El factor ROI)",
+        answer: "<strong>La eficiencia es mi obsesión.</strong> Solo necesito 45-60 minutos al mes de entrevista grabada. De ahí extraigo el \"oro\" (tus tesis, historias y visión) y me encargo de toda la redacción, edición y estrategia. Tú solo revisas y das el \"ok\" final."
+    },
+    {
+        question: "¿En qué te diferencias de una Agencia de PR Crypto?",
+        answer: "PR busca \"alquilar\" audiencias de terceros (notas de prensa, menciones). Yo construyo <strong>tu propio canal de distribución</strong> y activo digital. Una nota de prensa muere en 24h; tu perfil de LinkedIn es un <em>compounder</em> que gana valor con el tiempo."
+    },
+    {
+        question: "¿Escribes sobre precio o trading?",
+        answer: "Solo si tu marca profesional lo requiere, y desde una perspectiva profesional y regulada. Nos enfocamos más en Infraestructura, Tesis de Inversión, Regulación (MiCA) y Casos de Uso Institucionales. Cero consejos financieros (NFA). Cero \"shilling\". Solo liderazgo de pensamiento serio."
+    }
+];
+
 export default function BlockchainPage() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+    const toggleFaq = (index: number) => {
+        setOpenFaqIndex(openFaqIndex === index ? null : index);
+    };
 
     useEffect(() => {
         const observerOptions = {
@@ -50,23 +81,23 @@ export default function BlockchainPage() {
             <header className="pt-40 pb-20 px-6">
                 <div className="max-w-3xl mx-auto text-center reveal">
                     <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-8">
-                        Tu reputación no escala. <br />
-                        <span className="text-gray-400">Tu presencia digital, sí.</span>
+                        Ghostwriting Blockchain para Ejecutivos<br />
+                        <span className="text-gray-400">que lideran, no que escriben.</span>
                     </h1>
 
                     <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
-                        El único servicio de Ghostwriting Ejecutivo diseñado para quienes entienden que en Blockchain, <strong>el silencio es el activo más caro</strong>.
+                        El único servicio de <strong>Ghostwriting Blockchain</strong> y <strong>Escritor Fantasma</strong> diseñado para ejecutivos Fintech que entienden que, en este sector regulado, <strong>el silencio en LinkedIn es el error más caro</strong>.
                         <br /><br />
-                        <span className="text-sm font-medium text-das-dark/80 bg-gray-200/50 px-2 py-1 rounded">No delego. No tengo juniors. Por eso hay lista de espera.</span>
+                        <span className="text-sm font-medium text-das-dark/80 bg-gray-200/50 px-2 py-1 rounded">No delego. No tengo juniors. Comunicación financiera y tecnológica de alto nivel.</span>
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <button
-                            onClick={() => setIsModalOpen(true)}
+                        <a
+                            href="https://www.blockcha-in.com"
                             className="premium-btn inline-block bg-das-dark text-white px-8 py-4 font-poppins font-semibold text-sm tracking-wide uppercase rounded-sm shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
                         >
-                            Aplicar para Acceso
-                        </button>
+                            Solicitar Acceso en Blockcha-in.com
+                        </a>
                         <span className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 sm:hidden">
                             <Lock className="w-3 h-3" /> Plazas limitadas
                         </span>
@@ -83,35 +114,47 @@ export default function BlockchainPage() {
                 <div className="max-w-4xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6 reveal">
-                            <h2 className="text-2xl font-bold font-poppins">Tu competencia está ocupando el vacío que dejas.</h2>
-                            <p className="text-gray-600">Mientras tú cierras acuerdos en privado, otros con la mitad de tu experiencia están construyendo la autoridad pública que te corresponde.</p>
+                            <h2 className="text-2xl font-bold font-poppins">El dilema del CEO Blockchain 2026: Tu competencia ocupa tu vacío.</h2>
+                            <p className="text-gray-600">Mientras tú cierras acuerdos en privado y diriges tu compañía, otros perfiles con menos experiencia están construyendo la autoridad pública que te corresponde como líder en Finanzas y Tecnología.</p>
 
                             <div className="space-y-4 pt-4">
                                 <div className="flex gap-4 items-start">
                                     <div className="bg-red-50 p-2 rounded text-red-900"><XCircle className="w-5 h-5" /></div>
                                     <div>
                                         <h4 className="font-bold text-sm">El coste de oportunidad</h4>
-                                        <p className="text-xs text-gray-500">Inversores y reguladores buscan voces autorizadas en LinkedIn. Si no estás, asumen que no tienes opinión.</p>
+                                        <p className="text-xs text-gray-500">Inversores y reguladores buscan y confían en voces autorizadas en LinkedIn. Si no estás, asumen que no tienes autoridad.</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-4 items-start">
                                     <div className="bg-red-50 p-2 rounded text-red-900"><AlertOctagon className="w-5 h-5" /></div>
                                     <div>
                                         <h4 className="font-bold text-sm">El riesgo de delegar mal</h4>
-                                        <p className="text-xs text-gray-500">Dejar tu marca personal a una agencia generalista es un riesgo de reputación que no puedes permitirte.</p>
+                                        <p className="text-xs text-gray-500">Dejar tu marca personal a una agencia generalista o a un equipo de marketing sin experiencia en LinkedIn es un riesgo reputacional que no puedes permitirte.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-gray-50 p-8 border border-gray-100 rounded-sm relative reveal delay-200">
-                            <div className="absolute -top-3 -right-3 bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest transform rotate-2 shadow-lg">La Realidad</div>
-                            <blockquote className="font-raleway text-lg italic leading-relaxed text-gray-700">
-                                "Víctor, sé que debo publicar. Pero entre el board, Compliance y la operativa diaria, LinkedIn siempre queda para mañana. Y ese 'mañana' nunca llega."
-                            </blockquote>
-                            <div className="mt-6 flex items-center gap-3 opacity-60">
-                                <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-                                <span className="text-xs font-bold uppercase tracking-widest text-gray-500">CEO Fintech (Cliente actual)</span>
+                        <div className="bg-[#ECE5DD] p-6 rounded-lg relative reveal delay-200 shadow-inner border border-black/5 flex flex-col justify-center min-h-[200px]">
+                            <div className="absolute -top-3 -right-3 bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest transform rotate-2 shadow-lg z-10">La Realidad</div>
+
+                            {/* WhatsApp Message Bubble (Incoming) */}
+                            <div className="bg-white p-3 rounded-lg rounded-tl-none shadow-sm relative max-w-[95%] self-start">
+                                {/* Bubble Tail */}
+                                <div className="absolute top-0 -left-2 w-0 h-0 border-t-[8px] border-t-white border-l-[8px] border-l-transparent"></div>
+
+                                {/* Sender Name */}
+                                <p className="text-[11px] font-bold text-[#D65F29] mb-1 font-sans">CEO Fintech (Cliente actual)</p>
+
+                                {/* Message Text */}
+                                <p className="text-[13px] leading-relaxed text-gray-800 font-sans">
+                                    Víctor, sé que debo empezar a publicar en mi perfil. Pero entre el board, compliance y la operativa diaria, LinkedIn siempre se me queda para mañana. Y ese 'mañana' nunca llega ¿puedes hablar ahora?
+                                </p>
+
+                                {/* Time */}
+                                <div className="flex justify-end mt-1">
+                                    <span className="text-[10px] text-gray-400 font-sans">19:42</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -141,7 +184,7 @@ export default function BlockchainPage() {
                             <div className="divide-y divide-gray-100 text-sm">
                                 <div className="grid grid-cols-2 p-4">
                                     <div className="text-gray-500">Escribe un Junior/IA</div>
-                                    <div className="font-bold text-das-dark">Escribe Víctor Ribes</div>
+                                    <div className="font-bold text-das-dark">Tu Escritor Fantasma (Víctor Ribes)</div>
                                 </div>
                                 <div className="grid grid-cols-2 p-4">
                                     <div className="text-gray-500">Objetivo: Volumen</div>
@@ -225,7 +268,7 @@ export default function BlockchainPage() {
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-das-dark" /> 2-3 posts semanales</li>
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-das-dark" /> Auditoría básica</li>
                             </ul>
-                            <a href="https://buy.stripe.com/test_seed" target="_blank" rel="noopener noreferrer" className="block text-center border border-gray-300 text-gray-600 py-3 text-xs font-bold uppercase tracking-widest hover:border-das-dark hover:text-das-dark transition-colors">Solicitar</a>
+                            <a href="https://www.blockcha-in.com" className="block text-center border border-gray-300 text-gray-600 py-3 text-xs font-bold uppercase tracking-widest hover:border-das-dark hover:text-das-dark transition-colors">Solicitar en Blockcha-in.com</a>
                         </div>
 
                         {/* GROWTH (MAIN) */}
@@ -247,7 +290,7 @@ export default function BlockchainPage() {
                                 <li className="flex gap-2"><CheckCircle className="w-4 h-4" /> Optimización mensual</li>
                                 <li className="flex gap-2"><CheckCircle className="w-4 h-4" /> Soporte prioritario</li>
                             </ul>
-                            <a href="https://buy.stripe.com/test_growth" target="_blank" rel="noopener noreferrer" className="block text-center bg-das-dark text-white py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">Aplicar ahora</a>
+                            <a href="https://www.blockcha-in.com" className="block text-center bg-das-dark text-white py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">Aplicar en Blockcha-in.com</a>
                         </div>
 
                         {/* AUTHORITY (WAITLIST) */}
@@ -255,7 +298,7 @@ export default function BlockchainPage() {
                             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center text-center p-6">
                                 <span className="bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest mb-2">Lista de Espera</span>
                                 <p className="text-xs text-gray-600 font-medium">Actualmente al máximo de capacidad para este nivel.</p>
-                                <button onClick={() => setIsModalOpen(true)} className="mt-4 underline text-xs font-bold text-das-dark">Unirme a la lista</button>
+                                <a href="https://www.blockcha-in.com" className="mt-4 underline text-xs font-bold text-das-dark">Unirme a la lista en Blockcha-in.es</a>
                             </div>
 
                             <div className="flex justify-between items-start mb-4 opacity-50">
@@ -275,10 +318,50 @@ export default function BlockchainPage() {
                 </div>
             </section>
 
+            {/* FAQ SECTION for Semantic Density */}
+            <section className="py-24 px-6 bg-white border-t border-gray-100">
+                <div className="max-w-3xl mx-auto">
+                    <h2 className="text-3xl font-bold mb-12 text-center text-das-dark">Preguntas Frecuentes sobre <span className="text-gray-400">Ghostwriting Ejecutivo</span></h2>
+
+                    <div className="space-y-4">
+                        {FAQS.map((faq, index) => (
+                            <div
+                                key={index}
+                                className={`border border-gray-200 rounded-lg overflow-hidden transition-all duration-300 ${openFaqIndex === index ? 'bg-gray-50 border-das-dark/20 shadow-sm' : 'bg-white hover:border-gray-300'
+                                    }`}
+                            >
+                                <button
+                                    onClick={() => toggleFaq(index)}
+                                    className="w-full flex items-center justify-between p-5 text-left focus:outline-none"
+                                >
+                                    <span className={`font-bold text-lg font-poppins ${openFaqIndex === index ? 'text-das-dark' : 'text-gray-700'}`}>
+                                        {faq.question}
+                                    </span>
+                                    {openFaqIndex === index ? (
+                                        <ChevronUp className="w-5 h-5 text-das-dark flex-shrink-0" />
+                                    ) : (
+                                        <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                    )}
+                                </button>
+
+                                <div
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                        }`}
+                                >
+                                    <div className="p-5 pt-0 text-gray-600 text-sm leading-relaxed border-t border-gray-100/50 mt-2">
+                                        <div dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* FINAL CTA */}
             <section id="auditoria" className="py-24 px-6 bg-das-dark text-white text-center relative overflow-hidden">
                 <div className="max-w-2xl mx-auto relative z-10 reveal">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6">No contrates un servicio.<br />Aplica a una vacante.</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-6">No contratas un servicio.<br />Aplicas a una vacante.</h2>
                     <p className="text-gray-400 mb-10 text-lg">
                         Para garantizar la calidad de mi trabajo, mantengo un límite estricto de clientes activos. El primer paso es una auditoría ejecutiva de 30 min para ver si encajamos.
                     </p>
@@ -288,17 +371,17 @@ export default function BlockchainPage() {
                         <ul className="space-y-3 text-sm text-gray-300">
                             <li className="flex gap-3"><Search className="w-4 h-4 text-das-accent" /> Auditoría de tu perfil actual (Riesgos/Oportunidades)</li>
                             <li className="flex gap-3"><Target className="w-4 h-4 text-das-accent" /> Estrategia de posicionamiento preliminar</li>
-                            <li className="flex gap-3"><MessageSquare className="w-4 h-4 text-das-accent" /> Validación de tono y química de trabajo</li>
+                            <li className="flex gap-3"><MessageSquare className="w-4 h-4 text-das-accent" /> Validación de objetivos y química de trabajo</li>
                         </ul>
                     </div>
 
-                    <button
-                        onClick={() => setIsModalOpen(true)}
+                    <a
+                        href="https://www.blockcha-in.com"
                         className="premium-btn inline-flex items-center gap-3 bg-white text-das-dark px-10 py-5 font-bold rounded-sm hover:bg-gray-100 transition-colors shadow-2xl"
                     >
-                        <span>Solicitar Entrevista de Acceso</span>
+                        <span>Solicitar Entrevista en Blockcha-in.com</span>
                         <ArrowRight className="w-5 h-5" />
-                    </button>
+                    </a>
 
                     <p className="mt-6 text-[10px] text-gray-500 uppercase tracking-widest">
                         Sin compromiso. Si no encajamos, te lo diré honestamente.
