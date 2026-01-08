@@ -181,7 +181,7 @@ export default function Home() {
               </div>
               <h3 className="font-poppins font-bold text-xl mb-4 tracking-tight">Tesis &<br />Pitch Decks</h3>
               <p className="text-sm text-gray-600 leading-relaxed font-raleway h-20">
-                Cerramos el gap entre Web3 y TradFi. Traducimos tu tecnología en una narrativa financiera capaz de superar una <em>Due Diligence</em>.
+                Cerramos el gap entre Blockchain y TradFi. Traducimos tu tecnología en una narrativa financiera capaz de superar una <em>Due Diligence</em>.
               </p>
             </div>
 
@@ -251,7 +251,7 @@ export default function Home() {
                 <span className="text-[10px] bg-white text-black px-2 py-0.5 rounded font-bold uppercase tracking-wide">Producto DAS</span>
               </div>
               <h2 className="font-poppins font-bold text-4xl lg:text-5xl leading-tight">
-                Ghostwriting Ejecutivo<br />para Líderes Web3.
+                Ghostwriting Ejecutivo<br />para Líderes Blockchain.
               </h2>
             </div>
             <p className="text-gray-400 max-w-md text-base leading-relaxed">

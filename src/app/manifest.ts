@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
     return {
         name: 'Digital Atelier Solutions',
         short_name: 'DAS®',
-        description: 'Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas.',
+        description: 'Agencia boutique de comunicación estratégica y ghostwriting para líderes Blockchain y finanzas descentralizadas.',
         start_url: '/',
         display: 'standalone',
         background_color: '#FAFAFA', // bg-das-light

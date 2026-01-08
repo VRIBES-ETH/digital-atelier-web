@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins, Raleway, Barlow, Inter, Manrope, Playfair_Display } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import TopLoader from "@/components/TopLoader";
 import CookieBanner from "@/components/CookieBanner";
 
@@ -49,34 +49,34 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://digitalateliersolutions.agency'),
   title: {
-    default: "DAS® | Copywriting & Ghostwriting Blockchain",
+    default: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
     template: "%s | DAS®"
   },
-  description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional. Expertos en posicionamiento ejecutivo, contenido técnico y liderazgo de pensamiento para la industria Blockchain.",
-  keywords: ["Ghostwriting", "Blockchain", "Comunicación Estratégica", "Digital Assets", "Personal Branding", "Executive Communication", "Copywriting", "Finanzas Descentralizadas"],
+  description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas. Elevamos tu narrativa al estándar institucional.",
+  keywords: ["Ghostwriting", "Blockchain", "Web3", "Comunicación Estratégica", "Digital Assets", "Personal Branding", "Executive Communication", "Copywriting", "Finanzas Descentralizadas"],
   authors: [{ name: "Victor Ribes", url: "https://www.linkedin.com/in/victorribes/" }],
   creator: "Digital Atelier Solutions",
   openGraph: {
     type: "website",
     locale: "es_ES",
     url: "https://digitalateliersolutions.agency",
-    title: "DAS® | Copywriting & Ghostwriting Blockchain",
-    description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional. Expertos en posicionamiento ejecutivo, contenido técnico y liderazgo de pensamiento para la industria Blockchain.",
+    title: "Digital Atelier Solutions | Ghostwriting & Strategic Comms",
+    description: "Comunicación estratégica para infraestructura blockchain y finanzas descentralizadas.",
     siteName: "Digital Atelier Solutions",
     images: [
       {
-        url: "https://digitalateliersolutions.agency/images/og-default.jpg",
+        url: "/images/og-default.jpg",
         width: 1200,
         height: 630,
-        alt: "Digital Atelier Solutions - Strategic Blockchain Communication",
+        alt: "Digital Atelier Solutions - Strategic Web3 Communication",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Digital Atelier Solutions | DAS®",
-    description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
-    images: ["https://digitalateliersolutions.agency/images/og-default.jpg"],
+    description: "Comunicación estratégica para infraestructura blockchain y finanzas descentralizadas.",
+    images: ["/images/og-default.jpg"],
     creator: "@vribes_eth",
   },
   robots: {
@@ -109,7 +109,8 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${poppins.variable} ${raleway.variable} ${barlow.variable} ${playfair.variable} scroll-smooth`} suppressHydrationWarning>
       <body
-        className={`${poppins.variable} ${raleway.variable} ${barlow.variable} ${inter.variable} ${manrope.variable} ${playfair.variable} antialiased bg-das-light text-das-dark font-raleway`}
+        className={`${poppins.variable} ${raleway.variable} ${barlow.variable} ${inter.variable} ${manrope.variable} ${playfair.variable} antialiased bg-zinc-950 text-white font-raleway`}
+        suppressHydrationWarning
       >
         <TopLoader />
         {children}
@@ -143,8 +144,8 @@ export default function RootLayout({
                 "https://www.linkedin.com/company/digital-atelier-solutions",
                 "https://twitter.com/vribes_eth"
               ],
-              "description": "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
-              "knowsAbout": ["Blockchain", "Ghostwriting", "Corporate Communication", "DeFi", "RWA"]
+              "description": "Agencia boutique de comunicación estratégica y ghostwriting para líderes Web3 y finanzas descentralizadas.",
+              "knowsAbout": ["Blockchain", "Web3", "Ghostwriting", "Corporate Communication", "DeFi", "RWA"]
             })
           }}
         />

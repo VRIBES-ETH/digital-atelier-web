@@ -55,7 +55,7 @@ export default function BlockchainPage() {
                     </h1>
 
                     <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
-                        El único servicio de Ghostwriting Ejecutivo diseñado para quienes entienden que en Web3, <strong>el silencio es el activo más caro</strong>.
+                        El único servicio de Ghostwriting Ejecutivo diseñado para quienes entienden que en Blockchain, <strong>el silencio es el activo más caro</strong>.
                         <br /><br />
                         <span className="text-sm font-medium text-das-dark/80 bg-gray-200/50 px-2 py-1 rounded">No delego. No tengo juniors. Por eso hay lista de espera.</span>
                     </p>

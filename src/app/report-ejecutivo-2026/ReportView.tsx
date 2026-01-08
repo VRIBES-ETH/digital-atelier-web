@@ -269,7 +269,7 @@ export default function ReportView() {
         openModal();
 
         try {
-            const prompt = `Genera un plan de posicionamiento estratégico en LinkedIn (Roadmap 2026) para la siguiente transición profesional en el sector Web3/Blockchain:
+            const prompt = `Genera un plan de posicionamiento estratégico en LinkedIn (Roadmap 2026) para la siguiente transición profesional en el sector Blockchain:
       
       CONTEXTO: Estamos en Diciembre 2025. La estrategia es para ejecutar en 2026.
       Perfil Actual: "${currentRole}"
@@ -358,7 +358,7 @@ export default function ReportView() {
     // 1. Job Titles (Bar - 2023 vs 2025)
     // 1. Job Titles (Bar - 2023 vs 2025)
     const jobTitlesData: ChartData<'bar'> = {
-        labels: ['Dev Lead', 'Head Digital Assets', 'Tokenomics Dir.', 'Chief Web3', 'Auditor'],
+        labels: ['Dev Lead', 'Head Digital Assets', 'Tokenomics Dir.', 'Chief Blockchain', 'Auditor'],
         datasets: [
             {
                 label: '2023 (Base)',

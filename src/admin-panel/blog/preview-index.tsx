@@ -7,10 +7,10 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
     title: "Blog | Digital Atelier Solutions",
-    description: "Insights sobre comunicación estratégica, ghostwriting e identidad digital para líderes Blockchain.",
+    description: "Insights sobre comunicación estratégica, ghostwriting e identidad digital para líderes Web3.",
     openGraph: {
         title: "Blog | Digital Atelier Solutions",
-        description: "Insights sobre comunicación estratégica, ghostwriting e identidad digital para líderes Blockchain.",
+        description: "Insights sobre comunicación estratégica, ghostwriting e identidad digital para líderes Web3.",
     },
 };
 
