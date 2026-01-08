@@ -12,7 +12,8 @@ export async function GET(request: Request) {
 
   const clientId = process.env.LINKEDIN_CLIENT_ID;
   const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
-  const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/linkedin/callback`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const redirectUri = `${baseUrl}/api/auth/linkedin/callback`;
 
   try {
     const response = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {

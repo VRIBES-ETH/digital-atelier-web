@@ -46,14 +46,24 @@ export async function GET(request: Request) {
 
   try {
     // 1. Refresh Access Token (Simplified flow for demo purposes)
-    const tokenResponse = await fetch(`https://www.linkedin.com/oauth/v2/accessToken?grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`, {
+    // 1. Refresh Access Token (Simplified flow for demo purposes)
+    const tokenBody = new URLSearchParams();
+    tokenBody.append('grant_type', 'refresh_token');
+    tokenBody.append('refresh_token', refreshToken);
+    tokenBody.append('client_id', clientId);
+    tokenBody.append('client_secret', clientSecret);
+
+    const tokenResponse = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: tokenBody
     });
 
     // Check if token response is ok
     if (!tokenResponse.ok) {
-      throw new Error(`Token refresh failed: ${tokenResponse.statusText}`);
+      const errorBody = await tokenResponse.text();
+      console.error("LinkedIn Token Refresh Error:", errorBody);
+      throw new Error(`Token refresh failed: ${tokenResponse.statusText} - ${errorBody}`);
     }
 
     const tokenData = await tokenResponse.json();
@@ -62,17 +72,20 @@ export async function GET(request: Request) {
     if (!accessToken) throw new Error("Failed to refresh token: No access token in response");
 
     // 2. Fetch Posts
-    // Using the UGC Posts API or Shares API depending on the URN type (person vs organization)
-    // Here we use a generic request structure suitable for most retrieval cases
-    const response = await fetch(`https://api.linkedin.com/v2/ugcPosts?q=authors&authors=List(${authorUrn})&count=3`, {
+    // Using the modern rest/posts API
+    // Documentation: https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/posts-api
+    const response = await fetch(`https://api.linkedin.com/rest/posts?q=author&author=${encodeURIComponent(authorUrn)}&count=3`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
+        'LinkedIn-Version': '202510',
         'X-Restli-Protocol-Version': '2.0.0'
       }
     });
 
     if (!response.ok) {
-      throw new Error(`LinkedIn Posts fetch failed: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error("LinkedIn Posts API Error Body:", errorText);
+      throw new Error(`LinkedIn Posts fetch failed: ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
@@ -80,10 +93,11 @@ export async function GET(request: Request) {
     // Transform data safely
     const posts = data.elements?.map((item: any) => ({
       id: item.id,
-      content: item.specificContent?.["com.linkedin.ugc.ShareContent"]?.shareCommentary?.text || "Contenido no disponible",
-      date: new Date(item.created?.time || Date.now()).toLocaleDateString(),
-      likes: 0, // In a real scenario, this requires a separate API call for socialMetadata
-      comments: 0
+      content: item.commentary || "Contenido no disponible", // 'commentary' is the field in rest/posts
+      date: new Date(item.createdAt || Date.now()).toLocaleDateString(),
+      likes: 0, // Likes require a separate call or different projection in new API, keeping 0 for now to avoid complexity
+      comments: 0,
+      url: `https://www.linkedin.com/feed/update/${item.id}` // Construct URL from ID
     })) || [];
 
     return NextResponse.json({ posts });
