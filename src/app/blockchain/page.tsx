@@ -376,7 +376,7 @@ export default function BlockchainPage() {
                     </div>
 
                     <a
-                        href="https://www.blockcha-in.com"
+                        href="https://cal.com/vribes/blockcha-in"
                         className="premium-btn inline-flex items-center gap-3 bg-white text-das-dark px-10 py-5 font-bold rounded-sm hover:bg-gray-100 transition-colors shadow-2xl"
                     >
                         <span>Solicitar Entrevista en Blockcha-in.com</span>
