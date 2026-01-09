@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Poppins, Raleway, Barlow, Inter, Manrope, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import TopLoader from "@/components/TopLoader";
@@ -147,6 +148,12 @@ export default function RootLayout({
               "knowsAbout": ["Blockchain", "Ghostwriting", "Corporate Communication", "DeFi", "RWA"]
             })
           }}
+        />
+        <Script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "5aef2dbbab57493e87e6345bab17cb18"}'
+          strategy="afterInteractive"
         />
       </body>
     </html>
