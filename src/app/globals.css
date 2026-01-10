@@ -13,6 +13,14 @@
 
     --font-display: var(--font-manrope);
     --font-inter: var(--font-inter);
+    --font-playfair: var(--font-playfair);
+
+    --color-atelier-bg: #09090b;
+    --color-atelier-card: #18181b;
+    --color-atelier-border: #27272a;
+    --color-atelier-text: #f4f4f5;
+    --color-atelier-muted: #71717a;
+    --color-atelier-accent: #ea580c;
 }
 
 body {
