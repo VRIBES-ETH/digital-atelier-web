@@ -180,7 +180,7 @@ export default function BlogEditor({ post }: { post?: any }) {
 
         const data = new FormData();
         const { tags, status, ...rest } = formData;
-        const tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+        const tagArray = tags.split(',').map((t: string) => t.trim()).filter(Boolean);
 
         Object.entries({
             ...rest,
