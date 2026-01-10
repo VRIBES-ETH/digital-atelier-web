@@ -1,6 +1,6 @@
 'use client';
 
-import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
@@ -44,8 +44,8 @@ export default function BlogEditor({ post }: { post?: any }) {
 
     const editor = useEditor({
         extensions: [
-            StarterKit.configure({ 
-                bulletList: false, 
+            StarterKit.configure({
+                bulletList: false,
                 codeBlock: false,
                 heading: { levels: [2, 3] }
             }),
@@ -53,7 +53,7 @@ export default function BlogEditor({ post }: { post?: any }) {
                 HTMLAttributes: { class: 'list-disc ml-6 space-y-2' },
             }),
             ListItem,
-            Link.configure({ 
+            Link.configure({
                 openOnClick: false,
                 HTMLAttributes: { class: 'text-das-accent underline cursor-pointer' }
             }),
@@ -109,10 +109,10 @@ export default function BlogEditor({ post }: { post?: any }) {
             const { selection } = editor.state;
             const { $from } = selection;
             const parentText = $from.parent.textContent;
-            
+
             if (parentText.startsWith('/') && $from.parent.type.name === 'paragraph') {
                 const start = editor.view.coordsAtPos($from.pos);
-                setSlashMenuPos({ top: start.top + 24, left: start.left }); 
+                setSlashMenuPos({ top: start.top + 24, left: start.left });
                 setSlashQuery(parentText.slice(1).toLowerCase());
                 setShowSlashMenu(true);
             } else {
@@ -149,14 +149,14 @@ export default function BlogEditor({ post }: { post?: any }) {
         const { $from } = editor.state.selection;
         const textBefore = $from.parent.textContent;
         const slashPos = $from.pos - textBefore.length;
-        
+
         editor.chain().focus().command(({ tr, dispatch }) => {
-            if (dispatch) { 
-                tr.delete(slashPos, $from.pos); 
+            if (dispatch) {
+                tr.delete(slashPos, $from.pos);
             }
             return true;
         }).run();
-        
+
         item.command(editor);
         setShowSlashMenu(false);
     };
@@ -164,7 +164,7 @@ export default function BlogEditor({ post }: { post?: any }) {
     const handleSubmit = async (forcedStatus?: 'draft' | 'ready' | 'published') => {
         if (!formData.slug) { alert('Slug requerido'); return; }
         setIsSaving(true);
-        
+
         let content = formData.content;
         if (editor && (editor.storage as any).markdown) {
             content = (editor.storage as any).markdown.getMarkdown();
@@ -180,31 +180,31 @@ export default function BlogEditor({ post }: { post?: any }) {
 
         const data = new FormData();
         const { tags, status, ...rest } = formData;
-        const tagArray = tags.split(',').map(t => t.trim()).filter(Boolean); 
-        
-        Object.entries({ 
-            ...rest, 
-            content, 
+        const tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+
+        Object.entries({
+            ...rest,
+            content,
             status: currentStatus,
-            tags: JSON.stringify(tagArray) 
+            tags: JSON.stringify(tagArray)
         }).forEach(([key, val]) => data.append(key, val as string));
 
-        if (post) { 
-            data.append('_action', 'update'); 
-            data.append('id', post.id); 
-        } else { 
-            data.append('_action', 'create'); 
+        if (post) {
+            data.append('_action', 'update');
+            data.append('id', post.id);
+        } else {
+            data.append('_action', 'create');
         }
 
         try {
             const res = await fetch('/api/admin/blog', { method: 'POST', body: data });
             const result = await res.json();
-            if (result.success) { 
+            if (result.success) {
                 if (currentStatus === 'ready' && formData.status !== 'published') {
                     alert('¡Artículo guardado como LISTO!\nAhora puedes pulsar "Publicar en Vivo" en el panel principal para que el artículo pase a PUBLICADO y se vea en la web.');
                 }
-                router.push('/vribesadmin/blog'); 
-                router.refresh(); 
+                router.push('/vribesadmin/blog');
+                router.refresh();
             }
             else { alert(result.message); }
         } catch (e) { alert('Error: ' + e); }
@@ -234,20 +234,20 @@ export default function BlogEditor({ post }: { post?: any }) {
                         deviceMode={deviceMode}
                     />
                 </div>
-                <SlashMenu 
-                    show={showSlashMenu} 
-                    position={slashMenuPos} 
-                    query={slashQuery} 
-                    onSelect={handleSlashSelect} 
-                    onClose={() => setShowSlashMenu(false)} 
+                <SlashMenu
+                    show={showSlashMenu}
+                    position={slashMenuPos}
+                    query={slashQuery}
+                    onSelect={handleSlashSelect}
+                    onClose={() => setShowSlashMenu(false)}
                 />
             </main>
 
-            <aside 
+            <aside
                 className={`fixed right-0 bottom-0 bg-zinc-950 border-l border-zinc-800 z-40 transition-transform duration-300 ${showSidebar ? 'translate-x-0' : 'translate-x-full'}`}
-                style={{ 
-                    width: '300px', 
-                    minWidth: '300px', 
+                style={{
+                    width: '300px',
+                    minWidth: '300px',
                     maxWidth: '300px',
                     top: '64px'
                 }}
