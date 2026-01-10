@@ -133,13 +133,17 @@ export default function ReportView() {
 
             const formBody = "userGroup=Reporte2026&mailingLists=&email=" + encodeURIComponent(gateForm.email) + "&firstName=" + encodeURIComponent(gateForm.name);
 
-            const res = await fetch("https://app.loops.so/api/newsletter-form/cm2rflmgu01h51390iumvl8na", {
-                method: "POST",
-                body: formBody,
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            });
+            // Parallel: Loops (Primary) + Supabase (Safety Net)
+            const [res] = await Promise.all([
+                fetch("https://app.loops.so/api/newsletter-form/cm2rflmgu01h51390iumvl8na", {
+                    method: "POST",
+                    body: formBody,
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                }),
+                import("@/app/actions/leads").then(mod =>
+                    mod.saveLead(gateForm.email, "report_2026_gate", { name: gateForm.name })
+                )
+            ]);
 
             if (res.ok) {
                 localStorage.setItem('report-2026-unlocked', 'true');

@@ -14,13 +14,19 @@ export default function LinkedInAnalysisForm() {
         setStatus("loading");
 
         try {
-            const res = await fetch("/api/analisis-linkedin", {
-                method: "POST",
-                body: JSON.stringify({ email, linkedinUrl }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            // Parallel execution: API (Critical) + Safety Net (Backup)
+            const [res] = await Promise.all([
+                fetch("/api/analisis-linkedin", {
+                    method: "POST",
+                    body: JSON.stringify({ email, linkedinUrl }),
+                    headers: { "Content-Type": "application/json" },
+                }),
+                // Import dynamically to avoid server action issues in client components if not passed as prop
+                // But Server Actions can be imported directly in Client Components in Next.js 14+
+                import("@/app/actions/leads").then(mod =>
+                    mod.saveLead(email, "linkedin_analysis", { linkedinUrl })
+                )
+            ]);
 
             const data = await res.json();
 

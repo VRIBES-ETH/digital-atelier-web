@@ -111,7 +111,9 @@ export default function RootLayout({
     <html lang="es" className={`${poppins.variable} ${raleway.variable} ${barlow.variable} ${playfair.variable} scroll-smooth`} suppressHydrationWarning>
       <body
         className={`${poppins.variable} ${raleway.variable} ${barlow.variable} ${inter.variable} ${manrope.variable} ${playfair.variable} antialiased bg-das-light text-das-dark font-raleway`}
+        suppressHydrationWarning
       >
+
         <TopLoader />
         {children}
         <CookieBanner />

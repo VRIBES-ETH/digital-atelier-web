@@ -11,12 +11,13 @@ export type BlogPost = {
     slug: string;
     content: string;
     excerpt: string;
-    status: 'draft' | 'published';
+    status: 'draft' | 'ready' | 'published';
     created_at: string;
     updated_at: string;
     featured_image?: string;
     seo_title?: string;
-    seo_description?: string;
+    seo_description?: string; tags?: string[];
+
 };
 
 // --- PUBLIC ACTIONS ---
@@ -29,7 +30,7 @@ export async function getPublishedPosts() {
     const { data, error } = await supabase
         .from('blog_posts')
         .select('*')
-        .eq('status', 'published')
+        .in('status', ['published', 'ready'])
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -45,7 +46,7 @@ export async function getPostBySlug(slug: string) {
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
-        .eq('status', 'published')
+        .in('status', ['published', 'ready'])
         .single();
 
     if (error) {
@@ -154,7 +155,7 @@ export async function createPost(formData: FormData) {
             status,
             featured_image,
             seo_title,
-            seo_description
+            seo_description,
         });
 
         if (error) return { success: false, message: error.message };

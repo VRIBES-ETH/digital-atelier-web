@@ -1,92 +1,22 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
-  --font-poppins: var(--font-poppins);
-  --font-raleway: var(--font-raleway);
-  --font-barlow: var(--font-barlow);
+    --font-poppins: var(--font-poppins);
+    --font-raleway: var(--font-raleway);
+    --font-barlow: var(--font-barlow);
 
-  --color-das-dark: #0f1115;
-  --color-das-light: #f8f9fa;
-  --color-das-accent: #e67e22;
-  --color-das-border: rgba(0, 0, 0, 0.06);
+    --color-das-dark: #0f1115;
+    --color-das-light: #f8f9fa;
+    --color-das-accent: #e67e22;
+    --color-das-border: rgba(0, 0, 0, 0.06);
 
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-
-  @keyframes float {
-
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-
-    50% {
-      transform: translateY(-20px);
-    }
-  }
-
-  --color-atelier-bg: #0f0f0f;
-  --color-atelier-card: #161616;
-  --color-atelier-accent: #EA580C;
-  --color-atelier-border: #27272a;
-  --color-atelier-text: #F3F4F6;
-  --color-atelier-muted: #9CA3AF;
-
-  --font-display: var(--font-manrope);
-  --font-inter: var(--font-inter);
-}
-
-@layer utilities {
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  }
-
-  .bg-noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-  }
-
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-  }
-
-  .reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .premium-btn {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .premium-btn::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: 0.5s;
-  }
-
-  .premium-btn:hover::after {
-    left: 100%;
-  }
-
-  .shadow-glow {
-    box-shadow: 0 0 30px rgba(230, 126, 34, 0.3);
-  }
+    --font-display: var(--font-manrope);
+    --font-inter: var(--font-inter);
 }
 
 body {
-  font-family: var(--font-raleway), sans-serif;
+    font-family: var(--font-raleway), sans-serif;
 }
 
 h1,
@@ -94,9 +24,146 @@ h2,
 h3,
 h4,
 .btn {
-  font-family: var(--font-poppins), sans-serif;
+    font-family: var(--font-poppins), sans-serif;
 }
 
-.technical {
-  font-family: var(--font-barlow), sans-serif;
+/* -------------------------------------------------------------------------- */
+/* EXECUTIVE SUMMARY CARD - PUBLIC PAGE                                       */
+/* -------------------------------------------------------------------------- */
+
+/* Target both the class and blockquote for safety */
+.executive-summary-card,
+blockquote.executive-summary-card {
+    background-color: #f9fafb !important;
+    border: 1px solid #f3f4f6 !important;
+    border-left: 3px solid #EA580C !important;
+    border-radius: 0 !important;
+    padding: 1rem 1.25rem 1.25rem 1.25rem !important;
+    margin: 2rem 0 !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+    width: 100% !important;
+    display: block !important;
+    font-style: normal !important;
+}
+
+/* AGGRESSIVE DROP-CAP REMOVAL */
+/* We target every possible source of drop-caps to ensure they never appear in technical notes */
+.executive-summary-card p::first-letter,
+.executive-summary-card div::first-letter,
+.executive-summary-card strong::first-letter,
+.executive-summary-card span::first-letter,
+.executive-summary-card h2::first-letter,
+.executive-summary-card h3::first-letter,
+::first-letter {
+    all: revert !important;
+    float: none !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-weight: inherit !important;
+}
+
+/* Header style for the summary card */
+.executive-summary-card strong:first-child,
+.executive-summary-card p>strong:first-child,
+.executive-summary-card h2:first-child,
+.executive-summary-card h3:first-child,
+.executive-summary-card .summary-title {
+    display: block !important;
+    color: #4b5563 !important;
+    font-family: var(--font-inter), sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.15em !important;
+    margin-bottom: 0.75rem !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    padding-bottom: 0.25rem !important;
+    margin-top: 0 !important;
+}
+
+.executive-summary-card p,
+.executive-summary-card li {
+    font-size: 0.75rem !important;
+    line-height: 1.6 !important;
+    color: #4b5563 !important;
+    margin-bottom: 0.5rem !important;
+    font-family: var(--font-raleway), sans-serif !important;
+}
+
+.executive-summary-card ul {
+    margin-top: 0.5rem !important;
+    padding-left: 1.25rem !important;
+    list-style-type: disc !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* TABLE OF CONTENTS                                                         */
+/* -------------------------------------------------------------------------- */
+
+.toc-scroll-area::-webkit-scrollbar {
+    width: 3px;
+}
+
+.toc-scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.toc-scroll-area::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 10px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* TIPTAP EDITOR STYLES                                                      */
+/* -------------------------------------------------------------------------- */
+
+.ProseMirror {
+    outline: none !important;
+}
+
+.ProseMirror ::selection {
+    background-color: #f97316 !important;
+    color: #ffffff !important;
+}
+
+.ProseMirror a {
+    color: #f97316 !important;
+    font-weight: 600 !important;
+    text-decoration: underline !important;
+    text-decoration-thickness: 1.5px !important;
+    text-underline-offset: 4px;
+    cursor: pointer !important;
+}
+
+.ProseMirror p {
+    color: #D4D4D4 !important;
+}
+
+.ProseMirror strong {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+.ProseMirror h2,
+.ProseMirror h3 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* GLOBAL PROSE RESET FOR FIRST LETTER */
+/* Disabling Tailwind Typography's default drop-cap if it exists */
+.prose p:first-of-type::first-letter,
+.prose>p:first-of-type::first-letter {
+    float: none !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-weight: inherit !important;
 }
