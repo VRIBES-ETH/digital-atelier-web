@@ -7,7 +7,6 @@ import BlogNewsletterForm from '@/components/BlogNewsletterForm';
 import BlogCTA from '@/components/BlogCTA';
 import BlogShareButton from '@/components/BlogShareButton';
 import TableOfContents from '@/components/TableOfContents';
-import AdminHeader from '@/app/vribesadmin/components/AdminHeader';
 import Link from 'next/link';
 import React from 'react';
 
@@ -109,17 +108,17 @@ export default async function BlogPostPage({ params }: { params: any }) {
             "url": "https://www.linkedin.com/in/victorribes/"
         },
         "publisher": {
-          "@type": "Organization",
-          "name": "Digital Atelier Solutions",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://digitalateliersolutions.agency/images/logo-dark.png"
-          }
+            "@type": "Organization",
+            "name": "Digital Atelier Solutions",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://digitalateliersolutions.agency/images/logo-dark.png"
+            }
         },
         "description": post.excerpt,
         "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": `https://digitalateliersolutions.agency/blog/${post.slug}`
+            "@type": "WebPage",
+            "@id": `https://digitalateliersolutions.agency/blog/${post.slug}`
         },
         "keywords": post.tags || [],
         "articleSection": "Blockchain Market Intelligence"
@@ -136,8 +135,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            
-            <AdminHeader />
+
 
             {/* Navbar Placeholder / Minimal */}
             <nav className="h-14 border-b border-gray-100 flex items-center px-6 justify-between bg-white/80 backdrop-blur-md sticky top-0 z-50">
@@ -169,7 +167,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                             {readingTime} MIN DE LECTURA
                         </div>
                     </div>
-                    
+
                     <h1 className="text-4xl md:text-5xl lg:text-[72px] font-playfair font-bold text-das-dark leading-[1.05] mb-8 tracking-tight">
                         {post.title}
                     </h1>
@@ -182,10 +180,10 @@ export default async function BlogPostPage({ params }: { params: any }) {
                 {/* 2. Featured Image - HERO WIDTH */}
                 {post.featured_image && (
                     <div className="mb-20 relative aspect-[21/9] overflow-hidden rounded-sm shadow-2xl border border-gray-100">
-                        <img 
-                            src={post.featured_image} 
-                            alt={post.title} 
-                            className="w-full h-full object-cover" 
+                        <img
+                            src={post.featured_image}
+                            alt={post.title}
+                            className="w-full h-full object-cover"
                         />
                     </div>
                 )}
