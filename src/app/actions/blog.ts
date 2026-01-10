@@ -16,8 +16,9 @@ export type BlogPost = {
     updated_at: string;
     featured_image?: string;
     seo_title?: string;
-    seo_description?: string; tags?: string[];
-
+    seo_description?: string;
+    tags?: string[];
+    contributor_name?: string;
 };
 
 // --- PUBLIC ACTIONS ---
@@ -146,6 +147,7 @@ export async function createPost(formData: FormData) {
         const featured_image = formData.get('featured_image') as string;
         const seo_title = formData.get('seo_title') as string;
         const seo_description = formData.get('seo_description') as string;
+        const contributor_name = formData.get('contributor_name') as string;
 
         const { error } = await supabaseAdmin.from('blog_posts').insert({
             title,
@@ -156,6 +158,7 @@ export async function createPost(formData: FormData) {
             featured_image,
             seo_title,
             seo_description,
+            contributor_name,
         });
 
         if (error) return { success: false, message: error.message };
@@ -187,6 +190,7 @@ export async function updatePost(id: string, formData: FormData) {
         const featured_image = formData.get('featured_image') as string;
         const seo_title = formData.get('seo_title') as string;
         const seo_description = formData.get('seo_description') as string;
+        const contributor_name = formData.get('contributor_name') as string;
 
         const { error } = await supabaseAdmin.from('blog_posts').update({
             title,
@@ -197,6 +201,7 @@ export async function updatePost(id: string, formData: FormData) {
             featured_image,
             seo_title,
             seo_description,
+            contributor_name,
             updated_at: new Date().toISOString()
         }).eq('id', id);
 
