@@ -34,11 +34,15 @@ export async function POST(req: NextRequest) {
         const status = formData.get('status') as 'draft' | 'published';
         const featured_image = formData.get('featured_image') as string;
         const seo_title = formData.get('seo_title') as string;
-        const seo_description = formData.get('seo_description') as string; const tagsRaw = formData.get('tags') as string; const tags = tagsRaw ? JSON.parse(tagsRaw) : [];
+        const seo_description = formData.get('seo_description') as string;
+        const contributor_name = formData.get('contributor_name') as string;
+        const category = formData.get('category') as string;
+        const tagsRaw = formData.get('tags') as string;
+        const tags = tagsRaw ? JSON.parse(tagsRaw) : [];
 
         if (action === 'create') {
             const { error } = await supabaseAdmin.from('blog_posts').insert({
-                title, slug, content, excerpt, status, featured_image, seo_title, seo_description, tags
+                title, slug, content, excerpt, status, featured_image, seo_title, seo_description, tags, contributor_name, category
             });
 
             if (error) return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -54,6 +58,7 @@ export async function POST(req: NextRequest) {
 
             const { error } = await supabaseAdmin.from('blog_posts').update({
                 title, slug, content, excerpt, status, featured_image, seo_title, seo_description, tags,
+                contributor_name, category,
                 updated_at: new Date().toISOString()
             }).eq('id', id);
 

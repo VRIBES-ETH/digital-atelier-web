@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin';
 // This is the specific hook for Digital Atelier Web (Admin Blog)
 const CLOUDFLARE_DEPLOY_HOOK = "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/322857bb-95f5-4ada-b109-7a77d20d97c3";
 
-export const runtime = 'nodejs'; // Using nodejs for Supabase Admin compatibility if needed, though edge might work.
+export const runtime = 'edge';
 
 export async function POST() {
     try {
