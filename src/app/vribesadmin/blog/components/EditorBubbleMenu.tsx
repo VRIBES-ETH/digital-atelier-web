@@ -47,6 +47,7 @@ export default function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
 
         editor.on('selectionUpdate', updateBubble);
         editor.on('transaction', updateBubble);
+        // @ts-ignore
         editor.on('openLinkUi', handleOpenLink);
 
         const handleBlur = (e: any) => {
@@ -61,6 +62,7 @@ export default function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
         return () => {
             editor.off('selectionUpdate', updateBubble);
             editor.off('transaction', updateBubble);
+            // @ts-ignore
             editor.off('openLinkUi', handleOpenLink);
             editor.off('blur', handleBlur);
         };
