@@ -11,26 +11,40 @@ export async function POST() {
         const admin = getSupabaseAdmin();
 
         // 1. Transition all 'ready' posts to 'published'
-        const { error: updateError } = await admin
+        const { data: updatedData, error: updateError } = await admin
             .from('blog_posts')
             .update({ status: 'published' })
-            .eq('status', 'ready');
+            .eq('status', 'ready')
+            .select('id');
 
         if (updateError) {
             console.error('Error transitioning statuses:', updateError);
-            return NextResponse.json({ success: false, message: 'Failed to update post statuses' }, { status: 500 });
+            return NextResponse.json({ success: false, message: 'Fallo al actualizar estados en la DB: ' + updateError.message }, { status: 500 });
         }
 
+        const updatedCount = updatedData?.length || 0;
+        console.log(`Transitioned ${updatedCount} posts to published.`);
+
         // 2. Trigger Cloudflare Build
+        console.log('Triggering Cloudflare build via hook...');
         const response = await fetch(CLOUDFLARE_DEPLOY_HOOK, {
             method: 'POST',
         });
 
+        const hookResult = await response.text();
+        console.log('Cloudflare hook response:', response.status, hookResult);
+
         if (!response.ok) {
-            return NextResponse.json({ success: false, message: 'Cloudflare rejected the hook' }, { status: 500 });
+            return NextResponse.json({
+                success: false,
+                message: `Base de datos actualizada (${updatedCount} posts), pero fallo en Cloudflare (${response.status}): ${hookResult}`
+            }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, message: 'Posts published and build triggered' });
+        return NextResponse.json({
+            success: true,
+            message: `¡Listo! Se han procesado ${updatedCount} artículos y se ha iniciado el despliegue.`
+        });
     } catch (error) {
         console.error('Deploy error:', error);
         return NextResponse.json({ success: false, message: 'Network error triggering build' }, { status: 500 });

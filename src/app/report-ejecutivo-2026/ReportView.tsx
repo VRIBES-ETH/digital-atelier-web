@@ -585,7 +585,7 @@ export default function ReportView() {
 
 
     return (
-        <div className="bg-atelier-bg min-h-screen font-sans text-atelier-text selection:bg-atelier-accent selection:text-white">
+        <div className="bg-atelier-bg min-h-screen text-atelier-text selection:bg-atelier-accent selection:text-white">
             {/* Background Grid */}
             <div className="fixed inset-0 pointer-events-none z-0" style={{
                 backgroundSize: '40px 40px',
@@ -670,8 +670,8 @@ export default function ReportView() {
                         </motion.div>
                     </motion.div>
 
-                    {/* Content Wrapper for Lead Gate */}
-                    <div className={`space-y-20 transition-all duration-1000 ${!isUnlocked ? 'filter blur-xl opacity-30 pointer-events-none select-none' : ''}`}>
+                    {/* Content Wrapper for Lead Gate - Enhanced Blur for a more "locked" premium feel */}
+                    <div className={`space-y-20 transition-all duration-700 ${!isUnlocked ? 'filter blur-2xl opacity-20 pointer-events-none select-none grayscale' : ''}`}>
 
                         {/* LinkedIn Talent Insights 2025 (New Section) */}
                         <motion.section

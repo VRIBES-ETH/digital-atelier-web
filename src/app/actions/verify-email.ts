@@ -14,7 +14,10 @@ const BLACKLISTED_DOMAINS = [
     'spam.spam', 'mailinator.com', 'temp-mail.org', 'guerrillamail.com',
     '10minutemail.com', 'trashmail.com', 'yopmail.com', 'fools.com',
     'falso.com', 'fake.com', 'example.com', 'test.com', 'sharklasers.com',
-    'getnada.com', 'spam.com', 'disposable.com'
+    'getnada.com', 'spam.com', 'disposable.com', 'dispostable.com',
+    'maildrop.cc', 'tempmail.net', 'minuteinbox.com', 'mail.ru',
+    'proton.me', 'protonmail.com', 'outlook.com.es', 'icloud.com.es',
+    'spamherelots.com', 'img.com', 'pau.com', 'pepe.com', 'juan.com'
 ];
 
 export async function verifyEmail(email: string): Promise<{ valid: boolean; message?: string }> {
