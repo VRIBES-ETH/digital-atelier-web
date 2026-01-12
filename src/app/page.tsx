@@ -403,6 +403,63 @@ export default function Home() {
       <Footer />
 
       {/* <AuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "WebPage",
+              "name": "Digital Atelier Solutions | Comunicación Blockchain",
+              "speakable": {
+                "@type": "SpeakableSpecification",
+                "cssSelector": ["h1", ".header-description"]
+              },
+              "url": "https://www.digitalateliersolutions.agency"
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "name": "Servicio de Ghostwriting Blockcha-in",
+              "description": "Servicio premium de escritura fantasma y marca personal para ejecutivos del sector tecnológico y financiero.",
+              "brand": {
+                "@type": "Brand",
+                "name": "Blockcha-in"
+              },
+              "offers": {
+                "@type": "AggregateOffer",
+                "priceCurrency": "USD",
+                "lowPrice": "500",
+                "highPrice": "1500",
+                "offerCount": "3",
+                "offers": [
+                  {
+                    "@type": "Offer",
+                    "name": "Seed Plan",
+                    "price": "500",
+                    "priceCurrency": "USD",
+                    "description": "8-10 posts/mes. Ideal para perfiles emergentes."
+                  },
+                  {
+                    "@type": "Offer",
+                    "name": "Growth Plan",
+                    "price": "900",
+                    "priceCurrency": "USD",
+                    "description": "12-14 posts/mes. Análisis de sector y optimización de perfil."
+                  },
+                  {
+                    "@type": "Offer",
+                    "name": "Authority Plan",
+                    "price": "1500",
+                    "priceCurrency": "USD",
+                    "description": "20-22 posts/mes. Lead generation y engagement estratégico."
+                  }
+                ]
+              }
+            }
+          ])
+        }}
+      />
     </main>
   );
 }

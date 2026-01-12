@@ -120,84 +120,95 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ProfessionalService",
-              "name": "Digital Atelier Solutions",
-              "image": "https://www.digitalateliersolutions.agency/images/og-default.jpg",
-              "@id": "https://www.digitalateliersolutions.agency",
-              "url": "https://www.digitalateliersolutions.agency",
-              "telephone": "",
-              "priceRange": "$$$",
-              "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "ES"
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "ProfessionalService",
+                "name": "Digital Atelier Solutions",
+                "image": "https://www.digitalateliersolutions.agency/images/og-default.jpg",
+                "@id": "https://www.digitalateliersolutions.agency",
+                "url": "https://www.digitalateliersolutions.agency",
+                "telephone": "",
+                "priceRange": "$$$",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressCountry": "ES"
+                },
+                "founder": {
+                  "@id": "https://www.digitalateliersolutions.agency/#founder"
+                },
+                "sameAs": [
+                  "https://www.linkedin.com/company/digital-atelier-solutions",
+                  "https://twitter.com/vribes_eth",
+                  "https://www.linkedin.com/in/victorribes/"
+                ],
+                "description": "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
+                "knowsAbout": [
+                  {
+                    "@type": "Thing",
+                    "name": "Blockchain",
+                    "sameAs": "https://en.wikipedia.org/wiki/Blockchain"
+                  },
+                  {
+                    "@type": "Thing",
+                    "name": "Ghostwriting",
+                    "sameAs": "https://en.wikipedia.org/wiki/Ghostwriter"
+                  },
+                  {
+                    "@type": "Thing",
+                    "name": "Cryptocurrency Regulation (MiCA)",
+                    "sameAs": "https://en.wikipedia.org/wiki/Markets_in_Crypto-Assets"
+                  },
+                  {
+                    "@type": "Thing",
+                    "name": "DeFi",
+                    "sameAs": "https://en.wikipedia.org/wiki/Decentralized_finance"
+                  },
+                  {
+                    "@type": "Thing",
+                    "name": "Asset tokenization (RWA)",
+                    "sameAs": "https://en.wikipedia.org/wiki/Asset_tokenization"
+                  }
+                ],
+                "hasOfferCatalog": {
+                  "@type": "OfferCatalog",
+                  "name": "Servicios DAS",
+                  "itemListElement": [
+                    {
+                      "@type": "Offer",
+                      "itemOffered": {
+                        "@type": "Service",
+                        "name": "Ghostwriting Ejecutivo para LinkedIn",
+                        "description": "Posicionamos a líderes del sector blockchain como autoridades de industria."
+                      }
+                    },
+                    {
+                      "@type": "Offer",
+                      "itemOffered": {
+                        "@type": "Service",
+                        "name": "Comunicación Estratégica Corporativa",
+                        "description": "Gestión de branding institucional para empresas de activos digitales."
+                      }
+                    }
+                  ]
+                }
               },
-              "founder": {
+              {
+                "@context": "https://schema.org",
                 "@type": "Person",
+                "@id": "https://www.digitalateliersolutions.agency/#founder",
                 "name": "Víctor Ribes",
+                "jobTitle": "Principal & Founder at Digital Atelier Solutions",
+                "description": "Expert in strategic communication and ghostwriting for the blockchain and fintech ecosystem since 2016. Specialized in institutional narratives and regulatory compliance (MiCA).",
                 "url": "https://www.linkedin.com/in/victorribes/",
                 "sameAs": [
                   "https://twitter.com/vribes_eth",
-                  "https://www.linkedin.com/in/victorribes/"
-                ]
-              },
-              "sameAs": [
-                "https://www.linkedin.com/company/digital-atelier-solutions",
-                "https://twitter.com/vribes_eth",
-                "https://www.linkedin.com/in/victorribes/"
-              ],
-              "description": "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
-              "knowsAbout": [
-                {
-                  "@type": "Thing",
-                  "name": "Blockchain",
-                  "sameAs": "https://en.wikipedia.org/wiki/Blockchain"
-                },
-                {
-                  "@type": "Thing",
-                  "name": "Ghostwriting",
-                  "sameAs": "https://en.wikipedia.org/wiki/Ghostwriter"
-                },
-                {
-                  "@type": "Thing",
-                  "name": "Cryptocurrency Regulation (MiCA)",
-                  "sameAs": "https://en.wikipedia.org/wiki/Markets_in_Crypto-Assets"
-                },
-                {
-                  "@type": "Thing",
-                  "name": "DeFi",
-                  "sameAs": "https://en.wikipedia.org/wiki/Decentralized_finance"
-                },
-                {
-                  "@type": "Thing",
-                  "name": "Asset tokenization (RWA)",
-                  "sameAs": "https://en.wikipedia.org/wiki/Asset_tokenization"
-                }
-              ],
-              "hasOfferCatalog": {
-                "@type": "OfferCatalog",
-                "name": "Servicios DAS",
-                "itemListElement": [
-                  {
-                    "@type": "Offer",
-                    "itemOffered": {
-                      "@type": "Service",
-                      "name": "Ghostwriting Ejecutivo para LinkedIn",
-                      "description": "Posicionamos a líderes del sector blockchain como autoridades de industria."
-                    }
-                  },
-                  {
-                    "@type": "Offer",
-                    "itemOffered": {
-                      "@type": "Service",
-                      "name": "Comunicación Estratégica Corporativa",
-                      "description": "Gestión de branding institucional para empresas de activos digitales."
-                    }
-                  }
-                ]
+                  "https://www.linkedin.com/in/victorribes/",
+                  "https://www.blockcha-in.com"
+                ],
+                "knowsAbout": ["Blockchain", "Digital Assets", "Executive Branding", "MiCA Regulation", "Corporate Strategy"]
               }
-            })
+            ])
           }}
         />
         <Script

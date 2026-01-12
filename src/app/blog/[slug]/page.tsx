@@ -103,9 +103,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
         "datePublished": post.created_at,
         "dateModified": post.updated_at || post.created_at,
         "author": {
-            "@type": "Person",
-            "name": post.contributor_name || "Víctor Ribes",
-            "url": "https://www.linkedin.com/in/victorribes/"
+            "@id": "https://www.digitalateliersolutions.agency/#founder"
         },
         "publisher": {
             "@type": "Organization",
