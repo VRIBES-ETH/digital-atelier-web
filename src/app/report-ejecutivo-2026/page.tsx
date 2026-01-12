@@ -31,5 +31,41 @@ export const metadata: Metadata = {
 export const runtime = 'edge';
 
 export default function ReportPage() {
-    return <ReportView />;
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Article",
+                        "headline": "Informe Estratégico 2026: El Futuro de los Activos Digitales y Marca Profesional",
+                        "description": "Un análisis profundo sobre RWA, Tokenización y el impacto del nuevo algoritmo de LinkedIn en la comunicación institucional.",
+                        "image": "https://www.digitalateliersolutions.agency/og-executive-2026.jpg",
+                        "author": {
+                            "@type": "Person",
+                            "name": "Víctor Ribes",
+                            "url": "https://www.linkedin.com/in/victorribes/"
+                        },
+                        "publisher": {
+                            "@type": "Organization",
+                            "name": "Digital Atelier Solutions",
+                            "logo": {
+                                "@type": "ImageObject",
+                                "url": "https://www.digitalateliersolutions.agency/images/das-logo.png"
+                            }
+                        },
+                        "datePublished": "2024-12-15",
+                        "dateModified": "2026-01-12",
+                        "mainEntityOfPage": {
+                            "@type": "WebPage",
+                            "@id": "https://www.digitalateliersolutions.agency/report-ejecutivo-2026"
+                        },
+                        "keywords": ["Blockchain", "RWA", "Tokenización", "LinkedIn Algorithm", "Executive Brand"]
+                    })
+                }}
+            />
+            <ReportView />
+        </>
+    );
 }

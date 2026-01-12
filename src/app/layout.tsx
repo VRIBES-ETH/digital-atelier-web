@@ -148,7 +148,55 @@ export default function RootLayout({
                 "https://www.linkedin.com/in/victorribes/"
               ],
               "description": "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
-              "knowsAbout": ["Blockchain", "Ghostwriting", "Corporate Communication", "DeFi", "RWA"]
+              "knowsAbout": [
+                {
+                  "@type": "Thing",
+                  "name": "Blockchain",
+                  "sameAs": "https://en.wikipedia.org/wiki/Blockchain"
+                },
+                {
+                  "@type": "Thing",
+                  "name": "Ghostwriting",
+                  "sameAs": "https://en.wikipedia.org/wiki/Ghostwriter"
+                },
+                {
+                  "@type": "Thing",
+                  "name": "Cryptocurrency Regulation (MiCA)",
+                  "sameAs": "https://en.wikipedia.org/wiki/Markets_in_Crypto-Assets"
+                },
+                {
+                  "@type": "Thing",
+                  "name": "DeFi",
+                  "sameAs": "https://en.wikipedia.org/wiki/Decentralized_finance"
+                },
+                {
+                  "@type": "Thing",
+                  "name": "Asset tokenization (RWA)",
+                  "sameAs": "https://en.wikipedia.org/wiki/Asset_tokenization"
+                }
+              ],
+              "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Servicios DAS",
+                "itemListElement": [
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Ghostwriting Ejecutivo para LinkedIn",
+                      "description": "Posicionamos a líderes del sector blockchain como autoridades de industria."
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Comunicación Estratégica Corporativa",
+                      "description": "Gestión de branding institucional para empresas de activos digitales."
+                    }
+                  }
+                ]
+              }
             })
           }}
         />

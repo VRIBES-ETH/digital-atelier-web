@@ -15,5 +15,36 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    return <>{children}</>;
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "FAQPage",
+                        "mainEntity": [
+                            {
+                                "@type": "Question",
+                                "name": "¿Qué hace exactamente un Ghostwriter Blockchain?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": "Un Escritor Fantasma (Ghostwriter) especializado en Blockchain traduce conocimiento técnico y visión estratégica en contenido de alto impacto para LinkedIn, con experiencia en MiCA y protocolos institucionales."
+                                }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": "¿Es seguro para CEOs de empresas reguladas (Fintech)?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": "Sí. Se aplica una metodología Compliance-First donde todo el contenido es validado para evitar riesgos regulatorios con la CNMV, SEC o bajo normativa MiCA."
+                                }
+                            }
+                        ]
+                    })
+                }}
+            />
+            {children}
+        </>
+    );
 }
