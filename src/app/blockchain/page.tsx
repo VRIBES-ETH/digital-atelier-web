@@ -298,7 +298,7 @@ export default function BlockchainPage() {
                             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center text-center p-6">
                                 <span className="bg-das-dark text-white px-3 py-1 text-xs font-bold uppercase tracking-widest mb-2">Lista de Espera</span>
                                 <p className="text-xs text-gray-600 font-medium">Actualmente al máximo de capacidad para este nivel.</p>
-                                <a href="https://www.blockcha-in.com" className="mt-4 underline text-xs font-bold text-das-dark">Unirme a la lista en Blockcha-in.es</a>
+                                <a href="https://www.blockcha-in.com" className="mt-4 underline text-xs font-bold text-das-dark">Unirme a la lista en Blockcha-in.com</a>
                             </div>
 
                             <div className="flex justify-between items-start mb-4 opacity-50">

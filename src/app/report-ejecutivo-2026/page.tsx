@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'Informe Estratégico 2026 | Digital Atelier Solutions',
         description: 'Análisis de tendencias en Digital Assets, RWA, Tokenización y Desarrollo de Marca Profesional bajo el nuevo algoritmo de LinkedIn.',
-        url: '/report-ejecutivo-2026',
+        url: 'https://www.digitalateliersolutions.agency/report-ejecutivo-2026',
         siteName: 'Digital Atelier Solutions',
         images: [
             {

@@ -6,6 +6,15 @@ import { Link2, ThumbsUp, ArrowUpRight, Linkedin, Twitter, Facebook, Mail, Link 
 export const metadata = {
     title: "Newsletter | Blockcha-In® - Víctor Ribes",
     description: "Newsletter para ejecutivos blockchain y fintech que quieren dominar LinkedIn.",
+    alternates: {
+        canonical: "https://www.digitalateliersolutions.agency/newsletter",
+    },
+    openGraph: {
+        title: "Newsletter | Blockcha-In® - Víctor Ribes",
+        description: "Newsletter para ejecutivos blockchain y fintech que quieren dominar LinkedIn.",
+        url: "https://www.digitalateliersolutions.agency/newsletter",
+        type: "website",
+    },
 };
 
 export default function NewsletterPage() {

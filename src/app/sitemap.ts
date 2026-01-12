@@ -43,6 +43,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: 'weekly',
             priority: 0.9,
         },
+        {
+            url: `${baseUrl}/newsletter`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.7,
+        },
+        {
+            url: `${baseUrl}/report-ejecutivo-2026`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
     ]
 
     // Dynamic Blog Posts

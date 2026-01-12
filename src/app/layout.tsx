@@ -136,15 +136,16 @@ export default function RootLayout({
               "founder": {
                 "@type": "Person",
                 "name": "Víctor Ribes",
-                "url": "https://www.linkedin.com/in/vribes/",
+                "url": "https://www.linkedin.com/in/victorribes/",
                 "sameAs": [
                   "https://twitter.com/vribes_eth",
-                  "https://www.linkedin.com/in/vribes/"
+                  "https://www.linkedin.com/in/victorribes/"
                 ]
               },
               "sameAs": [
                 "https://www.linkedin.com/company/digital-atelier-solutions",
-                "https://twitter.com/vribes_eth"
+                "https://twitter.com/vribes_eth",
+                "https://www.linkedin.com/in/victorribes/"
               ],
               "description": "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
               "knowsAbout": ["Blockchain", "Ghostwriting", "Corporate Communication", "DeFi", "RWA"]
