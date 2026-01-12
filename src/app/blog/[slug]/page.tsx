@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
         };
     }
 
-    const postUrl = `https://digitalateliersolutions.agency/blog/${post.slug}`;
+    const postUrl = `https://www.digitalateliersolutions.agency/blog/${post.slug}`;
 
     return {
         title: `${post.seo_title || post.title} | Digital Atelier Solutions`,
@@ -112,19 +112,19 @@ export default async function BlogPostPage({ params }: { params: any }) {
             "name": "Digital Atelier Solutions",
             "logo": {
                 "@type": "ImageObject",
-                "url": "https://digitalateliersolutions.agency/images/logo-dark.png"
+                "url": "https://www.digitalateliersolutions.agency/images/logo-dark.png"
             }
         },
         "description": post.excerpt,
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://digitalateliersolutions.agency/blog/${post.slug}`
+            "@id": `https://www.digitalateliersolutions.agency/blog/${post.slug}`
         },
         "keywords": post.tags || [],
         "articleSection": "Blockchain Market Intelligence"
     };
 
-    const postUrl = `https://digitalateliersolutions.agency/blog/${post.slug}`;
+    const postUrl = `https://www.digitalateliersolutions.agency/blog/${post.slug}`;
     const shareText = `Análisis Estratégico: ${post.title}`;
     const headings = extractHeadings(post.content);
     const readingTime = calculateReadingTime(post.content);

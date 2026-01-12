@@ -48,7 +48,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://digitalateliersolutions.agency'),
+  metadataBase: new URL('https://www.digitalateliersolutions.agency'),
   title: {
     default: "DAS® | Copywriting & Ghostwriting Blockchain",
     template: "%s | DAS®"
@@ -60,13 +60,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "https://digitalateliersolutions.agency",
+    url: "https://www.digitalateliersolutions.agency",
     title: "DAS® | Copywriting & Ghostwriting Blockchain",
     description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional. Expertos en posicionamiento ejecutivo, contenido técnico y liderazgo de pensamiento para la industria Blockchain.",
     siteName: "Digital Atelier Solutions",
     images: [
       {
-        url: "https://digitalateliersolutions.agency/images/og-default.jpg",
+        url: "https://www.digitalateliersolutions.agency/images/og-default.jpg",
         width: 1200,
         height: 630,
         alt: "Digital Atelier Solutions - Strategic Blockchain Communication",
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Digital Atelier Solutions | DAS®",
     description: "Agencia boutique de comunicación estratégica y ghostwriting para líderes en blockchain y finanzas. Elevamos tu narrativa al estándar institucional.",
-    images: ["https://digitalateliersolutions.agency/images/og-default.jpg"],
+    images: ["https://www.digitalateliersolutions.agency/images/og-default.jpg"],
     creator: "@vribes_eth",
   },
   robots: {
@@ -124,9 +124,9 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "ProfessionalService",
               "name": "Digital Atelier Solutions",
-              "image": "https://digitalateliersolutions.agency/images/og-default.jpg",
-              "@id": "https://digitalateliersolutions.agency",
-              "url": "https://digitalateliersolutions.agency",
+              "image": "https://www.digitalateliersolutions.agency/images/og-default.jpg",
+              "@id": "https://www.digitalateliersolutions.agency",
+              "url": "https://www.digitalateliersolutions.agency",
               "telephone": "",
               "priceRange": "$$$",
               "address": {

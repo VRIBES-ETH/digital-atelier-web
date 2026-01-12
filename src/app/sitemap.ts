@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next'
 import { getPublishedPosts } from '@/app/actions/blog'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://digitalateliersolutions.agency'
+    const baseUrl = 'https://www.digitalateliersolutions.agency'
 
     // Static Routes
     const routes: MetadataRoute.Sitemap = [
