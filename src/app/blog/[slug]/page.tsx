@@ -125,6 +125,13 @@ const normalizeContent = (content: string) => {
     if (!content) return '';
     let result = unescapeHtml(content);
 
+    // 1. SCAN FOR TWITTER URLS AND CONVERT TO SHORTCODES
+    // This is the most robust way: extract the URL before it gets mangled by markdown parsing.
+    // We look for patterns like: (twitter.com/user/status/12345) or [text](twitter.com/user/status/12345)
+    result = result.replace(/(?:https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/(\d+)[^\s\)]*)/gi, (match) => {
+        return `[[TWEET_URL:${match.replace(/[">].*$/, '')}]]`;
+    });
+
     // Fix broken markdown links created from HTML <a> tags inside tweets
     // Matches: [text](url">text)
     result = result.replace(/\[([^\]]*?)\]\((https?:\/\/[^\s\)]+?)">[^)]*?\)/gi, '<a href="$2">$1</a>');
@@ -310,28 +317,31 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         return <h3 id={id} className="text-xl md:text-2xl mt-10 mb-5 font-playfair scroll-mt-24" {...props}>{children}</h3>;
                                     },
                                     p: ({ node, children, ...props }) => {
-                                        // 1. Aggressive Twitter Restoration
-                                        // If a paragraph contains a Twitter status URL, it's likely part of a mangled tweet.
-                                        // We discard the text and reconstruct a clean interactive blockquote.
-                                        const findTwitterStatusUrl = (n: any): string | null => {
-                                            if (n.tagName === 'a' && (n.properties?.href?.includes('twitter.com') || n.properties?.href?.includes('x.com')) && n.properties?.href?.includes('/status/')) {
-                                                return n.properties.href;
+                                        // 1. Shortcode Twitter Reconstruction
+                                        const findTweetShortcode = (n: any): string | null => {
+                                            if (typeof n === 'string' && n.includes('[[TWEET_URL:')) {
+                                                const match = n.match(/\[\[TWEET_URL:([^\]]+)\]\]/);
+                                                return match ? match[1] : null;
+                                            }
+                                            if (n.value && typeof n.value === 'string' && n.value.includes('[[TWEET_URL:')) {
+                                                const match = n.value.match(/\[\[TWEET_URL:([^\]]+)\]\]/);
+                                                return match ? match[1] : null;
                                             }
                                             if (n.children) {
                                                 for (const child of n.children) {
-                                                    const url = findTwitterStatusUrl(child);
+                                                    const url = findTweetShortcode(child);
                                                     if (url) return url;
                                                 }
                                             }
                                             return null;
                                         };
 
-                                        const twitterUrl = findTwitterStatusUrl(node);
-                                        if (twitterUrl) {
+                                        const tweetUrl = findTweetShortcode(node);
+                                        if (tweetUrl) {
                                             return (
-                                                <div className="twitter-embed-container flex justify-center w-full my-12" key={twitterUrl}>
+                                                <div className="twitter-embed-container flex justify-center w-full my-12" key={tweetUrl}>
                                                     <blockquote className="twitter-tweet">
-                                                        <a href={twitterUrl}></a>
+                                                        <a href={tweetUrl}></a>
                                                     </blockquote>
                                                 </div>
                                             );
