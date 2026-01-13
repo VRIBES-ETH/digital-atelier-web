@@ -139,47 +139,38 @@ const unescapeHtml = (html: string) => {
 const normalizeContent = (content: string) => {
     if (!content) return '';
 
-    // 1. Initial manual cleanup of common Tiptap-Markdown hybrid trash
-    let result = content;
+    // 1. Initial Unescape Layer
+    // We do this first so the following regexes can match real HTML tags
+    let result = unescapeHtml(content);
 
-    // Surgical fix for "FRANKENSTEIN" headings trapped in Tiptap <p> tags
-    // This looks for <p>### Heading</p> and unwraps it for the markdown parser
+    // 2. SURGICAL TWITTER SALVAGE (Standalone only)
+    const twitterStatusRegex = /(?:\n|^)\s*((?:\[[^\]]*\]\()?https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/(\d+)(?:[^\s\n<\]\)]*)(?:\))?)\s*(?:\n|$)/gi;
+    result = result.replace(twitterStatusRegex, (all, tweetUrl) => {
+        const urlMatch = tweetUrl.match(/https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/\d+/i);
+        if (!urlMatch) return all;
+        return `\n\n<blockquote class="twitter-tweet"><a href="${urlMatch[0]}"></a></blockquote>\n\n`;
+    });
+
+    // 3. Surgical fix for "FRANKENSTEIN" headings trapped in Tiptap <p> tags
+    // Aggressive unwrap for any heading level (H1-H6)
     result = result.replace(/<p>\s*(#{1,6})\s+(.*?)<\/p>/gi, '\n\n$1 $2\n\n');
 
-    // Ensure headers have newlines if they follow a block element without one
-    result = result.replace(/(<\/figure>|<\/img>|<\/blockquote>|<\/div>)(#{1,6}\s+)/gi, '$1\n\n$2');
+    // Ensure headers have newlines if they follow ANY tag without one (Crucial for Markdown)
+    result = result.replace(/(<\/?[a-z0-9]+[^>]*>)\s*(#{1,6}\s+)/gi, '$1\n\n$2');
 
-    // Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
-    // We only target the specific sequence that includes "> 
+    // 4. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
     result = result.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+?)(?:%22|")>[^)]+\)/gi, (match, text, url) => {
         return `<a href="${url}">${text}</a>`;
     });
 
-    // 2. SURGICAL TWITTER SALVAGE (Standalone only)
-    // We only convert to blockquote if the URL is on its own line.
-    // This prevents breaking sentences like "En el [URL] del 11 de agosto".
-    const twitterStatusRegex = /(?:\n|^)\s*((?:\[[^\]]*\]\()?https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/(\d+)(?:[^\s\n<\]\)]*)(?:\))?)\s*(?:\n|$)/gi;
-
-    result = result.replace(twitterStatusRegex, (all, tweetUrl) => {
-        // Find the clean URL within the potentially markdown-wrapped match
-        const urlMatch = tweetUrl.match(/https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/\d+/i);
-        if (!urlMatch) return all;
-
-        // Return with double newline for clean block structure
-        return `\n\n<blockquote class="twitter-tweet"><a href="${urlMatch[0]}"></a></blockquote>\n\n`;
-    });
-
-    // 3. Deep Unescape Layer (Recursive while loop)
-    result = unescapeHtml(result);
-
-    // 4. Cleanup of common URL-encoded HTML fragments
+    // 5. Cleanup of common URL-encoded HTML fragments
     result = result.replace(/%22%3E/g, '">')
         .replace(/%3C%2Fa%3E/g, '</a>')
         .replace(/%3Cbr%3E/g, '<br>')
         .replace(/%3C\/p%3E/g, '</p>')
         .replace(/%3E/g, '>');
 
-    // 5. Remove any script tags (handled globally)
+    // 6. Final security cleanup
     result = result.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
     return result;
