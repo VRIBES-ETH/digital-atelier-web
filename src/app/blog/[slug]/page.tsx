@@ -294,7 +294,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                 }}
                                 rehypePlugins={[rehypeRaw]}
                             >
-                                {post.content}
+                                {post.content.replace(/&lt;/g, '<').replace(/&gt;/g, '>')}
                             </ReactMarkdown>
 
                             {/* Dynamic CTA Injection */}
