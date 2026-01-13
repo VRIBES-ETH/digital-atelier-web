@@ -1,6 +1,7 @@
 import { getPostBySlug, getPublishedPosts } from '@/app/actions/blog';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import { Clock } from 'lucide-react';
 import { Metadata } from 'next';
 import BlogNewsletterForm from '@/components/BlogNewsletterForm';
@@ -231,7 +232,12 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             {props.alt && <figcaption className="text-center text-sm text-gray-500 mt-4 font-barlow uppercase tracking-widest">{props.alt}</figcaption>}
                                         </figure>
                                     ),
-                                    blockquote: ({ node, children, ...props }) => {
+                                    blockquote: ({ node, className, children, ...props }) => {
+                                        // Check if it's a Twitter tweet
+                                        if (className === 'twitter-tweet') {
+                                            return <blockquote className={className} {...props}>{children}</blockquote>;
+                                        }
+
                                         const findRawText = (n: any): string => {
                                             if (n.value) return n.value;
                                             if (n.children) return n.children.map(findRawText).join(' ');
@@ -263,6 +269,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         );
                                     },
                                 }}
+                                rehypePlugins={[rehypeRaw]}
                             >
                                 {post.content}
                             </ReactMarkdown>
