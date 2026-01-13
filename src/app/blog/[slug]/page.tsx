@@ -10,7 +10,7 @@ import BlogShareButton from '@/components/BlogShareButton';
 import TableOfContents from '@/components/TableOfContents';
 import Link from 'next/link';
 import React from 'react';
-import TwitterHydrator from '@/components/TwitterHydrator';
+import { Tweet } from 'react-tweet';
 
 export const dynamicParams = true;
 
@@ -19,21 +19,21 @@ const slugify = (text: string) => {
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '');
+        .replace(/[^\w ]+/g, '')
+        .replace(/ +/g, '-');
 };
 
 const getPlainText = (children: any): string => {
-    if (!children) return '';
-    if (typeof children === 'string') return children;
-    if (Array.isArray(children)) return children.map(getPlainText).join('');
-    if (children.props && children.props.children) return getPlainText(children.props.children);
-    return '';
+    return React.Children.toArray(children).map((child: any) => {
+        if (typeof child === 'string') return child;
+        if (child.props && child.props.children) return getPlainText(child.props.children);
+        return '';
+    }).join('');
 };
 
 const extractHeadings = (markdown: string) => {
     // 1. First, strip HTML tags for heading extraction to avoid confusion
-    const cleanMd = markdown.replace(/<[^>]*>/g, '');
+    const cleanMd = markdown.replace(/&lt;[^&gt;]*&gt;/g, '');
     const lines = cleanMd.split('\n');
     const headings: any[] = [];
     lines.forEach(line => {
@@ -54,9 +54,9 @@ const extractHeadings = (markdown: string) => {
     return headings;
 };
 
-const calculateReadingTime = (markdown: string) => {
+const calculateReadingTime = (content: string) => {
     const wordsPerMinute = 200;
-    const words = markdown.split(/\s+/).length;
+    const words = content.split(/\s+/).length;
     return Math.ceil(words / wordsPerMinute);
 };
 
@@ -146,20 +146,18 @@ const normalizeContent = (content: string) => {
         return `<a href="${url}">${text}</a>`;
     });
 
-    // 2. SURGICAL TWITTER SALVAGE
-    // We ONLY replace the Twitter URL with a blockquote if the URL is on its own line or in its own markdown link block.
-    // This stops it from breaking links in the middle of sentences.
-    const twitterStatusRegex = /(?:\[[^\]]*\]\()?https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/\d+(?:[^\s\n<\]\)]*)(?:\))?/gi;
+    // 2. SURGICAL TWITTER SALVAGE (Standalone only)
+    // We only convert to blockquote if the URL is on its own line.
+    // This prevents breaking sentences like "En el [URL] del 11 de agosto".
+    const twitterStatusRegex = /(?:\n|^)\s*((?:\[[^\]]*\]\()?https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/(\d+)(?:[^\s\n<\]\)]*)(?:\))?)\s*(?:\n|$)/gi;
 
-    result = result.replace(twitterStatusRegex, (all) => {
-        const urlMatch = all.match(/https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/\d+/i);
+    result = result.replace(twitterStatusRegex, (all, tweetUrl) => {
+        // Find the clean URL within the potentially markdown-wrapped match
+        const urlMatch = tweetUrl.match(/https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/\d+/i);
         if (!urlMatch) return all;
 
-        // If the match is just the URL without much else, replace it. 
-        // If it's a very long string, it might be a sentence we accidentally caught.
-        if (all.length > 150) return all;
-
-        return `<blockquote class="twitter-tweet"><a href="${urlMatch[0]}"></a></blockquote>`;
+        // Return with double newline for clean block structure
+        return `\n\n<blockquote class="twitter-tweet"><a href="${urlMatch[0]}"></a></blockquote>\n\n`;
     });
 
     // 3. Deep Unescape Layer (Recursive while loop)
@@ -224,28 +222,14 @@ export default async function BlogPostPage({ params }: { params: any }) {
 
     return (
         <div className="min-h-screen bg-white">
-            <TwitterHydrator />
             <style dangerouslySetInnerHTML={{
                 __html: `
-                /* Force removal of orange border and styles for Twitter embeds */
-                .prose blockquote.twitter-tweet,
-                .prose .twitter-tweet,
-                .twitter-tweet {
-                    border-left: none !important;
-                    padding: 0 !important;
-                    margin-left: auto !important;
-                    margin-right: auto !important;
-                    background: transparent !important;
-                    font-style: normal !important;
-                    border: none !important;
-                    box-shadow: none !important;
-                }
-                .prose blockquote.twitter-tweet::before,
-                .prose blockquote.twitter-tweet::after {
-                    content: none !important;
-                }
-                .prose blockquote.twitter-tweet p {
-                    font-style: normal !important;
+                /* Clean reset for react-tweet containers */
+                .tweet-container {
+                    display: flex;
+                    justify-content: center;
+                    width: 100%;
+                    margin: 3rem 0;
                 }
             `}} />
 
@@ -364,21 +348,30 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         };
                                         const allText = findRawText(node as any);
 
-                                        // Detection Logic
+                                        // Robust detection: check class, text, and child links (href)
+                                        const childrenHrefs = (node as any).children?.map((c: any) => c.properties?.href || '').join(' ') || '';
+
                                         const isTwitter = className?.includes('twitter-tweet') ||
                                             allText.includes('twitter.com/') ||
-                                            allText.includes('x.com/');
+                                            allText.includes('x.com/') ||
+                                            childrenHrefs.includes('twitter.com/') ||
+                                            childrenHrefs.includes('x.com/');
 
                                         const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación/i.test(allText);
 
                                         if (isTwitter) {
-                                            return (
-                                                <div className="not-prose flex justify-center w-full my-12">
-                                                    <blockquote className="twitter-tweet" {...props}>
-                                                        {children}
-                                                    </blockquote>
-                                                </div>
-                                            );
+                                            // Extract ID from text or link properties
+                                            const combinedSearch = (allText + ' ' + childrenHrefs);
+                                            const idMatch = combinedSearch.match(/status\/(\d+)/i);
+                                            const tweetId = idMatch ? idMatch[1] : null;
+
+                                            if (tweetId) {
+                                                return (
+                                                    <div className="tweet-container not-prose">
+                                                        <Tweet id={tweetId} />
+                                                    </div>
+                                                );
+                                            }
                                         }
 
                                         if (isExecutive) {
@@ -390,6 +383,9 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                                 </div>
                                             );
                                         }
+
+                                        // Safety: If it's an empty blockquote (Tiptap artifact), don't render it
+                                        if (!allText.trim() && !childrenHrefs.trim()) return null;
 
                                         return <blockquote className={className} {...props}>{children}</blockquote>;
                                     },

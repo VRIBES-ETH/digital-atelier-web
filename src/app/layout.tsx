@@ -213,11 +213,6 @@ export default function RootLayout({
         />
         <Script
           defer
-          src="https://platform.twitter.com/widgets.js"
-          strategy="afterInteractive"
-        />
-        <Script
-          defer
           src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon='{"token": "5aef2dbbab57493e87e6345bab17cb18"}'
           strategy="afterInteractive"
