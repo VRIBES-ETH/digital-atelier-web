@@ -268,6 +268,21 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             </a>
                                         );
                                     },
+                                    iframe: ({ node, ...props }) => {
+                                        const src = props.src || '';
+                                        const isYouTube = src.includes('youtube.com') || src.includes('youtu.be');
+                                        const isLinkedIn = src.includes('linkedin.com');
+
+                                        return (
+                                            <div className={`my-12 flex justify-center w-full ${isYouTube ? 'aspect-video' : ''}`}>
+                                                <iframe
+                                                    {...props}
+                                                    className={`rounded-sm shadow-lg ${isYouTube ? 'w-full h-full' : 'max-w-full'}`}
+                                                    style={{ border: 'none', ...props.style }}
+                                                />
+                                            </div>
+                                        );
+                                    },
                                 }}
                                 rehypePlugins={[rehypeRaw]}
                             >
