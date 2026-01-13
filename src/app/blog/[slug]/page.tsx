@@ -90,6 +90,23 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
     };
 }
 
+const unescapeHtml = (html: string) => {
+    return html
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&#39;/g, "'")
+        .replace(/&mdash;/g, '—')
+        .replace(/&ldquo;/g, '“')
+        .replace(/&rdquo;/g, '”')
+        .replace(/&lsquo;/g, '‘')
+        .replace(/&rsquo;/g, '’')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&bull;/g, '•')
+        .replace(/&hellip;/g, '…');
+};
+
 export default async function BlogPostPage({ params }: { params: any }) {
     const { slug } = await params;
     const post = await getPostBySlug(slug);
@@ -222,12 +239,6 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         const id = slugify(text);
                                         return <h3 id={id} className="text-xl md:text-2xl mt-10 mb-5 font-playfair scroll-mt-24" {...props}>{children}</h3>;
                                     },
-                                    p: ({ node, children, ...props }) => {
-                                        if (node?.children?.some((child: any) => child.tagName === 'img')) {
-                                            return <div className="mb-6">{children}</div>;
-                                        }
-                                        return <p {...props}>{children}</p>;
-                                    },
                                     img: ({ node, ...props }) => (
                                         <figure className="my-16">
                                             <img className="w-full rounded-sm shadow-sm" {...props} />
@@ -249,7 +260,13 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             allText.includes('@saylor');
 
                                         if (isTwitter) {
-                                            return <blockquote className="twitter-tweet" {...props}>{children}</blockquote>;
+                                            return (
+                                                <div className="not-prose my-16 twitter-embed-wrapper">
+                                                    <blockquote className="twitter-tweet" {...props}>
+                                                        {children}
+                                                    </blockquote>
+                                                </div>
+                                            );
                                         }
 
                                         // 2. Detect Executive Summary variants
@@ -264,7 +281,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         }
                                         return <blockquote {...props}>{children}</blockquote>;
                                     },
-                                    script: () => null, // Prevents console error from pasted embed scripts
+                                    script: () => null, // Suppress scripts to avoid React hydration/attribute errors
                                     a: ({ node, href, children, ...props }) => {
                                         const isInternal = href?.startsWith('/') || href?.includes('digitalateliersolutions.agency');
                                         return (
@@ -281,7 +298,6 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                     iframe: ({ node, ...props }) => {
                                         const src = props.src || '';
                                         const isYouTube = src.includes('youtube.com') || src.includes('youtu.be');
-                                        const isLinkedIn = src.includes('linkedin.com');
 
                                         return (
                                             <div className={`my-12 flex justify-center w-full ${isYouTube ? 'aspect-video' : ''}`}>
@@ -296,12 +312,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                 }}
                                 rehypePlugins={[rehypeRaw]}
                             >
-                                {post.content
-                                    .replace(/&lt;/g, '<')
-                                    .replace(/&gt;/g, '>')
-                                    .replace(/&quot;/g, '"')
-                                    .replace(/&amp;/g, '&')
-                                    .replace(/&#39;/g, "'")}
+                                {unescapeHtml(post.content)}
                             </ReactMarkdown>
 
                             {/* Dynamic CTA Injection */}
@@ -309,6 +320,8 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                 <BlogCTA type={(post.title.toLowerCase().includes('linkedin') || post.title.toLowerCase().includes('marca')) ? 'linkedin_audit' : 'report_2026'} />
                             </div>
                         </article>
+                        ...
+
 
                         {/* Mobile Share Button */}
                         <div className="lg:hidden mt-12 mb-8 flex justify-center">
