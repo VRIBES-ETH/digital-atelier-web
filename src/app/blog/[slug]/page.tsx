@@ -117,6 +117,10 @@ export default async function BlogPostPage({ params }: { params: any }) {
         notFound();
     }
 
+    // 1. Pre-process content: Strip scripts and unescape
+    const cleanContent = unescapeHtml(post.content)
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
@@ -151,6 +155,35 @@ export default async function BlogPostPage({ params }: { params: any }) {
 
     return (
         <div className="min-h-screen bg-white">
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                /* Final fix for Twitter and Prose conflicts */
+                .prose blockquote.twitter-tweet {
+                    border-left: none !important;
+                    padding: 0 !important;
+                    margin: 40px auto !important;
+                    background: transparent !important;
+                    font-style: normal !important;
+                    display: block !important;
+                }
+                .prose blockquote.twitter-tweet p {
+                    font-style: normal !important;
+                    font-family: inherit !important;
+                }
+                /* Ensure executive summaries still look premium */
+                .executive-summary-card {
+                    background: transparent;
+                    border-left: 4px solid #cc8e35;
+                    padding-left: 1.5rem;
+                    margin-top: 4rem;
+                    margin-bottom: 4rem;
+                    font-style: italic;
+                    font-family: "Playfair Display", serif;
+                    font-size: 1.25rem;
+                    color: #1a1a1a;
+                }
+            `}} />
+
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -242,9 +275,9 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         return <h3 id={id} className="text-xl md:text-2xl mt-10 mb-5 font-playfair scroll-mt-24" {...props}>{children}</h3>;
                                     },
                                     p: ({ node, children, ...props }) => {
-                                        // Prevention of hydration mismatch by checking for block elements inside p
+                                        // Simplified prevention of hydration mismatch
                                         const hasBlock = node?.children?.some((child: any) =>
-                                            ['div', 'blockquote', 'figure', 'section', 'iframe'].includes(child.tagName)
+                                            ['div', 'blockquote', 'figure', 'section', 'iframe', 'header', 'footer'].includes(child.tagName)
                                         );
                                         if (hasBlock) return <div className="mb-6">{children}</div>;
                                         return <p className="mb-6" {...props}>{children}</p>;
@@ -263,36 +296,18 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         };
                                         const allText = findRawText(node as any);
 
-                                        // 1. Check if it's a Twitter tweet (HIGHER PRIORITY)
-                                        const isTwitter = className?.includes('twitter-tweet') ||
-                                            allText.includes('twitter.com') ||
-                                            allText.includes('x.com') ||
-                                            allText.includes('@saylor') ||
-                                            allText.includes('Michael Saylor');
-
-                                        if (isTwitter) {
-                                            return (
-                                                <div className="not-prose my-16 twitter-embed-wrapper block">
-                                                    <blockquote className="twitter-tweet mx-auto" {...props}>
-                                                        {children}
-                                                    </blockquote>
-                                                </div>
-                                            );
-                                        }
-
-                                        // 2. Detect Executive Summary variants
+                                        // Executive Summary Detection (No Twitter wrapper anymore, handled by CSS)
                                         const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación/i.test(allText);
 
-                                        if (isExecutive) {
+                                        if (isExecutive && !className?.includes('twitter-tweet')) {
                                             return (
-                                                <div className="executive-summary-card not-prose my-16">
+                                                <div className="executive-summary-card">
                                                     {children}
                                                 </div>
                                             );
                                         }
-                                        return <blockquote {...props}>{children}</blockquote>;
+                                        return <blockquote className={className} {...props}>{children}</blockquote>;
                                     },
-                                    script: () => null, // Suppress scripts to avoid React hydration/attribute errors
                                     a: ({ node, href, children, ...props }) => {
                                         const isInternal = href?.startsWith('/') || href?.includes('digitalateliersolutions.agency');
                                         return (
@@ -324,7 +339,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                 }}
                                 rehypePlugins={[rehypeRaw]}
                             >
-                                {unescapeHtml(post.content)}
+                                {cleanContent}
                             </ReactMarkdown>
 
                             {/* Dynamic CTA Injection */}
@@ -332,8 +347,6 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                 <BlogCTA type={(post.title.toLowerCase().includes('linkedin') || post.title.toLowerCase().includes('marca')) ? 'linkedin_audit' : 'report_2026'} />
                             </div>
                         </article>
-                        ...
-
 
                         {/* Mobile Share Button */}
                         <div className="lg:hidden mt-12 mb-8 flex justify-center">
