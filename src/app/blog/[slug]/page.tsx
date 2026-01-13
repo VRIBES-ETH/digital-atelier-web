@@ -167,11 +167,18 @@ const normalizeContent = (content: string) => {
 
     // 4. EXECUTIVE SUMMARY HEALING LAYER
     // If we see a "Resumen Ejecutivo" heading followed by a blockquote,
-    // ensure the blockquote has the "Resumen Ejecutivo" anchor so the renderer catches it.
-    // This fixes the issue where Tiptap moves the heading outside the blockquote.
+    // mark the blockquote with data-type="executive" so the renderer catches it.
     const executiveKeywords = 'Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways';
-    const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords})\\s*?\\n+)(>)(?!\\s*\\*\\*(?:${executiveKeywords}))`, 'gi');
-    result = result.replace(executiveRegex, '$1> **Resumen Ejecutivo**\n\n>');
+    const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords})\\s*?\\n+)(<blockquote>|>)`, 'gi');
+    result = result.replace(executiveRegex, (match, h, b) => {
+        if (b.startsWith('<blockquote')) {
+            return `${h}<blockquote data-type="executive"`;
+        }
+        return `${h}\n\n<blockquote data-type="executive">\n\n`;
+    });
+
+    // We also need to fix the closing tag if we opened one manually
+    result = result.replace(/<blockquote data-type="executive">\n\n([^<]+)\n\n/g, '<blockquote data-type="executive">$1</blockquote>');
 
     // 5. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
     result = result.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+?)(?:%22|")>[^)]+\)/gi, (match, text, url) => {
@@ -377,7 +384,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             childrenHrefs.includes('twitter.com/') ||
                                             childrenHrefs.includes('x.com/');
 
-                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways/i.test(allText);
+                                        const isExecutive = (props as any)['data-type'] === 'executive' || /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways/i.test(allText);
 
                                         if (isTwitter) {
                                             // Extract ID from text or link properties
