@@ -108,8 +108,11 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
 const unescapeHtml = (html: string) => {
     if (!html) return '';
     let result = html;
-    // Multi-pass unescaping for deeply nested entities (common in Tiptap/Supabase)
-    for (let i = 0; i < 4; i++) {
+    let prev;
+    // Recursive unescaping to beat Tiptap's multiple levels of escaping (&amp;amp;mdash;)
+    let safety = 0;
+    do {
+        prev = result;
         result = result
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
@@ -124,13 +127,9 @@ const unescapeHtml = (html: string) => {
             .replace(/&ndash;/g, '–')
             .replace(/&nbsp;/g, ' ')
             .replace(/&bull;/g, '•')
-            .replace(/&hellip;/g, '…')
-            .replace(/&amp;mdash;/g, '—')
-            .replace(/&amp;ndash;/g, '–')
-            .replace(/&amp;quot;/g, '"')
-            .replace(/&amp;lt;/g, '<')
-            .replace(/&amp;gt;/g, '>');
-    }
+            .replace(/&hellip;/g, '…');
+        safety++;
+    } while (result !== prev && safety < 10);
     return result;
 };
 
@@ -138,15 +137,46 @@ const unescapeHtml = (html: string) => {
 const normalizeContent = (content: string) => {
     if (!content) return '';
 
-    // 1. DEEP UNESCAPE: Crucial so that <blockquote ...> is parsed as HTML by rehype-raw
-    // and not displayed as raw text &lt;blockquote ...&gt;
-    let result = unescapeHtml(content);
+    // 1. Initial manual cleanup of common Tiptap-Markdown hybrid trash
+    let result = content;
 
-    // 2. Fix very specific common editor mangling (Frankenstein links)
-    // Matches: [text](url">text)
-    result = result.replace(/\[([^\]]*?)\]\((https?:\/\/[^\s\)]+?)">[^)]*?\)/gi, '<a href="$2">$1</a>');
+    // Fix broken markdown links: [text](URL">text) -> <a href="URL">text</a>
+    result = result.replace(/\[([^\]]*?)\]\((https?:\/\/[^\s\)]+?)(?:%22|")>([^)]*?)\)/gi, '<a href="$2">$1</a>');
 
-    // 3. Remove script tags from content to avoid React hydration errors (handled by TwitterHydrator)
+    // Fix orphan markdown links from Tiptap "helpfulness": text](URL) -> <a href="URL">text</a>
+    result = result.replace(/([A-Z0-9][^\]\n]*?)\]\((https?:\/\/[^\s\)]+?)\)/gi, '<a href="$2">$1</a>');
+
+    // 2. TWITTER STATUS SALVAGE (The Final Fix)
+    // We identify status URLs even if they are buried in debris.
+    // For every Twitter status URL, we reconstruct a clean blockquote.
+    const twitterStatusRegex = /https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/(\d+)(?:[^\s\n<]*)/gi;
+    const matches = Array.from(result.matchAll(twitterStatusRegex));
+
+    const processedIds = new Set();
+    matches.forEach(match => {
+        const id = match[1];
+        // Clean the individual URL found from any trailing markdown/html junk
+        const fullUrl = match[0].split(/[">\]\)]/)[0];
+
+        if (processedIds.has(id)) return;
+        processedIds.add(id);
+
+        // Replace the cluster that contains this ID (greedily consuming debris around it)
+        const clusterRegex = new RegExp(`[^\n]*?${id}[^\n]*`, 'gi');
+        result = result.replace(clusterRegex, `\n\n<blockquote class="twitter-tweet"><a href="${fullUrl}"></a></blockquote>\n\n`);
+    });
+
+    // 3. Deep Unescape Layer (Recursive while loop)
+    result = unescapeHtml(result);
+
+    // 4. Cleanup of common URL-encoded HTML fragments appearing after Tiptap link breaks
+    result = result.replace(/%22%3E/g, '">')
+        .replace(/%3C%2Fa%3E/g, '</a>')
+        .replace(/%3Cbr%3E/g, '<br>')
+        .replace(/%3C\/p%3E/g, '</p>')
+        .replace(/%3E/g, '>');
+
+    // 5. Remove any script tags (handled globally)
     result = result.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
     return result;

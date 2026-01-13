@@ -13,25 +13,32 @@ export default function TableOfContents({ headings, shareUrl }: { headings: Head
     const [activeId, setActiveId] = useState<string>('');
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActiveId(entry.target.id);
+        // Hydration delay: Wait for ReactMarkdown to finish rendering elements
+        const timer = setTimeout(() => {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            setActiveId(entry.target.id);
+                        }
+                    });
+                },
+                { rootMargin: '-120px 0px -70% 0px' }
+            );
+
+            if (headings) {
+                headings.forEach((heading) => {
+                    const element = document.getElementById(heading.id);
+                    if (element) {
+                        observer.observe(element);
                     }
                 });
-            },
-            { rootMargin: '-100px 0px -66% 0px' }
-        );
+            }
 
-        if (headings) {
-            headings.forEach((heading) => {
-                const element = document.getElementById(heading.id);
-                if (element) observer.observe(element);
-            });
-        }
+            return () => observer.disconnect();
+        }, 1200); // 1.2s delay to ensure content is stable and DOM elements are present
 
-        return () => observer.disconnect();
+        return () => clearTimeout(timer);
     }, [headings]);
 
     const scrollToHeading = (id: string, e: React.MouseEvent) => {
@@ -61,7 +68,7 @@ export default function TableOfContents({ headings, shareUrl }: { headings: Head
 
     if (!headings || headings.length === 0) return (
         <div className="sticky top-32 flex flex-col justify-end">
-             <SubscriptionBox />
+            <SubscriptionBox />
         </div>
     );
 
@@ -80,8 +87,8 @@ export default function TableOfContents({ headings, shareUrl }: { headings: Head
                                     href={`#${heading.id}`}
                                     onClick={(e) => scrollToHeading(heading.id, e)}
                                     className={`text-[11px] transition-all duration-300 block leading-tight tracking-wide ${activeId === heading.id
-                                            ? 'text-das-accent font-bold border-l-2 border-das-accent -ml-[17px] pl-[15.5px]'
-                                            : 'text-gray-400 hover:text-das-dark'
+                                        ? 'text-das-accent font-bold border-l-2 border-das-accent -ml-[17px] pl-[15.5px]'
+                                        : 'text-gray-400 hover:text-das-dark'
                                         }`}
                                 >
                                     {heading.text}
