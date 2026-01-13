@@ -11,6 +11,8 @@ import TableOfContents from '@/components/TableOfContents';
 import Link from 'next/link';
 import React from 'react';
 import { Tweet } from 'react-tweet';
+import { YouTubeEmbed } from '@next/third-parties/google';
+import LinkedInEmbed from '@/components/LinkedInEmbed';
 
 export const dynamicParams = true;
 
@@ -414,13 +416,33 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                     iframe: ({ node, ...props }) => {
                                         const src = props.src || '';
                                         if (!src) return null;
+
                                         const isYouTube = src.includes('youtube.com') || src.includes('youtu.be');
+                                        const isLinkedIn = src.includes('linkedin.com');
+
+                                        if (isYouTube) {
+                                            // Extract ID from youtube.com/embed/ID or youtube.com/watch?v=ID or youtu.be/ID
+                                            const ytIdMatch = src.match(/(?:embed\/|v=|youtu\.be\/|watch\?v=)([^&?#]+)/);
+                                            const ytId = ytIdMatch ? ytIdMatch[1] : null;
+
+                                            if (ytId) {
+                                                return (
+                                                    <div className="my-12 flex justify-center w-full aspect-video">
+                                                        <YouTubeEmbed videoid={ytId} style="width: 100%; height: 100%;" />
+                                                    </div>
+                                                );
+                                            }
+                                        }
+
+                                        if (isLinkedIn) {
+                                            return <LinkedInEmbed url={src} />;
+                                        }
 
                                         return (
-                                            <div className={`my-12 flex justify-center w-full ${isYouTube ? 'aspect-video' : ''}`}>
+                                            <div className="my-12 flex justify-center w-full">
                                                 <iframe
                                                     {...props}
-                                                    className={`rounded-sm shadow-lg ${isYouTube ? 'w-full h-full' : 'max-w-full'}`}
+                                                    className="rounded-sm shadow-lg max-w-full"
                                                     style={{ border: 'none', ...props.style }}
                                                 />
                                             </div>
