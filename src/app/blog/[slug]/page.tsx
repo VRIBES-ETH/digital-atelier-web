@@ -34,8 +34,8 @@ const getPlainText = (children: any): string => {
 };
 
 const extractHeadings = (markdown: string) => {
-    // 1. First, strip HTML tags for heading extraction to avoid confusion
-    const cleanMd = markdown.replace(/&lt;[^&gt;]*&gt;/g, '');
+    // 1. Strip HTML tags from the content to isolate potential Markdown headings
+    const cleanMd = markdown.replace(/<[^>]*>/g, '');
     const lines = cleanMd.split('\n');
     const headings: any[] = [];
     lines.forEach(line => {
@@ -151,11 +151,18 @@ const normalizeContent = (content: string) => {
         return `\n\n<blockquote class="twitter-tweet"><a href="${urlMatch[0]}"></a></blockquote>\n\n`;
     });
 
-    // 3. Surgical fix for "FRANKENSTEIN" headings trapped in Tiptap <p> tags
-    // Aggressive unwrap for any heading level (H1-H6)
+    // 3. Surgical fix for "FRANKENSTEIN" headings
+    // Aggressive unwrap: ensure ANY heading (H1-H6) follows a double newline for Markdown compatibility
+    // Case A: Trapped in <p> tags
     result = result.replace(/<p>\s*(#{1,6})\s+(.*?)<\/p>/gi, '\n\n$1 $2\n\n');
 
-    // Ensure headers have newlines if they follow ANY tag without one (Crucial for Markdown)
+    // Case B: Touching ANY previous content or tag without a newline
+    result = result.replace(/([^\n])\s*(#{1,6}\s+)/g, '$1\n\n$2');
+
+    // Case C: Leading whitespace within a line (Tiptap &nbsp; artifact)
+    result = result.replace(/^[ \t]+(#{1,6}\s+)/gm, '$1');
+
+    // Ensure headers after block tags are properly separated
     result = result.replace(/(<\/?[a-z0-9]+[^>]*>)\s*(#{1,6}\s+)/gi, '$1\n\n$2');
 
     // 4. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
