@@ -23,16 +23,30 @@ const slugify = (text: string) => {
         .replace(/(^-|-$)+/g, '');
 };
 
+const getPlainText = (children: any): string => {
+    if (!children) return '';
+    if (typeof children === 'string') return children;
+    if (Array.isArray(children)) return children.map(getPlainText).join('');
+    if (children.props && children.props.children) return getPlainText(children.props.children);
+    return '';
+};
+
 const extractHeadings = (markdown: string) => {
-    const lines = markdown.split('\n');
+    // 1. First, strip HTML tags for heading extraction to avoid confusion
+    const cleanMd = markdown.replace(/<[^>]*>/g, '');
+    const lines = cleanMd.split('\n');
     const headings: any[] = [];
     lines.forEach(line => {
-        const match = line.match(/^(##|###) (.*)/);
+        // Match headings with optional leading whitespace
+        const match = line.match(/^\s*(##|###) (.*)/);
         if (match) {
             const level = match[1].length;
             let text = match[2].trim();
-            // Clean markdown symbols from TOC text
-            text = text.replace(/\*\*|_|__/g, '').replace(/`/g, '');
+            // Clean markdown symbols to get pure text for slugification
+            text = text
+                .replace(/\*\*|_|__/g, '')
+                .replace(/`/g, '')
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
             const id = slugify(text);
             headings.push({ id, text, level });
         }
@@ -187,30 +201,25 @@ export default async function BlogPostPage({ params }: { params: any }) {
             <TwitterHydrator />
             <style dangerouslySetInnerHTML={{
                 __html: `
-                /* Final fix for Twitter and Prose conflicts */
-                .prose blockquote.twitter-tweet {
+                /* Force removal of orange border and styles for Twitter embeds */
+                .prose blockquote.twitter-tweet,
+                .prose .twitter-tweet,
+                .twitter-tweet {
                     border-left: none !important;
                     padding: 0 !important;
-                    margin: 40px auto !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
                     background: transparent !important;
                     font-style: normal !important;
-                    display: block !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+                .prose blockquote.twitter-tweet::before,
+                .prose blockquote.twitter-tweet::after {
+                    content: none !important;
                 }
                 .prose blockquote.twitter-tweet p {
                     font-style: normal !important;
-                    font-family: inherit !important;
-                }
-                /* Ensure executive summaries still look premium */
-                .executive-summary-card {
-                    background: transparent;
-                    border-left: 4px solid #cc8e35;
-                    padding-left: 1.5rem;
-                    margin-top: 4rem;
-                    margin-bottom: 4rem;
-                    font-style: italic;
-                    font-family: "Playfair Display", serif;
-                    font-size: 1.25rem;
-                    color: #1a1a1a;
                 }
             `}} />
 
@@ -295,12 +304,12 @@ export default async function BlogPostPage({ params }: { params: any }) {
                             <ReactMarkdown
                                 components={{
                                     h2: ({ node, children, ...props }) => {
-                                        const text = String(children);
+                                        const text = getPlainText(children);
                                         const id = slugify(text);
                                         return <h2 id={id} className="text-2xl md:text-3xl mt-12 mb-6 tracking-tight font-playfair scroll-mt-24" {...props}>{children}</h2>;
                                     },
                                     h3: ({ node, children, ...props }) => {
-                                        const text = String(children);
+                                        const text = getPlainText(children);
                                         const id = slugify(text);
                                         return <h3 id={id} className="text-xl md:text-2xl mt-10 mb-5 font-playfair scroll-mt-24" {...props}>{children}</h3>;
                                     },
@@ -329,18 +338,16 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         };
                                         const allText = findRawText(node as any);
 
-                                        // Improved Twitter Detection: Identify tweets even if the class is lost during markdown conversion
+                                        // Detection Logic
                                         const isTwitter = className?.includes('twitter-tweet') ||
                                             allText.includes('twitter.com/') ||
-                                            allText.includes('x.com/') ||
-                                            allText.includes('pic.twitter.com') ||
-                                            (allText.includes('Michael Saylor') && allText.includes('MicroStrategy')) ||
-                                            allText.includes('@saylor') ||
-                                            allText.includes('@gerovich');
+                                            allText.includes('x.com/');
+
+                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación/i.test(allText);
 
                                         if (isTwitter) {
                                             return (
-                                                <div className="twitter-embed-container flex justify-center w-full">
+                                                <div className="not-prose flex justify-center w-full my-12">
                                                     <blockquote className="twitter-tweet" {...props}>
                                                         {children}
                                                     </blockquote>
@@ -348,16 +355,16 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             );
                                         }
 
-                                        // Executive Summary Detection
-                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación/i.test(allText);
-
-                                        if (isExecutive && !className?.includes('twitter-tweet')) {
+                                        if (isExecutive) {
                                             return (
-                                                <div className="executive-summary-card">
-                                                    {children}
+                                                <div className="not-prose w-full">
+                                                    <blockquote className="executive-summary-card" {...props}>
+                                                        {children}
+                                                    </blockquote>
                                                 </div>
                                             );
                                         }
+
                                         return <blockquote className={className} {...props}>{children}</blockquote>;
                                     },
                                     a: ({ node, href, children, ...props }) => {
