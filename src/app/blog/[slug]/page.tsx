@@ -10,6 +10,7 @@ import BlogShareButton from '@/components/BlogShareButton';
 import TableOfContents from '@/components/TableOfContents';
 import Link from 'next/link';
 import React from 'react';
+import TwitterHydrator from '@/components/TwitterHydrator';
 
 export const dynamicParams = true;
 
@@ -93,8 +94,8 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
 const unescapeHtml = (html: string) => {
     if (!html) return '';
     let result = html;
-    // Double pass to handle multi-escaped content from the editor/storage
-    for (let i = 0; i < 2; i++) {
+    // Multi-pass unescaping for deeply nested entities
+    for (let i = 0; i < 3; i++) {
         result = result
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
@@ -114,6 +115,21 @@ const unescapeHtml = (html: string) => {
     return result;
 };
 
+// Undo mangling caused by Tiptap-Markdown conversion of Twitter HTML snippets
+const normalizeContent = (content: string) => {
+    if (!content) return '';
+    return unescapeHtml(content)
+        // Fix broken markdown links created from HTML <a> tags inside tweets
+        .replace(/\]\(https:\/\/(twitter\.com|t\.co|x\.com)\/[^)]*?%22%3E([^)]*?)%3C\/a%3E\)/gi, (_, domain, text) => `</a>`)
+        // Fix URL-encoded entities that leaked into the content
+        .replace(/%22%3E/g, '">')
+        .replace(/%3C%2Fa%3E/g, '</a>')
+        .replace(/%3C%2Fp%3E/g, '</p>')
+        .replace(/%3Cbr%3E/g, '<br>')
+        // Fix script tags stripping but keep them safe
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+};
+
 export default async function BlogPostPage({ params }: { params: any }) {
     const { slug } = await params;
     const post = await getPostBySlug(slug);
@@ -122,10 +138,8 @@ export default async function BlogPostPage({ params }: { params: any }) {
         notFound();
     }
 
-    // 1. Pre-process content: Strip scripts and unescape
-    const rawContent = post.content || '';
-    const cleanContent = unescapeHtml(rawContent)
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    // 1. Pre-process content: Clean up mangling and unescape
+    const cleanContent = normalizeContent(post.content || '');
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -162,6 +176,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
 
     return (
         <div className="min-h-screen bg-white">
+            <TwitterHydrator />
             <style dangerouslySetInnerHTML={{
                 __html: `
                 /* Final fix for Twitter and Prose conflicts */
@@ -308,7 +323,26 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         };
                                         const allText = findRawText(node as any);
 
-                                        // Executive Summary Detection (No Twitter wrapper anymore, handled by CSS)
+                                        // Improved Twitter Detection: Identify tweets even if the class is lost during markdown conversion
+                                        const isTwitter = className?.includes('twitter-tweet') ||
+                                            allText.includes('twitter.com/') ||
+                                            allText.includes('x.com/') ||
+                                            allText.includes('pic.twitter.com') ||
+                                            (allText.includes('Michael Saylor') && allText.includes('MicroStrategy')) ||
+                                            allText.includes('@saylor') ||
+                                            allText.includes('@gerovich');
+
+                                        if (isTwitter) {
+                                            return (
+                                                <div className="twitter-embed-container flex justify-center w-full">
+                                                    <blockquote className="twitter-tweet" {...props}>
+                                                        {children}
+                                                    </blockquote>
+                                                </div>
+                                            );
+                                        }
+
+                                        // Executive Summary Detection
                                         const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación/i.test(allText);
 
                                         if (isExecutive && !className?.includes('twitter-tweet')) {
