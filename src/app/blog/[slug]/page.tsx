@@ -335,7 +335,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                     h4: ({ node, children, ...props }) => {
                                         const text = getPlainText(children);
                                         const id = slugify(text);
-                                        return <h4 id={id} className="text-lg md:text-xl mt-8 mb-4 font-playfair font-bold text-das-dark/90 scroll-mt-24" {...props}>{children}</h4>;
+                                        return <h4 id={id} className="text-lg md:text-xl mt-8 mb-4 font-playfair font-bold scroll-mt-24" {...props}>{children}</h4>;
                                     },
                                     p: ({ node, children, ...props }) => {
                                         // Prevent hydration mismatch for block elements inside p
