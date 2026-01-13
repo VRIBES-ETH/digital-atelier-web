@@ -140,36 +140,32 @@ const normalizeContent = (content: string) => {
     // 1. Initial manual cleanup of common Tiptap-Markdown hybrid trash
     let result = content;
 
-    // Fix broken markdown links: [text](URL">text) -> <a href="URL">text</a>
-    result = result.replace(/\[([^\]]*?)\]\((https?:\/\/[^\s\)]+?)(?:%22|")>([^)]*?)\)/gi, '<a href="$2">$1</a>');
+    // Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
+    // We only target the specific sequence that includes "> 
+    result = result.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+?)(?:%22|")>[^)]+\)/gi, (match, text, url) => {
+        return `<a href="${url}">${text}</a>`;
+    });
 
-    // Fix orphan markdown links from Tiptap "helpfulness": text](URL) -> <a href="URL">text</a>
-    result = result.replace(/([A-Z0-9][^\]\n]*?)\]\((https?:\/\/[^\s\)]+?)\)/gi, '<a href="$2">$1</a>');
+    // 2. SURGICAL TWITTER SALVAGE
+    // We ONLY replace the Twitter URL with a blockquote if the URL is on its own line or in its own markdown link block.
+    // This stops it from breaking links in the middle of sentences.
+    const twitterStatusRegex = /(?:\[[^\]]*\]\()?https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/\d+(?:[^\s\n<\]\)]*)(?:\))?/gi;
 
-    // 2. TWITTER STATUS SALVAGE (The Final Fix)
-    // We identify status URLs even if they are buried in debris.
-    // For every Twitter status URL, we reconstruct a clean blockquote.
-    const twitterStatusRegex = /https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/(\d+)(?:[^\s\n<]*)/gi;
-    const matches = Array.from(result.matchAll(twitterStatusRegex));
+    result = result.replace(twitterStatusRegex, (all) => {
+        const urlMatch = all.match(/https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/\d+/i);
+        if (!urlMatch) return all;
 
-    const processedIds = new Set();
-    matches.forEach(match => {
-        const id = match[1];
-        // Clean the individual URL found from any trailing markdown/html junk
-        const fullUrl = match[0].split(/[">\]\)]/)[0];
+        // If the match is just the URL without much else, replace it. 
+        // If it's a very long string, it might be a sentence we accidentally caught.
+        if (all.length > 150) return all;
 
-        if (processedIds.has(id)) return;
-        processedIds.add(id);
-
-        // Replace the cluster that contains this ID (greedily consuming debris around it)
-        const clusterRegex = new RegExp(`[^\n]*?${id}[^\n]*`, 'gi');
-        result = result.replace(clusterRegex, `\n\n<blockquote class="twitter-tweet"><a href="${fullUrl}"></a></blockquote>\n\n`);
+        return `<blockquote class="twitter-tweet"><a href="${urlMatch[0]}"></a></blockquote>`;
     });
 
     // 3. Deep Unescape Layer (Recursive while loop)
     result = unescapeHtml(result);
 
-    // 4. Cleanup of common URL-encoded HTML fragments appearing after Tiptap link breaks
+    // 4. Cleanup of common URL-encoded HTML fragments
     result = result.replace(/%22%3E/g, '">')
         .replace(/%3C%2Fa%3E/g, '</a>')
         .replace(/%3Cbr%3E/g, '<br>')
@@ -272,9 +268,9 @@ export default async function BlogPostPage({ params }: { params: any }) {
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto px-6 py-20">
+            <main className="max-w-7xl mx-auto px-6 pt-10 pb-20">
                 {/* 1. Header Section - CENTERED */}
-                <header className="mb-16 text-center max-w-4xl mx-auto">
+                <header className="mb-12 text-center max-w-4xl mx-auto">
                     <div className="flex items-center justify-center gap-3 mb-6">
                         <span className="text-[10px] font-bold text-das-accent uppercase tracking-widest px-2 py-0.5 bg-das-accent/5 rounded-sm font-barlow">
                             {post.category || "Market Intelligence"}
@@ -290,18 +286,18 @@ export default async function BlogPostPage({ params }: { params: any }) {
                         </div>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-[72px] font-playfair font-bold text-das-dark leading-[1.05] mb-8 tracking-tight">
+                    <h1 className="text-3xl md:text-5xl lg:text-[54px] font-playfair font-bold text-das-dark leading-[1.1] mb-6 tracking-tight">
                         {post.title}
                     </h1>
 
-                    <p className="text-xl md:text-2xl text-gray-500 font-raleway leading-relaxed max-w-3xl mx-auto">
+                    <p className="text-lg md:text-xl text-gray-500 font-raleway leading-relaxed max-w-3xl mx-auto">
                         {post.excerpt}
                     </p>
                 </header>
 
                 {/* 2. Featured Image - HERO WIDTH */}
                 {post.featured_image && (
-                    <div className="mb-20 relative aspect-[21/9] overflow-hidden rounded-sm shadow-2xl border border-gray-100">
+                    <div className="mb-16 relative aspect-[21/9] overflow-hidden rounded-sm shadow-2xl border border-gray-100">
                         <img
                             src={post.featured_image}
                             alt={post.title}
@@ -328,7 +324,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                             prose-ul:list-disc prose-li:text-gray-700
                             prose-li:marker:text-das-accent
                             prose-img:rounded-sm prose-img:w-full prose-img:my-10 prose-img:shadow-sm
-                            prose-a:text-das-accent prose-a:no-underline prose-a:border-b prose-a:border-das-accent/30 hover:prose-a:border-das-accent hover:prose-a:text-das-accent/80 transition-all
+                            prose-a:text-das-accent prose-a:no-underline prose-a:underline prose-a:underline-offset-4 prose-a:decoration-das-accent/30 hover:prose-a:decoration-das-accent hover:prose-a:text-das-accent/80 transition-all
                             prose-blockquote:border-l-4 prose-blockquote:border-das-accent prose-blockquote:bg-transparent prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:italic prose-blockquote:font-playfair prose-blockquote:text-xl prose-blockquote:text-das-dark
                         ">
                             <ReactMarkdown
@@ -399,12 +395,21 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                     },
                                     a: ({ node, href, children, ...props }) => {
                                         const isInternal = href?.startsWith('/') || href?.includes('digitalateliersolutions.agency');
+
+                                        // Safety check: Filter out malformed attributes that could cause hydration / React errors
+                                        const safeProps = Object.entries(props).reduce((acc: any, [key, value]) => {
+                                            // If the key contains a quote or weird character, it's a parsing artifact
+                                            if (!/^[a-zA-Z0-9-]+$/.test(key)) return acc;
+                                            acc[key] = value;
+                                            return acc;
+                                        }, {});
+
                                         return (
                                             <a
                                                 href={href}
                                                 target={isInternal ? undefined : '_blank'}
                                                 rel={isInternal ? undefined : 'noopener noreferrer'}
-                                                {...props}
+                                                {...safeProps}
                                             >
                                                 {children}
                                             </a>

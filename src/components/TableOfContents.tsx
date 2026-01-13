@@ -73,13 +73,13 @@ export default function TableOfContents({ headings, shareUrl }: { headings: Head
     );
 
     return (
-        <div className="sticky top-32 flex flex-col">
-            {/* TOC Navigation - Full height (companion mode) */}
-            <div className="flex flex-col">
+        <div className="sticky top-12 flex flex-col h-[calc(100vh-140px)]">
+            {/* TOC Navigation - Scrollable core */}
+            <div className="flex flex-col flex-1 overflow-hidden">
                 <h4 className="font-barlow font-bold text-[10px] uppercase tracking-[0.25em] text-gray-400 mb-6 shrink-0">
                     En este artículo
                 </h4>
-                <nav className="border-l border-gray-100 pr-2">
+                <nav className="border-l border-gray-100 pr-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-100 flex-1">
                     <ul className="space-y-3">
                         {headings.map((heading) => (
                             <li key={heading.id} className={`pl-4 ${heading.level === 3 ? 'ml-4' : ''}`}>
@@ -99,8 +99,8 @@ export default function TableOfContents({ headings, shareUrl }: { headings: Head
                 </nav>
             </div>
 
-            {/* Sticky Actions & CTA */}
-            <div className="pt-6 mt-6 border-t border-gray-100 shrink-0 space-y-6">
+            {/* Fixed Actions & CTA at the bottom */}
+            <div className="pt-6 mt-6 border-t border-gray-100 shrink-0 space-y-6 bg-white">
                 <a
                     href={shareUrl}
                     target="_blank"
