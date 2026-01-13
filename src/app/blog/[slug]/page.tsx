@@ -242,10 +242,11 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         };
                                         const allText = findRawText(node as any);
 
-                                        // 1. Check if it's a Twitter tweet (either by class or by containing twitter handles/links)
+                                        // 1. Check if it's a Twitter tweet (HIGHER PRIORITY)
                                         const isTwitter = className?.includes('twitter-tweet') ||
                                             allText.includes('twitter.com') ||
-                                            allText.includes('x.com');
+                                            allText.includes('x.com') ||
+                                            allText.includes('@saylor');
 
                                         if (isTwitter) {
                                             return <blockquote className="twitter-tweet" {...props}>{children}</blockquote>;
@@ -263,6 +264,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         }
                                         return <blockquote {...props}>{children}</blockquote>;
                                     },
+                                    script: () => null, // Prevents console error from pasted embed scripts
                                     a: ({ node, href, children, ...props }) => {
                                         const isInternal = href?.startsWith('/') || href?.includes('digitalateliersolutions.agency');
                                         return (
@@ -294,7 +296,12 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                 }}
                                 rehypePlugins={[rehypeRaw]}
                             >
-                                {post.content.replace(/&lt;/g, '<').replace(/&gt;/g, '>')}
+                                {post.content
+                                    .replace(/&lt;/g, '<')
+                                    .replace(/&gt;/g, '>')
+                                    .replace(/&quot;/g, '"')
+                                    .replace(/&amp;/g, '&')
+                                    .replace(/&#39;/g, "'")}
                             </ReactMarkdown>
 
                             {/* Dynamic CTA Injection */}
