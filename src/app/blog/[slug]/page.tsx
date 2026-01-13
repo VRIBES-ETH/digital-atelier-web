@@ -92,21 +92,26 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
 
 const unescapeHtml = (html: string) => {
     if (!html) return '';
-    return html
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&amp;/g, '&')
-        .replace(/&#39;/g, "'")
-        .replace(/&rsquo;/g, "'")
-        .replace(/&lsquo;/g, "'")
-        .replace(/&ldquo;/g, '"')
-        .replace(/&rdquo;/g, '"')
-        .replace(/&mdash;/g, '—')
-        .replace(/&ndash;/g, '–')
-        .replace(/&nbsp;/g, ' ')
-        .replace(/&bull;/g, '•')
-        .replace(/&hellip;/g, '…');
+    let result = html;
+    // Double pass to handle multi-escaped content from the editor/storage
+    for (let i = 0; i < 2; i++) {
+        result = result
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&#39;/g, "'")
+            .replace(/&rsquo;/g, "'")
+            .replace(/&lsquo;/g, "'")
+            .replace(/&ldquo;/g, '"')
+            .replace(/&rdquo;/g, '"')
+            .replace(/&mdash;/g, '—')
+            .replace(/&ndash;/g, '–')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&bull;/g, '•')
+            .replace(/&hellip;/g, '…');
+    }
+    return result;
 };
 
 export default async function BlogPostPage({ params }: { params: any }) {
@@ -118,7 +123,8 @@ export default async function BlogPostPage({ params }: { params: any }) {
     }
 
     // 1. Pre-process content: Strip scripts and unescape
-    const cleanContent = unescapeHtml(post.content)
+    const rawContent = post.content || '';
+    const cleanContent = unescapeHtml(rawContent)
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
     const jsonLd = {
@@ -150,8 +156,9 @@ export default async function BlogPostPage({ params }: { params: any }) {
 
     const postUrl = `https://www.digitalateliersolutions.agency/blog/${post.slug}`;
     const shareText = `Análisis Estratégico: ${post.title}`;
-    const headings = extractHeadings(post.content);
-    const readingTime = calculateReadingTime(post.content);
+    // Extract headings from the CLEAN content to ensure IDs and text match the rendered output
+    const headings = extractHeadings(cleanContent);
+    const readingTime = calculateReadingTime(cleanContent);
 
     return (
         <div className="min-h-screen bg-white">
@@ -275,11 +282,16 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         return <h3 id={id} className="text-xl md:text-2xl mt-10 mb-5 font-playfair scroll-mt-24" {...props}>{children}</h3>;
                                     },
                                     p: ({ node, children, ...props }) => {
-                                        // Simplified prevention of hydration mismatch
+                                        // CRITICAL: Prevent hydration mismatch in React 19 / Next.js
+                                        // If this paragraph contains a block element (like figure from img)
+                                        // or other block tags provided by rehype-raw, we must use a div.
                                         const hasBlock = node?.children?.some((child: any) =>
-                                            ['div', 'blockquote', 'figure', 'section', 'iframe', 'header', 'footer'].includes(child.tagName)
+                                            ['div', 'blockquote', 'figure', 'section', 'iframe', 'header', 'footer', 'img'].includes(child.tagName)
                                         );
-                                        if (hasBlock) return <div className="mb-6">{children}</div>;
+
+                                        if (hasBlock) {
+                                            return <div className="mb-6 leading-8 font-raleway text-gray-800">{children}</div>;
+                                        }
                                         return <p className="mb-6" {...props}>{children}</p>;
                                     },
                                     img: ({ node, ...props }) => (
