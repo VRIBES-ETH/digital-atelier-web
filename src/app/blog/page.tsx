@@ -48,10 +48,15 @@ export default async function BlogIndexPage() {
                                     </div>
                                 )}
                                 <div className="flex-1 flex flex-col pt-2">
-                                    <div className="text-[10px] font-bold text-gray-400 font-barlow tracking-[0.2em] uppercase mb-4">
-                                        {new Date(post.created_at).toLocaleDateString('es-ES', {
-                                            month: 'long', year: 'numeric'
-                                        })}
+                                    <div className="flex justify-between items-center mb-4">
+                                        <div className="text-[10px] font-bold text-gray-400 font-barlow tracking-[0.2em] uppercase">
+                                            {new Date(post.created_at).toLocaleDateString('es-ES', {
+                                                month: 'long', year: 'numeric'
+                                            })}
+                                        </div>
+                                        <div className="text-[10px] font-bold text-das-accent font-barlow tracking-[0.2em] uppercase px-2 py-0.5 bg-das-accent/5 rounded-sm">
+                                            {post.category || "Market Intelligence"}
+                                        </div>
                                     </div>
                                     <h2 className="font-playfair font-bold text-2xl mb-3 text-das-dark group-hover:text-das-accent transition-colors leading-[1.15]">
                                         {post.title}
