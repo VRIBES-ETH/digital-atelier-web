@@ -94,8 +94,8 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
 const unescapeHtml = (html: string) => {
     if (!html) return '';
     let result = html;
-    // Multi-pass unescaping for deeply nested entities
-    for (let i = 0; i < 3; i++) {
+    // Multi-pass unescaping for deeply nested entities (common in Tiptap/Supabase)
+    for (let i = 0; i < 4; i++) {
         result = result
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
@@ -110,7 +110,12 @@ const unescapeHtml = (html: string) => {
             .replace(/&ndash;/g, '–')
             .replace(/&nbsp;/g, ' ')
             .replace(/&bull;/g, '•')
-            .replace(/&hellip;/g, '…');
+            .replace(/&hellip;/g, '…')
+            .replace(/&amp;mdash;/g, '—')
+            .replace(/&amp;ndash;/g, '–')
+            .replace(/&amp;quot;/g, '"')
+            .replace(/&amp;lt;/g, '<')
+            .replace(/&amp;gt;/g, '>');
     }
     return result;
 };
@@ -118,16 +123,24 @@ const unescapeHtml = (html: string) => {
 // Undo mangling caused by Tiptap-Markdown conversion of Twitter HTML snippets
 const normalizeContent = (content: string) => {
     if (!content) return '';
-    return unescapeHtml(content)
-        // Fix broken markdown links created from HTML <a> tags inside tweets
-        .replace(/\]\(https:\/\/(twitter\.com|t\.co|x\.com)\/[^)]*?%22%3E([^)]*?)%3C\/a%3E\)/gi, (_, domain, text) => `</a>`)
-        // Fix URL-encoded entities that leaked into the content
-        .replace(/%22%3E/g, '">')
+    let result = unescapeHtml(content);
+
+    // Fix broken markdown links created from HTML <a> tags inside tweets
+    // Matches: [text](url">text)
+    result = result.replace(/\[([^\]]*?)\]\((https?:\/\/[^\s\)]+?)">[^)]*?\)/gi, '<a href="$2">$1</a>');
+
+    // Fix URL-encoded entities and HTML that leaked into the content
+    result = result.replace(/%22%3E/g, '">')
         .replace(/%3C%2Fa%3E/g, '</a>')
         .replace(/%3C%2Fp%3E/g, '</p>')
         .replace(/%3Cbr%3E/g, '<br>')
-        // Fix script tags stripping but keep them safe
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        .replace(/%3Cblockquote/g, '<blockquote')
+        .replace(/%3C\/blockquote%3E/g, '</blockquote>');
+
+    // Remove any remaining script tags (we handle them via TwitterHydrator)
+    result = result.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+
+    return result;
 };
 
 export default async function BlogPostPage({ params }: { params: any }) {
@@ -297,9 +310,34 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         return <h3 id={id} className="text-xl md:text-2xl mt-10 mb-5 font-playfair scroll-mt-24" {...props}>{children}</h3>;
                                     },
                                     p: ({ node, children, ...props }) => {
-                                        // CRITICAL: Prevent hydration mismatch in React 19 / Next.js
-                                        // If this paragraph contains a block element (like figure from img)
-                                        // or other block tags provided by rehype-raw, we must use a div.
+                                        // 1. Aggressive Twitter Restoration
+                                        // If a paragraph contains a Twitter status URL, it's likely part of a mangled tweet.
+                                        // We discard the text and reconstruct a clean interactive blockquote.
+                                        const findTwitterStatusUrl = (n: any): string | null => {
+                                            if (n.tagName === 'a' && (n.properties?.href?.includes('twitter.com') || n.properties?.href?.includes('x.com')) && n.properties?.href?.includes('/status/')) {
+                                                return n.properties.href;
+                                            }
+                                            if (n.children) {
+                                                for (const child of n.children) {
+                                                    const url = findTwitterStatusUrl(child);
+                                                    if (url) return url;
+                                                }
+                                            }
+                                            return null;
+                                        };
+
+                                        const twitterUrl = findTwitterStatusUrl(node);
+                                        if (twitterUrl) {
+                                            return (
+                                                <div className="twitter-embed-container flex justify-center w-full my-12" key={twitterUrl}>
+                                                    <blockquote className="twitter-tweet">
+                                                        <a href={twitterUrl}></a>
+                                                    </blockquote>
+                                                </div>
+                                            );
+                                        }
+
+                                        // 2. Prevent hydration mismatch for other block elements
                                         const hasBlock = node?.children?.some((child: any) =>
                                             ['div', 'blockquote', 'figure', 'section', 'iframe', 'header', 'footer', 'img'].includes(child.tagName)
                                         );
@@ -307,7 +345,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         if (hasBlock) {
                                             return <div className="mb-6 leading-8 font-raleway text-gray-800">{children}</div>;
                                         }
-                                        return <p className="mb-6" {...props}>{children}</p>;
+                                        return <p className="mb-6 font-raleway text-gray-800 leading-8" {...props}>{children}</p>;
                                     },
                                     img: ({ node, ...props }) => (
                                         <figure className="my-16">
