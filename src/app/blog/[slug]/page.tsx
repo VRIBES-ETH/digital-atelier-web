@@ -91,17 +91,19 @@ export async function generateMetadata({ params }: { params: any }): Promise<Met
 }
 
 const unescapeHtml = (html: string) => {
+    if (!html) return '';
     return html
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/&quot;/g, '"')
         .replace(/&amp;/g, '&')
         .replace(/&#39;/g, "'")
+        .replace(/&rsquo;/g, "'")
+        .replace(/&lsquo;/g, "'")
+        .replace(/&ldquo;/g, '"')
+        .replace(/&rdquo;/g, '"')
         .replace(/&mdash;/g, '—')
-        .replace(/&ldquo;/g, '“')
-        .replace(/&rdquo;/g, '”')
-        .replace(/&lsquo;/g, '‘')
-        .replace(/&rsquo;/g, '’')
+        .replace(/&ndash;/g, '–')
         .replace(/&nbsp;/g, ' ')
         .replace(/&bull;/g, '•')
         .replace(/&hellip;/g, '…');
@@ -176,7 +178,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                             {post.category || "Market Intelligence"}
                         </span>
                         <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-barlow">
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-barlow" suppressHydrationWarning>
                             {new Date(post.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase()}
                         </div>
                         <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
@@ -239,6 +241,14 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         const id = slugify(text);
                                         return <h3 id={id} className="text-xl md:text-2xl mt-10 mb-5 font-playfair scroll-mt-24" {...props}>{children}</h3>;
                                     },
+                                    p: ({ node, children, ...props }) => {
+                                        // Prevention of hydration mismatch by checking for block elements inside p
+                                        const hasBlock = node?.children?.some((child: any) =>
+                                            ['div', 'blockquote', 'figure', 'section', 'iframe'].includes(child.tagName)
+                                        );
+                                        if (hasBlock) return <div className="mb-6">{children}</div>;
+                                        return <p className="mb-6" {...props}>{children}</p>;
+                                    },
                                     img: ({ node, ...props }) => (
                                         <figure className="my-16">
                                             <img className="w-full rounded-sm shadow-sm" {...props} />
@@ -257,12 +267,13 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         const isTwitter = className?.includes('twitter-tweet') ||
                                             allText.includes('twitter.com') ||
                                             allText.includes('x.com') ||
-                                            allText.includes('@saylor');
+                                            allText.includes('@saylor') ||
+                                            allText.includes('Michael Saylor');
 
                                         if (isTwitter) {
                                             return (
-                                                <div className="not-prose my-16 twitter-embed-wrapper">
-                                                    <blockquote className="twitter-tweet" {...props}>
+                                                <div className="not-prose my-16 twitter-embed-wrapper block">
+                                                    <blockquote className="twitter-tweet mx-auto" {...props}>
                                                         {children}
                                                     </blockquote>
                                                 </div>
@@ -297,6 +308,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                     },
                                     iframe: ({ node, ...props }) => {
                                         const src = props.src || '';
+                                        if (!src) return null;
                                         const isYouTube = src.includes('youtube.com') || src.includes('youtu.be');
 
                                         return (
