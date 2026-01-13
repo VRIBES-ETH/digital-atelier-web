@@ -165,7 +165,15 @@ const normalizeContent = (content: string) => {
     // Ensure headers after block tags are properly separated
     result = result.replace(/(<\/?[a-z0-9]+[^>]*>)\s*(#{1,6}\s+)/gi, '$1\n\n$2');
 
-    // 4. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
+    // 4. EXECUTIVE SUMMARY HEALING LAYER
+    // If we see a "Resumen Ejecutivo" heading followed by a blockquote,
+    // ensure the blockquote has the "Resumen Ejecutivo" anchor so the renderer catches it.
+    // This fixes the issue where Tiptap moves the heading outside the blockquote.
+    const executiveKeywords = 'Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways';
+    const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords})\\s*?\\n+)(>)(?!\\s*\\*\\*(?:${executiveKeywords}))`, 'gi');
+    result = result.replace(executiveRegex, '$1> **Resumen Ejecutivo**\n\n>');
+
+    // 5. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
     result = result.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+?)(?:%22|")>[^)]+\)/gi, (match, text, url) => {
         return `<a href="${url}">${text}</a>`;
     });
@@ -369,7 +377,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             childrenHrefs.includes('twitter.com/') ||
                                             childrenHrefs.includes('x.com/');
 
-                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación/i.test(allText);
+                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways/i.test(allText);
 
                                         if (isTwitter) {
                                             // Extract ID from text or link properties
