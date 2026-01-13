@@ -39,8 +39,8 @@ const extractHeadings = (markdown: string) => {
     const lines = cleanMd.split('\n');
     const headings: any[] = [];
     lines.forEach(line => {
-        // Match headings with optional leading whitespace
-        const match = line.match(/^\s*(##|###) (.*)/);
+        // Match headings with optional leading whitespace (supports H2, H3, H4)
+        const match = line.match(/^\s*(##|###|####) (.*)/);
         if (match) {
             const level = match[1].length;
             let text = match[2].trim();
@@ -141,6 +141,13 @@ const normalizeContent = (content: string) => {
 
     // 1. Initial manual cleanup of common Tiptap-Markdown hybrid trash
     let result = content;
+
+    // Surgical fix for "FRANKENSTEIN" headings trapped in Tiptap <p> tags
+    // This looks for <p>### Heading</p> and unwraps it for the markdown parser
+    result = result.replace(/<p>\s*(#{1,6})\s+(.*?)<\/p>/gi, '\n\n$1 $2\n\n');
+
+    // Ensure headers have newlines if they follow a block element without one
+    result = result.replace(/(<\/figure>|<\/img>|<\/blockquote>|<\/div>)(#{1,6}\s+)/gi, '$1\n\n$2');
 
     // Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
     // We only target the specific sequence that includes "> 
@@ -324,6 +331,11 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         const text = getPlainText(children);
                                         const id = slugify(text);
                                         return <h3 id={id} className="text-xl md:text-2xl mt-10 mb-5 font-playfair scroll-mt-24" {...props}>{children}</h3>;
+                                    },
+                                    h4: ({ node, children, ...props }) => {
+                                        const text = getPlainText(children);
+                                        const id = slugify(text);
+                                        return <h4 id={id} className="text-lg md:text-xl mt-8 mb-4 font-playfair font-bold text-das-dark/90 scroll-mt-24" {...props}>{children}</h4>;
                                     },
                                     p: ({ node, children, ...props }) => {
                                         // Prevent hydration mismatch for block elements inside p

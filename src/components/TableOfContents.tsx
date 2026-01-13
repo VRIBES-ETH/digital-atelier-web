@@ -82,7 +82,7 @@ export default function TableOfContents({ headings, shareUrl }: { headings: Head
                 <nav className="border-l border-gray-100 pr-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-100 flex-1">
                     <ul className="space-y-3">
                         {headings.map((heading) => (
-                            <li key={heading.id} className={`pl-4 ${heading.level === 3 ? 'ml-4' : ''}`}>
+                            <li key={heading.id} className={`pl-4 ${heading.level === 3 ? 'ml-4' : heading.level === 4 ? 'ml-8' : ''}`}>
                                 <a
                                     href={`#${heading.id}`}
                                     onClick={(e) => scrollToHeading(heading.id, e)}
