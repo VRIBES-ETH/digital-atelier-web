@@ -29,7 +29,9 @@ const extractHeadings = (markdown: string) => {
         const match = line.match(/^(##|###) (.*)/);
         if (match) {
             const level = match[1].length;
-            const text = match[2].trim();
+            let text = match[2].trim();
+            // Clean markdown symbols from TOC text
+            text = text.replace(/\*\*|_|__/g, '').replace(/`/g, '');
             const id = slugify(text);
             headings.push({ id, text, level });
         }
@@ -233,22 +235,28 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         </figure>
                                     ),
                                     blockquote: ({ node, className, children, ...props }) => {
-                                        // Check if it's a Twitter tweet
-                                        if (className === 'twitter-tweet') {
-                                            return <blockquote className={className} {...props}>{children}</blockquote>;
-                                        }
-
                                         const findRawText = (n: any): string => {
                                             if (n.value) return n.value;
                                             if (n.children) return n.children.map(findRawText).join(' ');
                                             return '';
                                         };
                                         const allText = findRawText(node as any);
-                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas/i.test(allText);
+
+                                        // 1. Check if it's a Twitter tweet (either by class or by containing twitter handles/links)
+                                        const isTwitter = className?.includes('twitter-tweet') ||
+                                            allText.includes('twitter.com') ||
+                                            allText.includes('x.com');
+
+                                        if (isTwitter) {
+                                            return <blockquote className="twitter-tweet" {...props}>{children}</blockquote>;
+                                        }
+
+                                        // 2. Detect Executive Summary variants
+                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación/i.test(allText);
 
                                         if (isExecutive) {
                                             return (
-                                                <div className="executive-summary-card not-prose">
+                                                <div className="executive-summary-card not-prose my-16">
                                                     {children}
                                                 </div>
                                             );
