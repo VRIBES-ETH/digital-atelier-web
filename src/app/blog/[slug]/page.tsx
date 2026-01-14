@@ -169,14 +169,24 @@ const normalizeContent = (content: string) => {
     // Consume redundant headings and inject a hidden marker + professional header 
     // into the blockquote. This ensures a single, unified premium card.
     const executiveKeywords = 'Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways';
-    // Robust regex: matches Heading + optional whitespace + one or more newlines + blockquote start
-    const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords}).*?)\\s*?(\\n\\s*)+(>|<blockquote>)`, 'gi');
-    result = result.replace(executiveRegex, (match, h, b) => {
-        const header = '**Resumen Ejecutivo**';
+    // Robust regex: matches Heading (Markdown OR HTML) + text + blockquote start
+    // Robust regex: matches Heading (Markdown OR HTML) + text + blockquote start
+    // Matches:
+    // 1. ## Resumen Ejecutivo... \n >
+    // 2. <h3>Resumen Ejecutivo...</h3> \n <blockquote>
+    // Fixed to allow inner formatting like **bold** or <strong>
+    const executiveRegex = new RegExp(`((?:##+\\s+|\\s*<h[2-6][^>]*>\\s*)(?:[*_]|<[^>]+>|\\s)*(?:${executiveKeywords})[\\s\\S]*?(?:\\n|<\\/h[2-6]>))\\s*(\\n\\s*)*(>|<blockquote\\b[^>]*>)`, 'gi');
+    result = result.replace(executiveRegex, (match, h, spacing, b) => {
+        // Extract the actual text from the heading to preserve user's title
+        let titleText = h.replace(/<[^>]+>|#+\s*/g, '').trim();
+        if (!titleText) titleText = 'Resumen Ejecutivo';
+
+        // If blockquote is HTML <blockquote> or <blockquote ...>
         if (b.startsWith('<blockquote')) {
-            return `<blockquote data-type="executive">\n<p><strong>${header}</strong></p>\n`;
+            return `<blockquote data-type="executive">\n<p><strong>${titleText}</strong></p>\n`;
         }
-        return `> :::EXECUTIVE:::\n> \n> **${header}**\n> \n> `;
+        // If blockquote is Markdown >
+        return `> :::EXECUTIVE:::\n> \n> **${titleText}**\n> \n> `;
     });
 
     // 5. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
@@ -191,8 +201,8 @@ const normalizeContent = (content: string) => {
         .replace(/%3C\/p%3E/g, '</p>')
         .replace(/%3E/g, '>');
 
-    // 6. Final security cleanup
-    result = result.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    // 1. Basic security: Remove script tags
+    result = result.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gmi, "");
 
     return result;
 };
