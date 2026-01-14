@@ -166,19 +166,11 @@ const normalizeContent = (content: string) => {
     result = result.replace(/(<\/?[a-z0-9]+[^>]*>)\s*(#{1,6}\s+)/gi, '$1\n\n$2');
 
     // 4. EXECUTIVE SUMMARY HEALING LAYER
-    // If we see a "Resumen Ejecutivo" heading followed by a blockquote,
-    // mark the blockquote with data-type="executive" so the renderer catches it.
+    // Inject a hidden "Magic Anchor" for the renderer to catch.
+    // This is safer than injecting HTML as it won't break the React hierarchy.
     const executiveKeywords = 'Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways';
-    const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords})\\s*?\\n+)(<blockquote>|>)`, 'gi');
-    result = result.replace(executiveRegex, (match, h, b) => {
-        if (b.startsWith('<blockquote')) {
-            return `${h}<blockquote data-type="executive"`;
-        }
-        return `${h}\n\n<blockquote data-type="executive">\n\n`;
-    });
-
-    // We also need to fix the closing tag if we opened one manually
-    result = result.replace(/<blockquote data-type="executive">\n\n([^<]+)\n\n/g, '<blockquote data-type="executive">$1</blockquote>');
+    const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords}).*?\\n+)(>|<blockquote>)`, 'gi');
+    result = result.replace(executiveRegex, '$1$2 /**EXECUTIVE**/ ');
 
     // 5. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
     result = result.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+?)(?:%22|")>[^)]+\)/gi, (match, text, url) => {
@@ -384,7 +376,14 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             childrenHrefs.includes('twitter.com/') ||
                                             childrenHrefs.includes('x.com/');
 
-                                        const isExecutive = (props as any)['data-type'] === 'executive' || /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways/i.test(allText);
+                                        const isExecutive = allText.includes('/**EXECUTIVE**/') ||
+                                            /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Key Takeaways/i.test(allText);
+
+                                        // Simple removal of the magic string from the children for clean rendering
+                                        const cleanChildren = React.Children.map(children, (child) => {
+                                            if (typeof child === 'string') return child.replace('/**EXECUTIVE**/', '');
+                                            return child;
+                                        });
 
                                         if (isTwitter) {
                                             // Extract ID from text or link properties
@@ -405,7 +404,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             return (
                                                 <div className="not-prose w-full">
                                                     <blockquote className="executive-summary-card" {...props}>
-                                                        {children}
+                                                        {cleanChildren}
                                                     </blockquote>
                                                 </div>
                                             );
@@ -414,7 +413,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         // Safety: If it's an empty blockquote (Tiptap artifact), don't render it
                                         if (!allText.trim() && !childrenHrefs.trim()) return null;
 
-                                        return <blockquote className={className} {...props}>{children}</blockquote>;
+                                        return <blockquote className={className} {...props}>{cleanChildren}</blockquote>;
                                     },
                                     a: ({ node, href, children, ...props }) => {
                                         const isInternal = href?.startsWith('/') || href?.includes('digitalateliersolutions.agency');
