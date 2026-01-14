@@ -166,11 +166,19 @@ const normalizeContent = (content: string) => {
     result = result.replace(/(<\/?[a-z0-9]+[^>]*>)\s*(#{1,6}\s+)/gi, '$1\n\n$2');
 
     // 4. EXECUTIVE SUMMARY HEALING LAYER
-    // Inject a hidden "Magic Anchor" for the renderer to catch.
-    // This is safer than injecting HTML as it won't break the React hierarchy.
+    // Robustly ensure the premium card styling by injecting the "Resumen Ejecutivo" header
+    // into the start of the blockquote. This is the most reliable way to trigger our CSS
+    // and ensure a single, unified blockquote.
     const executiveKeywords = 'Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways';
     const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords}).*?\\n+)(>|<blockquote>)`, 'gi');
-    result = result.replace(executiveRegex, '$1$2 /**EXECUTIVE**/ ');
+    result = result.replace(executiveRegex, (match, h, b) => {
+        // We inject the bold header which triggers our .executive-summary-card strong:first-child CSS
+        const header = '**Resumen Ejecutivo**';
+        if (b.startsWith('<blockquote')) {
+            return `${h}${b}\n<p><strong>${header}</strong></p>\n`;
+        }
+        return `${h}${b} ${header}\n${b} `;
+    });
 
     // 5. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
     result = result.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+?)(?:%22|")>[^)]+\)/gi, (match, text, url) => {
@@ -376,14 +384,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             childrenHrefs.includes('twitter.com/') ||
                                             childrenHrefs.includes('x.com/');
 
-                                        const isExecutive = allText.includes('/**EXECUTIVE**/') ||
-                                            /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Key Takeaways/i.test(allText);
-
-                                        // Simple removal of the magic string from the children for clean rendering
-                                        const cleanChildren = React.Children.map(children, (child) => {
-                                            if (typeof child === 'string') return child.replace('/**EXECUTIVE**/', '');
-                                            return child;
-                                        });
+                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways/i.test(allText);
 
                                         if (isTwitter) {
                                             // Extract ID from text or link properties
@@ -404,7 +405,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             return (
                                                 <div className="not-prose w-full">
                                                     <blockquote className="executive-summary-card" {...props}>
-                                                        {cleanChildren}
+                                                        {children}
                                                     </blockquote>
                                                 </div>
                                             );
@@ -413,7 +414,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         // Safety: If it's an empty blockquote (Tiptap artifact), don't render it
                                         if (!allText.trim() && !childrenHrefs.trim()) return null;
 
-                                        return <blockquote className={className} {...props}>{cleanChildren}</blockquote>;
+                                        return <blockquote className={className} {...props}>{children}</blockquote>;
                                     },
                                     a: ({ node, href, children, ...props }) => {
                                         const isInternal = href?.startsWith('/') || href?.includes('digitalateliersolutions.agency');
