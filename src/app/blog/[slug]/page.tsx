@@ -166,18 +166,18 @@ const normalizeContent = (content: string) => {
     result = result.replace(/(<\/?[a-z0-9]+[^>]*>)\s*(#{1,6}\s+)/gi, '$1\n\n$2');
 
     // 4. EXECUTIVE SUMMARY HEALING LAYER
-    // Robustly ensure the premium card styling by injecting the "Resumen Ejecutivo" header
-    // into the start of the blockquote. This is the most reliable way to trigger our CSS
-    // and ensure a single, unified blockquote.
+    // Consume redundant headings and inject a hidden marker + professional header 
+    // into the blockquote. This ensures a single, unified premium card.
     const executiveKeywords = 'Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways';
     const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords}).*?\\n+)(>|<blockquote>)`, 'gi');
     result = result.replace(executiveRegex, (match, h, b) => {
-        // We inject the bold header which triggers our .executive-summary-card strong:first-child CSS
         const header = '**Resumen Ejecutivo**';
         if (b.startsWith('<blockquote')) {
-            return `${h}${b}\n<p><strong>${header}</strong></p>\n`;
+            // Support both HTML and Markdown blockquotes from the editor
+            return `<blockquote data-type="executive">\n<p><strong>${header}</strong></p>\n`;
         }
-        return `${h}${b} ${header}\n${b} `;
+        // Injected marker ensures the renderer catches this block strictly
+        return `> :::EXECUTIVE:::\n> \n> **${header}**\n> \n> `;
     });
 
     // 5. Surgical fix for FRANKENSTEIN links specifically: [text](URL">text) -> <a href="URL">text</a>
@@ -384,7 +384,22 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             childrenHrefs.includes('twitter.com/') ||
                                             childrenHrefs.includes('x.com/');
 
-                                        const isExecutive = /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways/i.test(allText);
+                                        const isExecutive = allText.includes(':::EXECUTIVE:::') ||
+                                            (props as any)['data-type'] === 'executive' ||
+                                            /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Key Takeaways/i.test(allText);
+
+                                        // Surgically remove the hidden marker from the children
+                                        const cleanChildren = React.Children.map(children, (child) => {
+                                            if (typeof child === 'string') return child.replace(':::EXECUTIVE:::', '');
+                                            if (React.isValidElement(child) && (child as any).props.children) {
+                                                const subChildren = React.Children.map((child as any).props.children, (sub) => {
+                                                    if (typeof sub === 'string') return sub.replace(':::EXECUTIVE:::', '');
+                                                    return sub;
+                                                });
+                                                return React.cloneElement(child as React.ReactElement, (child as any).props, subChildren);
+                                            }
+                                            return child;
+                                        });
 
                                         if (isTwitter) {
                                             // Extract ID from text or link properties
@@ -405,7 +420,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                             return (
                                                 <div className="not-prose w-full">
                                                     <blockquote className="executive-summary-card" {...props}>
-                                                        {children}
+                                                        {cleanChildren}
                                                     </blockquote>
                                                 </div>
                                             );
@@ -414,7 +429,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
                                         // Safety: If it's an empty blockquote (Tiptap artifact), don't render it
                                         if (!allText.trim() && !childrenHrefs.trim()) return null;
 
-                                        return <blockquote className={className} {...props}>{children}</blockquote>;
+                                        return <blockquote className={className} {...props}>{cleanChildren}</blockquote>;
                                     },
                                     a: ({ node, href, children, ...props }) => {
                                         const isInternal = href?.startsWith('/') || href?.includes('digitalateliersolutions.agency');
