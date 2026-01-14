@@ -419,7 +419,7 @@ export default function Home() {
             },
             {
               "@context": "https://schema.org",
-              "@type": "Product",
+              "@type": "Service",
               "name": "Servicio de Ghostwriting Blockcha-in",
               "description": "Servicio premium de escritura fantasma y marca personal para ejecutivos del sector tecnológico y financiero.",
               "brand": {
