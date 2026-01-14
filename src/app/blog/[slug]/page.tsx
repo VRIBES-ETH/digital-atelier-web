@@ -169,14 +169,13 @@ const normalizeContent = (content: string) => {
     // Consume redundant headings and inject a hidden marker + professional header 
     // into the blockquote. This ensures a single, unified premium card.
     const executiveKeywords = 'Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways';
-    const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords}).*?\\n+)(>|<blockquote>)`, 'gi');
+    // Robust regex: matches Heading + optional whitespace + one or more newlines + blockquote start
+    const executiveRegex = new RegExp(`(##+ (?:${executiveKeywords}).*?)\\s*?(\\n\\s*)+(>|<blockquote>)`, 'gi');
     result = result.replace(executiveRegex, (match, h, b) => {
         const header = '**Resumen Ejecutivo**';
         if (b.startsWith('<blockquote')) {
-            // Support both HTML and Markdown blockquotes from the editor
             return `<blockquote data-type="executive">\n<p><strong>${header}</strong></p>\n`;
         }
-        // Injected marker ensures the renderer catches this block strictly
         return `> :::EXECUTIVE:::\n> \n> **${header}**\n> \n> `;
     });
 
@@ -386,7 +385,7 @@ export default async function BlogPostPage({ params }: { params: any }) {
 
                                         const isExecutive = allText.includes(':::EXECUTIVE:::') ||
                                             (props as any)['data-type'] === 'executive' ||
-                                            /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Key Takeaways/i.test(allText);
+                                            /Resumen Ejecutivo|Claves Estratégicas|Análisis Estratégico|Claves de la Comunicación|Keys de la Comunicación|Key Takeaways/i.test(allText);
 
                                         // Surgically remove the hidden marker from the children
                                         const cleanChildren = React.Children.map(children, (child) => {
