@@ -92,7 +92,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    // canonical: '/', // REMOVED: This was causing Google to ignore all subpages/blog posts
+    canonical: './',
   },
   appleWebApp: {
     title: "DAS®",
